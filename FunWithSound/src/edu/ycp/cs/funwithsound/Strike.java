@@ -14,13 +14,13 @@ public class Strike {
 			int cmp;
 			
 			// Compare by start time first
-			cmp = Util.compareInts(o1.getStartUs(), o2.getStartUs());
+			cmp = Util.compareLongs(o1.getStartUs(), o2.getStartUs());
 			if (cmp != 0) {
 				return cmp;
 			}
 			
 			// Compare by duration and velocity as a tie-breaker
-			cmp = Util.compareInts(o1.getDurationUs(), o2.getDurationUs());
+			cmp = Util.compareLongs(o1.getDurationUs(), o2.getDurationUs());
 			if (cmp != 0) {
 				return cmp;
 			}
@@ -28,33 +28,33 @@ public class Strike {
 		}
 	};
 
-	private int startUs;
-	private int durationUs;
+	private long startUs;
+	private long durationUs;
 	private int velocity;
 	
 	public Strike() {
 		
 	}
 	
-	public Strike(int startUs, int durationUs, int velocity) {
+	public Strike(long startUs, long durationUs, int velocity) {
 		this.startUs = startUs;
 		this.durationUs = durationUs;
 		this.velocity = velocity;
 	}
 	
-	public void setStartUs(int startUs) {
+	public void setStartUs(long startUs) {
 		this.startUs = startUs;
 	}
 	
-	public int getStartUs() {
+	public long getStartUs() {
 		return startUs;
 	}
 	
-	public void setDurationUs(int durationUs) {
+	public void setDurationUs(long durationUs) {
 		this.durationUs = durationUs;
 	}
 	
-	public int getDurationUs() {
+	public long getDurationUs() {
 		return durationUs;
 	}
 	
