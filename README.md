@@ -7,4 +7,6 @@ This is a work in progress.  However, it actually works: see the [Demo](https://
 
 The project depends on [Gervill4Beads](https://github.com/daveho/Gervill4Beads).  To run the code, just have both projects checked out in the same Eclipse workspace.
 
+The code is distributed under the [MIT license](https://github.com/daveho/FunWithSound/blob/master/LICENSE.txt).
+
 Contact: [David Hovemeyer](mailto:david.hovemeyer@gmail.com)
