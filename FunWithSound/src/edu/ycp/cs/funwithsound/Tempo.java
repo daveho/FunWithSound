@@ -7,21 +7,21 @@ package edu.ycp.cs.funwithsound;
  * within a measure.
  */
 public class Tempo {
-	private long beatsPerMinute;
-	private long beatsPerMeasure;
+	private int beatsPerMinute;
+	private int beatsPerMeasure;
 	private long usPerBeat;
 	
-	public Tempo(long beatsPerMinute, long beatsPerMeasure) {
+	public Tempo(int beatsPerMinute, int beatsPerMeasure) {
 		this.beatsPerMinute = beatsPerMinute;
 		this.beatsPerMeasure = beatsPerMeasure;
 		this.usPerBeat = (60L * 1000000L) / beatsPerMinute;
 	}
 	
-	public long getBeatsPerMinute() {
+	public int getBeatsPerMinute() {
 		return beatsPerMinute;
 	}
 	
-	public long getBeatsPerMeasure() {
+	public int getBeatsPerMeasure() {
 		return beatsPerMeasure;
 	}
 	
