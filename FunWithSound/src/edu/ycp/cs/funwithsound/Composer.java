@@ -96,7 +96,7 @@ public class Composer {
 	 * @param duration  duration in beats
 	 * @return the strike
 	 */
-	public Strike s(float beat, float duration) {
+	public Strike s(double beat, double duration) {
 		return s(beat, duration, 127);
 	}
 	
@@ -109,7 +109,7 @@ public class Composer {
 	 * @param velocity  velocity, in the range 0..127
 	 * @return the strike
 	 */
-	public Strike s(float beat, float duration, int velocity) {
+	public Strike s(double beat, double duration, int velocity) {
 		Strike strike = new Strike();
 		strike.setStartUs(tempo.beatToUs(beat));
 		strike.setDurationUs(tempo.beatToUs(duration));
@@ -123,7 +123,7 @@ public class Composer {
 	 * @param beat offset in beats
 	 * @return the strike
 	 */
-	public Strike p(float beat) {
+	public Strike p(double beat) {
 		return p(beat, 127);
 	}
 	
@@ -135,7 +135,7 @@ public class Composer {
 	 * @param velocity, in the range 0..127
 	 * @return the strike
 	 */
-	public Strike p(float beat, int velocity) {
+	public Strike p(double beat, int velocity) {
 		Strike strike = new Strike();
 		strike.setStartUs(tempo.beatToUs(beat));
 		strike.setDurationUs(1000000L/200L); // duration is arbitrarily 5ms
@@ -181,7 +181,7 @@ public class Composer {
 		figure.setRhythm(rhythm);
 		figure.setMelody(melody);
 		figure.setInstrument(instrument);
-		figure.setBeat(measure * tempo.getBeatsPerMeasure());
+		figure.setStartUs(measure * tempo.getBeatsPerMeasure() * tempo.getUsPerBeat());
 		composition.add(figure);
 	}
 }

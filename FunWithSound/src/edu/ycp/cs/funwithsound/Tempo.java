@@ -36,7 +36,7 @@ public class Tempo {
 	 * @param beat the beat number or count
 	 * @return offset or duration in microseconds
 	 */
-	public long beatToUs(float beat) {
+	public long beatToUs(double beat) {
 		return (long) (beat * usPerBeat);
 	}
 	

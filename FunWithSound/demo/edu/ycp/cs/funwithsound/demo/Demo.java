@@ -12,15 +12,22 @@ import edu.ycp.cs.funwithsound.Tempo;
 
 public class Demo extends Composer {
 	public void create() {
-		setScale(Scale.melodicMinor(69));
-		setTempo(new Tempo(140, 8));
+		setScale(Scale.major(65));
+		setTempo(new Tempo(250, 8));
 		
-		Instrument vibes = new Instrument(12);
+		Instrument bass = new Instrument(37);
+
+		Rhythm onbeat = r(s(0, .5), s(1,.5), s(2,.5), s(3,.5), s(4,.5), s(5,.5), s(6,.5), s(7,.5));
+//		Rhythm basspat = r(s(0,2), s(4,1), s(5,1));
+//		Melody bassmel = m(n(0,-4), n(0,-4), n(0,-3));
+		Melody replow = m(n(0,-4),n(0,-4),n(0,-4),n(0,-4),n(0,-4),n(0,-4),n(0,-4),n(0,-4));
+		Melody rephigh = m(n(3,-4),n(3,-4),n(3,-4),n(3,-4),n(3,-4),n(3,-4),n(3,-4),n(3,-4));
 		
-		Rhythm basic = r(s(0,1), s(1,1), s(2,1), s(3,1), s(4,1), s(5,1), s(6,1), s(7,1));
-		Melody asc = m(n(0), n(1), n(2), n(3), n(4), n(5), n(6), n(0,1));
-		
-		at(1, basic, asc, vibes);
+//		for (int i = 0; i < 4; i++) {
+//			at(i, basspat, bassmel, bass);
+//		}
+		at(0, onbeat, replow, bass);
+		at(1, onbeat, rephigh, bass);
 	}
 	
 	public void play() throws MidiUnavailableException {

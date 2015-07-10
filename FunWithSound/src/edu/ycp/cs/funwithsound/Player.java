@@ -18,7 +18,6 @@ import net.beadsproject.beads.core.AudioContext;
 public class Player {
 	private Composition composition;
 	private AudioContext ac;
-//	private GervillUGen gervill;
 	
 	public Player() {
 	}
@@ -59,9 +58,9 @@ public class Player {
 				Chord c = melody.get(i);
 				for (Integer note : c) {
 					ShortMessage noteOn = Midi.createShortMessage(ShortMessage.NOTE_ON, note, s.getVelocity());
-					gervill.getSynthRecv().send(noteOn, s.getStartUs());
+					gervill.getSynthRecv().send(noteOn, f.getStartUs() + s.getStartUs());
 					ShortMessage noteOff = Midi.createShortMessage(ShortMessage.NOTE_OFF, note, s.getVelocity());
-					gervill.getSynthRecv().send(noteOff, s.getStartUs() + s.getDurationUs());
+					gervill.getSynthRecv().send(noteOff, f.getStartUs() + s.getStartUs() + s.getDurationUs());
 				}
 			}
 		}
