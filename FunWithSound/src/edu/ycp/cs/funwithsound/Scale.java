@@ -47,7 +47,7 @@ public class Scale implements Iterable<Integer> {
 	
 	/**
 	 * Get the pitch (midi note number) of the specified note
-	 * in the scale, offset by given octace.
+	 * in the scale, offset by given octave.
 	 * 
 	 * @param index the note in the scale: should be in the range 0..6
 	 *              for a standard heptatonic scale
