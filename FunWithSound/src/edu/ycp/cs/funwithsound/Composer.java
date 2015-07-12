@@ -65,13 +65,18 @@ public class Composer {
 	 * Create a melody consisting of the specified
 	 * sequence of chords.
 	 * 
-	 * @param chords the chords
+	 * @param chords the chords: can be integers (to select single notes),
+	 *        or {@link Chord} objects
 	 * @return the melody
 	 */
-	public Melody m(Chord... chords) {
+	public Melody m(Object... chords) {
 		Melody melody = new Melody();
-		for (Chord c : chords) {
-			melody.add(c);
+		for (Object o : chords) {
+			if (o instanceof Number) {
+				melody.add(n(((Number)o).intValue()));
+			} else if (o instanceof Chord) {
+				melody.add((Chord)o);
+			}
 		}
 		return melody;
 	}

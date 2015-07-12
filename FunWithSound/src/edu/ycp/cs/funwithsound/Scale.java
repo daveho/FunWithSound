@@ -46,14 +46,6 @@ public class Scale implements Iterable<Integer> {
 	 * @return the midi note number
 	 */
 	public int get(int index) {
-		//return pitches.get(index);
-//		if (index < 0) {
-//			
-//		} else if (index >= pitches.size()) {
-//			
-//		} else {
-//			return pitches.get(index);
-//		}
 		int octaveOffset = index / pitches.size();
 		int noteOffset = index % pitches.size();
 		if (noteOffset < 0) {

@@ -18,9 +18,9 @@ public class Demo extends Composer {
 		Instrument bass = new Instrument(37);
 
 		Rhythm onbeat = r(s(0, .5), s(1,.5), s(2,.5), s(3,.5), s(4,.5), s(5,.5), s(6,.5), s(7,.5));
-		Melody low = m(n(-7), n(-6), n(-5), n(-4), n(-3), n(-2), n(-1), n(0));
-		Melody mid = m(n(0), n(1), n(2), n(3), n(4), n(5), n(6), n(7));
-		Melody hi = m(n(7), n(8), n(9), n(10), n(11), n(12), n(13), n(14));
+		Melody low = m(-7, -6, -5, -4, -3, -2, -1, 0);
+		Melody mid = m(0, 1, 2, 3, 4, 5, 6, 7);
+		Melody hi = m(7, 8, 9, 10, 11, 12, 13, 14);
 		
 		at(0, onbeat, low, bass);
 		at(1, onbeat, mid, bass);
