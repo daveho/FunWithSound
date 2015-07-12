@@ -50,27 +50,14 @@ public class Composer {
 	 * Create a note chosen from the composer's {@link Scale}.
 	 * 
 	 * @param note the note, which should be in the range 0..6 for a normal
-	 *        heptatonic scale
+	 *        heptatonic scale, but could be above or below that range
+	 *        to select notes in octaves above or below the scale's
+	 *        "normal" octave
 	 * @return the {@link Chord} representing the note
 	 */
 	public Chord n(int note) {
-		return n(note, 0);
-	}
-	
-	/**
-	 * Create a note chosen from the composer's {@link Scale},
-	 * choosing an octave.
-	 * 
-	 * @param note the note, which should be in the range 0..6 for a normal
-	 *        heptatonic scale
-	 * @param octave the octave: 0 for the scale's original octave,
-	 *        -1 for the next lower octave, 1 for the next higher octave,
-	 *        etc.
-	 * @return the {@link Chord} representing the note
-	 */
-	public Chord n(int note, int octave) {
 		Chord chord = new Chord();
-		chord.add(scale.get(note, octave));
+		chord.add(scale.get(note));
 		return chord;
 	}
 

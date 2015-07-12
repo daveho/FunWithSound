@@ -34,30 +34,33 @@ public class Scale implements Iterable<Integer> {
 	}
 	
 	/**
-	 * Get the pitch (midi note number) of the specified note
-	 * in the scale.
+	 * Get the midi note number of the specified note
+	 * in the scale.  If the parameter is outside the range 0..<i>n</i>-1,
+	 * where <i>n</i> is the number of notes in the scale, then
+	 * the note is in an octave above or below the default
+	 * octave for the scale.  E.g., for a hepatonic scale,
+	 * 7 is one octave above note 0, -7 is one octave below
+	 * note 0, etc.
 	 * 
-	 * @param index the note in the scale: should be in the range 0..6
-	 *              for a standard heptatonic scale
-	 * @return the pitch (midi note number)
+	 * @param index the note in the scale
+	 * @return the midi note number
 	 */
 	public int get(int index) {
-		return pitches.get(index);
-	}
-	
-	/**
-	 * Get the pitch (midi note number) of the specified note
-	 * in the scale, offset by given octave.
-	 * 
-	 * @param index the note in the scale: should be in the range 0..6
-	 *              for a standard heptatonic scale
-	 * @param octave the octave (0 for the original octave,
-	 *               -1 for the next lower octave, 1 for the next
-	 *               higher octave, etc.)
-	 * @return the pitch (midi note number)
-	 */
-	public int get(int index, int octave) {
-		return pitches.get(index) + (octave*12);
+		//return pitches.get(index);
+//		if (index < 0) {
+//			
+//		} else if (index >= pitches.size()) {
+//			
+//		} else {
+//			return pitches.get(index);
+//		}
+		int octaveOffset = index / pitches.size();
+		int noteOffset = index % pitches.size();
+		if (noteOffset < 0) {
+			octaveOffset--;
+			noteOffset = pitches.size() + noteOffset;
+		}
+		return pitches.get(noteOffset) + octaveOffset*12;
 	}
 	
 	@Override

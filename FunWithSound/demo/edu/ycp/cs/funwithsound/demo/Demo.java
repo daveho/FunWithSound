@@ -18,16 +18,13 @@ public class Demo extends Composer {
 		Instrument bass = new Instrument(37);
 
 		Rhythm onbeat = r(s(0, .5), s(1,.5), s(2,.5), s(3,.5), s(4,.5), s(5,.5), s(6,.5), s(7,.5));
-//		Rhythm basspat = r(s(0,2), s(4,1), s(5,1));
-//		Melody bassmel = m(n(0,-4), n(0,-4), n(0,-3));
-		Melody replow = m(n(0,-4),n(0,-4),n(0,-4),n(0,-4),n(0,-4),n(0,-4),n(0,-4),n(0,-4));
-		Melody rephigh = m(n(3,-4),n(3,-4),n(3,-4),n(3,-4),n(3,-4),n(3,-4),n(3,-4),n(3,-4));
+		Melody low = m(n(-7), n(-6), n(-5), n(-4), n(-3), n(-2), n(-1), n(0));
+		Melody mid = m(n(0), n(1), n(2), n(3), n(4), n(5), n(6), n(7));
+		Melody hi = m(n(7), n(8), n(9), n(10), n(11), n(12), n(13), n(14));
 		
-//		for (int i = 0; i < 4; i++) {
-//			at(i, basspat, bassmel, bass);
-//		}
-		at(0, onbeat, replow, bass);
-		at(1, onbeat, rephigh, bass);
+		at(0, onbeat, low, bass);
+		at(1, onbeat, mid, bass);
+		at(2, onbeat, hi, bass);
 	}
 	
 	public void play() throws MidiUnavailableException {
