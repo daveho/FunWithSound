@@ -12,19 +12,58 @@ import edu.ycp.cs.funwithsound.Tempo;
 
 public class Demo extends Composer {
 	public void create() {
-		setScale(Scale.major(65));
+		setScale(Scale.melodicMinor(65));
 		setTempo(new Tempo(250, 8));
 		
-		Instrument bass = new Instrument(37);
+		Instrument oohs = new Instrument(54);
+		Instrument organ = new Instrument(20);
+		Instrument b = new Instrument(77);
+		Instrument g = new Instrument(52);
 
-		Rhythm onbeat = r(s(0, .5), s(1,.5), s(2,.5), s(3,.5), s(4,.5), s(5,.5), s(6,.5), s(7,.5));
-		Melody low = m(-7, -6, -5, -4, -3, -2, -1, 0);
-		Melody mid = m(0, 1, 2, 3, 4, 5, 6, 7);
-		Melody hi = m(7, 8, 9, 10, 11, 12, 13, 14);
+		Rhythm leadin = r(fs(0), qs(1), fs(2), fs(3), fs(4), qs(5), fs(6), qs(7));
+		Melody low = m(-7, -6, n(-7, -5), -4, n(-5, -3), n(-6, -2), n(-6, -1), n(-5, 0));
+		Melody mid = xo(1, low);
+		Melody hi = xo(2, low);
 		
-		at(0, onbeat, low, bass);
-		at(1, onbeat, mid, bass);
-		at(2, onbeat, hi, bass);
+		Rhythm pulse = r(s(0,4), s(4,4));
+		Melody bassdrone = xo(-3, m(0, 0));
+		
+		Melody ominous1 = xo(-2, m(n(0, 2), n(1, 3)));
+		Melody ominous2 = xo(-2, m(0, n(2, 4)));
+		Melody ominous3 = xo(-2, m(n(2, 5), n(1, 6)));
+		
+		Melody lead1 = m(2, 0);
+		Melody lead2 = m(n(0, -3, -7));
+		Melody lead3 = m(n(-3, 3), 0, 4, 0, 3, 1, n(3, -3), n(2, -1));
+		Rhythm lead3r = r(fs(0), fs(1), fs(2), fs(3), fs(4), fs(5), fs(6), fs(7));
+		
+//		at(0, pulse, lead1, g);
+//		at(1, pulse, lead2, g);
+//		at(2, lead3r, lead3, g);
+
+		for (int i = 0; i < 4; i++) {
+			at(i*3+0, leadin, low, oohs);
+			at(i*3+1, leadin, mid, oohs);
+			at(i*3+2, leadin, hi, oohs);
+		}
+		
+		for (int i = 1; i < 7; i++) {
+			at(i*3+0, pulse, bassdrone, organ);
+			at(i*3+1, pulse, bassdrone, organ);
+			at(i*3+2, pulse, bassdrone, organ);
+		}
+		
+		for (int i = 2; i < 4; i++) {
+			at(i*3+0, pulse, ominous1, b);
+			at(i*3+1, pulse, ominous2, b);
+			at(i*3+2, pulse, ominous3, b);
+		}
+		
+		for (int i = 5; i < 7; i++) {
+			at(i*3+0, pulse, lead1, g);
+			at(i*3+1, pulse, lead2, g);
+			at(i*3+2, lead3r, lead3, g);
+		}
 	}
 	
 	public void play() throws MidiUnavailableException {

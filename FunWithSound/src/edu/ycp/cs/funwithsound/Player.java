@@ -20,7 +20,7 @@ import net.beadsproject.beads.core.Bead;
 public class Player {
 	// Delay before starting playback,
 	// to avoid early audio buffer underruns.
-	private static final long START_DELAY_US = 500000L;
+	private static final long START_DELAY_US = 1000000L;
 	
 	// Shut down this many microseconds after the last note off message.
 	private static final long IDLE_WAIT_US = 1000000L;

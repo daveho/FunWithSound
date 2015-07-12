@@ -47,17 +47,19 @@ public class Composer {
 	}
 
 	/**
-	 * Create a note chosen from the composer's {@link Scale}.
+	 * Create a note or notes chosen from the composer's {@link Scale}.
 	 * 
-	 * @param note the note, which should be in the range 0..6 for a normal
-	 *        heptatonic scale, but could be above or below that range
-	 *        to select notes in octaves above or below the scale's
-	 *        "normal" octave
-	 * @return the {@link Chord} representing the note
+	 * @param notes the note(s), which should be in the range 0..6 for a normal
+	 *              heptatonic scale, but could be above or below that range
+	 *              to select notes in octaves above or below the scale's
+	 *              "normal" octave
+	 * @return the {@link Chord} representing the note(s)
 	 */
-	public Chord n(int note) {
+	public Chord n(int... notes) {
 		Chord chord = new Chord();
-		chord.add(scale.get(note));
+		for (int note : notes) {
+			chord.add(scale.get(note));
+		}
 		return chord;
 	}
 
@@ -79,6 +81,36 @@ public class Composer {
 			}
 		}
 		return melody;
+	}
+	
+	/**
+	 * Shift the octave of a note/chord.
+	 * 
+	 * @param octave the octave: -1 for one octave down, 1 for one octave up, etc.
+	 * @param orig   the original note/chord
+	 * @return the shifted note/chord
+	 */
+	public Chord xn(int octave, Chord orig) {
+		Chord result = new Chord();
+		for (Integer note : orig) {
+			result.add(note + 12*octave);
+		}
+		return result;
+	}
+	
+	/**
+	 * Shift the octave a {@link Melody}. 
+	 * 
+	 * @param octave the octave: -1 for one octave down, 1 for one octave up, etc.
+	 * @param orig the melody to shift
+	 * @return the shifted melody
+	 */
+	public Melody xo(int octave, Melody orig) {
+		Melody result = new Melody();
+		for (Chord ch : orig) {
+			result.add(xn(octave, ch));
+		}
+		return result;
 	}
 
 	/**
@@ -107,6 +139,69 @@ public class Composer {
 		strike.setDurationUs(tempo.beatToUs(duration));
 		strike.setVelocity(velocity);
 		return strike;
+	}
+	
+	/**
+	 * Create a full-velocity quarter beat strike.
+	 * 
+	 * @param beat offset in beats
+	 * @return the strike
+	 */
+	public Strike qs(double beat) {
+		return s(beat, .25);
+	}
+
+	/**
+	 * Create a quarter beat strike with specified velocity.
+	 * 
+	 * @param beat      offset in beats
+	 * @param velocity  velocity, in the range 0..127
+	 * @return
+	 */
+	public Strike qs(double beat, int velocity) {
+		return s(beat, .25, velocity);
+	}
+	
+	/**
+	 * Create a full-velocity half beat strike.
+	 * 
+	 * @param beat offset in beats
+	 * @return the strike
+	 */
+	public Strike hs(double beat) {
+		return s(beat, .5);
+	}
+	
+	/**
+	 * Create a half beat strike with specified velocity.
+	 * 
+	 * @param beat offset in beats
+	 * @param velocity  velocity, in the range 0..127
+	 * @return the strike
+	 */
+	public Strike hs(double beat, int velocity) {
+		return s(beat, .5, velocity);
+	}
+	
+	/**
+	 * Create a full-velocity full beat strike.
+	 * 
+	 * @param beat offset in beats
+	 * @return the strike
+	 */
+	public Strike fs(double beat) {
+		return s(beat, 1);
+	}
+	
+	/**
+	 * Create a full beat strike with specified velocity.
+	 * 
+	 * @param beat offset in beats
+	 * @param velocity  velocity, in the range 0..127
+	 * @return the strike
+	 */
+	public Strike fs(double beat, int velocity) {
+		return s(beat, 1, velocity);
 	}
 	
 	/**
