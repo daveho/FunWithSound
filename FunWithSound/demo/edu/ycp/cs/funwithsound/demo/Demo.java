@@ -3,6 +3,7 @@ package edu.ycp.cs.funwithsound.demo;
 import javax.sound.midi.MidiUnavailableException;
 
 import edu.ycp.cs.funwithsound.Composer;
+import edu.ycp.cs.funwithsound.Figure;
 import edu.ycp.cs.funwithsound.Instrument;
 import edu.ycp.cs.funwithsound.Melody;
 import edu.ycp.cs.funwithsound.Player;
@@ -36,34 +37,52 @@ public class Demo extends Composer {
 		Melody lead2 = m(n(0, -3, -7));
 		Melody lead3 = m(n(-3, 3), 0, 4, 0, 3, 1, n(3, -3), n(2, -1));
 		Rhythm lead3r = r(fs(0), fs(1), fs(2), fs(3), fs(4), fs(5), fs(6), fs(7));
+
+		Figure lf1 = f(leadin, low, oohs);
+		Figure lf2 = f(leadin, mid, oohs);
+		Figure lf3 = f(leadin, hi, oohs);
+		
+		Figure bf = f(pulse, bassdrone, organ);
+		
+		add(lf1);
+		add(lf2);
+		add(lf3);
+
+		add(lf1);
+		add(lf2);
+		add(lf3);
 		
 //		at(0, pulse, lead1, g);
 //		at(1, pulse, lead2, g);
 //		at(2, lead3r, lead3, g);
 
-		for (int i = 0; i < 4; i++) {
-			at(i*3+0, leadin, low, oohs);
-			at(i*3+1, leadin, mid, oohs);
-			at(i*3+2, leadin, hi, oohs);
-		}
-		
-		for (int i = 1; i < 7; i++) {
-			at(i*3+0, pulse, bassdrone, organ);
-			at(i*3+1, pulse, bassdrone, organ);
-			at(i*3+2, pulse, bassdrone, organ);
-		}
-		
-		for (int i = 2; i < 4; i++) {
-			at(i*3+0, pulse, ominous1, b);
-			at(i*3+1, pulse, ominous2, b);
-			at(i*3+2, pulse, ominous3, b);
-		}
-		
-		for (int i = 5; i < 7; i++) {
-			at(i*3+0, pulse, lead1, g);
-			at(i*3+1, pulse, lead2, g);
-			at(i*3+2, lead3r, lead3, g);
-		}
+//		for (int i = 0; i < 4; i++) {
+//			at(i*3+0, leadin, low, oohs);
+//			at(i*3+1, leadin, mid, oohs);
+//			at(i*3+2, leadin, hi, oohs);
+//		}
+//		
+//		for (int i = 1; i < 7; i++) {
+//			at(i*3+0, pulse, bassdrone, organ);
+//			at(i*3+1, pulse, bassdrone, organ);
+//			at(i*3+2, pulse, bassdrone, organ);
+//		}
+//		
+//		for (int i = 2; i < 4; i++) {
+//			at(i*3+0, pulse, ominous1, b);
+//			at(i*3+1, pulse, ominous2, b);
+//			at(i*3+2, pulse, ominous3, b);
+//		}
+//		
+//		for (int i = 5; i < 7; i++) {
+//			at(i*3+0, pulse, lead1, g);
+//			at(i*3+1, pulse, lead2, g);
+//			at(i*3+2, lead3r, lead3, g);
+//		}
+//		
+//		for (int i = 6; i < 7; i++) {
+//			
+//		}
 	}
 	
 	public void play() throws MidiUnavailableException {

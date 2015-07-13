@@ -14,9 +14,11 @@ public class Composer {
 	private Tempo tempo;
 	private Scale scale;
 	private Composition composition;
+	private int measure;
 	
 	public Composer() {
 		composition = new Composition();
+		measure = 0;
 	}
 	
 	/**
@@ -254,21 +256,59 @@ public class Composer {
 		return new Instrument(patch);
 	}
 
+//	/**
+//	 * Schedule a rhythm/melody to be played on a particular instrument
+//	 * at a specified measure.
+//	 *  
+//	 * @param measure     the measure (0 for first measure, 1 for second, etc.)
+//	 * @param rhythm      the rhythm
+//	 * @param melody      the melody
+//	 * @param instrument  the instrument
+//	 */
+//	public void at(int measure, Rhythm rhythm, Melody melody, Instrument instrument) {
+//		Figure figure = new Figure();
+//		figure.setRhythm(rhythm);
+//		figure.setMelody(melody);
+//		figure.setInstrument(instrument);
+//		figure.setStartUs(measure * tempo.getBeatsPerMeasure() * tempo.getUsPerBeat());
+//		composition.add(figure);
+//	}
+	
 	/**
-	 * Schedule a rhythm/melody to be played on a particular instrument
-	 * at a specified measure.
-	 *  
-	 * @param measure     the measure (0 for first measure, 1 for second, etc.)
-	 * @param rhythm      the rhythm
-	 * @param melody      the melody
-	 * @param instrument  the instrument
+	 * Create a figure from a {@link Rhythm}, {@link Melody}, and {@link Instrument}.
+	 * 
+	 * @param rhythm  the rhythm
+	 * @param melody  the melody
+	 * @param instrument the instrument
+	 * @return the figure
 	 */
-	public void at(int measure, Rhythm rhythm, Melody melody, Instrument instrument) {
-		Figure figure = new Figure();
-		figure.setRhythm(rhythm);
-		figure.setMelody(melody);
-		figure.setInstrument(instrument);
-		figure.setStartUs(measure * tempo.getBeatsPerMeasure() * tempo.getUsPerBeat());
-		composition.add(figure);
+	public Figure f(Rhythm rhythm, Melody melody, Instrument instrument) {
+		Figure result = new Figure();
+		result.setRhythm(rhythm);
+		result.setMelody(melody);
+		result.setInstrument(instrument);
+		return result;
+	}
+	
+	public void add(Figure... figures) {
+		System.out.printf("measure %d\n", measure);
+		// Add figures to composition, keeping track of where the
+		// beat offsets occur
+		double lastBeatOffsetUs = 0;
+		for (Figure figure : figures) {
+			figure.setStartUs(measure * tempo.getBeatsPerMeasure() * tempo.getUsPerBeat());
+			composition.add(figure);
+			for (Strike strike : figure.getRhythm()) {
+				if (strike.getStartUs() > lastBeatOffsetUs) {
+					lastBeatOffsetUs = strike.getStartUs();
+				}
+			}
+		}
+		
+		// Based on start offsets, determine how many measures these
+		// figures span
+		double numMeasures = Math.floor(
+				lastBeatOffsetUs / (tempo.getBeatsPerMeasure() * tempo.getUsPerBeat())) + 1;
+		measure += ((int)numMeasures);
 	}
 }
