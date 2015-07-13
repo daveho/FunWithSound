@@ -9,7 +9,6 @@ public class Figure {
 	private Rhythm rhythm;
 	private Melody melody;
 	private Instrument instrument;
-	private long startUs;
 	
 	public Figure() {
 		
@@ -37,13 +36,5 @@ public class Figure {
 	
 	public Instrument getInstrument() {
 		return instrument;
-	}
-	
-	public void setStartUs(long startUs) {
-		this.startUs = startUs;
-	}
-	
-	public long getStartUs() {
-		return startUs;
 	}
 }

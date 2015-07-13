@@ -14,12 +14,12 @@ import edu.ycp.cs.funwithsound.Tempo;
 public class Demo extends Composer {
 	public void create() {
 		setScale(Scale.melodicMinor(65));
-		setTempo(new Tempo(250, 8));
+		setTempo(new Tempo(240, 8));
 		
 		Instrument oohs = new Instrument(54);
 		Instrument organ = new Instrument(20);
 		Instrument b = new Instrument(77);
-		Instrument g = new Instrument(52);
+		Instrument f = new Instrument(105);
 
 		Rhythm leadin = r(fs(0), qs(1), fs(2), fs(3), fs(4), qs(5), fs(6), qs(7));
 		Melody low = m(-7, -6, n(-7, -5), -4, n(-5, -3), n(-6, -2), n(-6, -1), n(-5, 0));
@@ -28,6 +28,8 @@ public class Demo extends Composer {
 		
 		Rhythm pulse = r(s(0,4), s(4,4));
 		Melody bassdrone = xo(-3, m(0, 0));
+		Melody bassdrone2 = xo(-3, m(1, 1));
+		Melody bassdrone3 = xo(-3, m(-4, -3));
 		
 		Melody ominous1 = xo(-2, m(n(0, 2), n(1, 3)));
 		Melody ominous2 = xo(-2, m(0, n(2, 4)));
@@ -35,54 +37,60 @@ public class Demo extends Composer {
 		
 		Melody lead1 = m(2, 0);
 		Melody lead2 = m(n(0, -3, -7));
-		Melody lead3 = m(n(-3, 3), 0, 4, 0, 3, 1, n(3, -3), n(2, -1));
+		Melody lead3 = m(n(-3, 3), n(0, 2), 4, 0, 3, 1, n(3, -3), n(2, -1));
 		Rhythm lead3r = r(fs(0), fs(1), fs(2), fs(3), fs(4), fs(5), fs(6), fs(7));
-
+		
+		Rhythm lead4r = r(s(0, 2), fs(3), fs(4), hs(5), s(6, 2));
+		Melody lead4 = xo(-1, m(n(3, -3), n(3, -6), n(3, -5), n(-4, 4), n(3, -3)));
+		Melody lead5 = xo(-1, m(n(2, 4, -7), n(-10, 1, 6)));
+		Rhythm linger = r(s(0, 6.5));
+		Melody lead6 = xo(-1, m(n(-7, 3, 7)));
+		
 		Figure lf1 = f(leadin, low, oohs);
 		Figure lf2 = f(leadin, mid, oohs);
 		Figure lf3 = f(leadin, hi, oohs);
 		
 		Figure bf = f(pulse, bassdrone, organ);
+		Figure bf2 = f(pulse, bassdrone2, organ);
+		Figure bf3 = f(pulse, bassdrone3, organ);
+		
+		Figure omf1 = f(pulse, ominous1, b);
+		Figure omf2 = f(pulse, ominous2, b);
+		Figure omf3 = f(pulse, ominous3, b);
+		
+		Figure l1f = f(pulse, lead1, oohs);
+		Figure l2f = f(pulse, lead2, oohs);
+		Figure l3f = f(lead3r, lead3, oohs);
+		
+		Figure l4f = f(lead4r, lead4, oohs);
+		Figure l5f = f(pulse, lead5, oohs);
+		Figure l6f = f(linger, lead6, oohs);
 		
 		add(lf1);
 		add(lf2);
 		add(lf3);
 
-		add(lf1);
-		add(lf2);
-		add(lf3);
-		
-//		at(0, pulse, lead1, g);
-//		at(1, pulse, lead2, g);
-//		at(2, lead3r, lead3, g);
+		add(lf1, bf);
+		add(lf2, bf);
+		add(lf3, bf);
 
-//		for (int i = 0; i < 4; i++) {
-//			at(i*3+0, leadin, low, oohs);
-//			at(i*3+1, leadin, mid, oohs);
-//			at(i*3+2, leadin, hi, oohs);
-//		}
-//		
-//		for (int i = 1; i < 7; i++) {
-//			at(i*3+0, pulse, bassdrone, organ);
-//			at(i*3+1, pulse, bassdrone, organ);
-//			at(i*3+2, pulse, bassdrone, organ);
-//		}
-//		
-//		for (int i = 2; i < 4; i++) {
-//			at(i*3+0, pulse, ominous1, b);
-//			at(i*3+1, pulse, ominous2, b);
-//			at(i*3+2, pulse, ominous3, b);
-//		}
-//		
-//		for (int i = 5; i < 7; i++) {
-//			at(i*3+0, pulse, lead1, g);
-//			at(i*3+1, pulse, lead2, g);
-//			at(i*3+2, lead3r, lead3, g);
-//		}
-//		
-//		for (int i = 6; i < 7; i++) {
-//			
-//		}
+		rpt(2, () ->
+			add(lf1, bf, omf1).
+			add(lf2, bf, omf2).
+			add(lf3, bf, omf3));
+		
+		rpt(2, () -> add(bf));
+
+		rpt(2, () -> 
+			add(bf, l1f).
+			add(bf, l2f).
+			add(bf, l3f));
+
+		// Need something else here!
+		
+		add(bf2, l4f);
+		add(bf3, l5f);
+		add(bf, l6f);
 	}
 	
 	public void play() throws MidiUnavailableException {

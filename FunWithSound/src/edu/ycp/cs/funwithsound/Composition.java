@@ -5,31 +5,31 @@ import java.util.Iterator;
 import java.util.List;
 
 /**
- * A composition is a collection of {@link Figure}s specifying
+ * A composition is a collection of {@link PlayFigureEvent}s specifying
  * rhythms and melodies to be played on specified instruments
  * at specified times.
  */
-public class Composition implements Iterable<Figure> {
-	private List<Figure> figures;
+public class Composition implements Iterable<PlayFigureEvent> {
+	private List<PlayFigureEvent> PlayFigureEvents;
 	
 	public Composition() {
-		figures = new ArrayList<Figure>();
+		PlayFigureEvents = new ArrayList<PlayFigureEvent>();
 	}
 	
-	public void add(Figure figure) {
-		figures.add(figure);
+	public void add(PlayFigureEvent PlayFigureEvent) {
+		PlayFigureEvents.add(PlayFigureEvent);
 	}
 	
 	public int size() {
-		return figures.size();
+		return PlayFigureEvents.size();
 	}
 	
-	public Figure get(int index) {
-		return figures.get(index);
+	public PlayFigureEvent get(int index) {
+		return PlayFigureEvents.get(index);
 	}
 	
 	@Override
-	public Iterator<Figure> iterator() {
-		return figures.iterator();
+	public Iterator<PlayFigureEvent> iterator() {
+		return PlayFigureEvents.iterator();
 	}
 }

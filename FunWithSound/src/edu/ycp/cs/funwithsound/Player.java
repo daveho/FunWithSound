@@ -51,7 +51,8 @@ public class Player {
 		
 		// Convert figures to MidiEvents and schedule them to be played
 		long lastNoteOffUs = 0L;
-		for (Figure f : composition) {
+		for (PlayFigureEvent e : composition) {
+			Figure f = e.getFigure();
 			Instrument instrument = f.getInstrument();
 			GervillUGen gervill = instrMap.get(instrument);
 			if (gervill == null) {
@@ -67,7 +68,7 @@ public class Player {
 				Strike s = rhythm.get(i);
 				Chord c = melody.get(i);
 				for (Integer note : c) {
-					long onTime = START_DELAY_US + f.getStartUs() + s.getStartUs();
+					long onTime = START_DELAY_US + e.getStartUs() + s.getStartUs();
 					long offTime = onTime + s.getDurationUs();
 					ShortMessage noteOn = Midi.createShortMessage(ShortMessage.NOTE_ON, note, s.getVelocity());
 					gervill.getSynthRecv().send(noteOn, onTime);

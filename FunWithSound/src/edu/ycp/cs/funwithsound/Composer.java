@@ -289,15 +289,27 @@ public class Composer {
 		result.setInstrument(instrument);
 		return result;
 	}
-	
-	public void add(Figure... figures) {
-		System.out.printf("measure %d\n", measure);
+
+	/**
+	 * Add figures to play simultaneously in the current measure in
+	 * the current {@link Composition}.  The start times of the
+	 * {@link Strike}s are checked to determine how many measures
+	 * are being added (usually one, but it's definitely possible
+	 * and useful to add longer figures that comprise multiple measures.)
+	 * 
+	 * @param figures the figures to play
+	 * @return this composer: allows calls to add to be chained
+	 */
+	public Composer add(Figure... figures) {
+//		System.out.printf("measure %d\n", measure);
 		// Add figures to composition, keeping track of where the
 		// beat offsets occur
 		double lastBeatOffsetUs = 0;
 		for (Figure figure : figures) {
-			figure.setStartUs(measure * tempo.getBeatsPerMeasure() * tempo.getUsPerBeat());
-			composition.add(figure);
+			PlayFigureEvent evt = new PlayFigureEvent();
+			evt.setFigure(figure);
+			evt.setStartUs(measure * tempo.getBeatsPerMeasure() * tempo.getUsPerBeat());
+			composition.add(evt);
 			for (Strike strike : figure.getRhythm()) {
 				if (strike.getStartUs() > lastBeatOffsetUs) {
 					lastBeatOffsetUs = strike.getStartUs();
@@ -310,5 +322,19 @@ public class Composer {
 		double numMeasures = Math.floor(
 				lastBeatOffsetUs / (tempo.getBeatsPerMeasure() * tempo.getUsPerBeat())) + 1;
 		measure += ((int)numMeasures);
+		
+		return this;
+	}
+	
+	/**
+	 * Repeat given runnable specified number of times.
+	 * 
+	 * @param times number of times to repat
+	 * @param r the runnable
+	 */
+	public void rpt(int times, Runnable r) {
+		for (int i = 0; i < times; i++) {
+			r.run();
+		}
 	}
 }
