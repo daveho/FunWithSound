@@ -122,11 +122,11 @@ public class Composer {
 	 * @param orig the figure whose melody should be shifted
 	 * @return a figure with the shifted melody
 	 */
-	public Figure xo(int octave, Figure figure) {
+	public Figure xo(int octave, Figure orig) {
 		Figure result = new Figure();
-		result.setRhythm(figure.getRhythm());
-		result.setMelody(xo(octave, figure.getMelody()));
-		result.setInstrument(figure.getInstrument());
+		result.setRhythm(orig.getRhythm());
+		result.setMelody(xo(octave, orig.getMelody()));
+		result.setInstrument(orig.getInstrument());
 		return result;
 	}
 
