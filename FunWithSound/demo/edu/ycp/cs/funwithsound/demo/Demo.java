@@ -14,12 +14,12 @@ import edu.ycp.cs.funwithsound.Tempo;
 public class Demo extends Composer {
 	public void create() {
 		setScale(Scale.melodicMinor(65));
-		setTempo(new Tempo(240, 8));
+		setTempo(new Tempo(220, 8));
 		
 		Instrument oohs = new Instrument(54);
 		Instrument organ = new Instrument(20);
 		Instrument b = new Instrument(77);
-		Instrument f = new Instrument(105);
+		Instrument f = new Instrument(64);
 
 		Rhythm leadin = r(fs(0), qs(1), fs(2), fs(3), fs(4), qs(5), fs(6), qs(7));
 		Melody low = m(-7, -6, n(-7, -5), -4, n(-5, -3), n(-6, -2), n(-6, -1), n(-5, 0));
@@ -30,14 +30,17 @@ public class Demo extends Composer {
 		Melody bassdrone = xo(-3, m(0, 0));
 		Melody bassdrone2 = xo(-3, m(1, 1));
 		Melody bassdrone3 = xo(-3, m(-4, -3));
+		Melody bassdrone4 = xo(-3, m(n(-2, 4), 2));
+		Melody bassdrone5 = xo(-3, m(0, 3));
+		Melody bassdrone6 = xo(-3, m(0, -1));
 		
 		Melody ominous1 = xo(-2, m(n(0, 2), n(1, 3)));
 		Melody ominous2 = xo(-2, m(0, n(2, 4)));
 		Melody ominous3 = xo(-2, m(n(2, 5), n(1, 6)));
 		
-		Melody lead1 = m(2, 0);
-		Melody lead2 = m(n(0, -3, -7));
-		Melody lead3 = m(n(-3, 3), n(0, 2), 4, 0, 3, 1, n(3, -3), n(2, -1));
+		Melody lead1 = xo(-1, m(n(0,2), n(-5,0)));
+		Melody lead2 = xo(-1, m(n(0, -3, -7)));
+		Melody lead3 = xo(0, m(n(-3, 3), n(0, 2), 4, 0, 3, 1, n(3, -3), n(2, -1)));
 		Rhythm lead3r = r(fs(0), fs(1), fs(2), fs(3), fs(4), fs(5), fs(6), fs(7));
 		
 		Rhythm lead4r = r(s(0, 2), fs(3), fs(4), hs(5), s(6, 2));
@@ -53,6 +56,9 @@ public class Demo extends Composer {
 		Figure bf = f(pulse, bassdrone, organ);
 		Figure bf2 = f(pulse, bassdrone2, organ);
 		Figure bf3 = f(pulse, bassdrone3, organ);
+		Figure bf4 = f(pulse, bassdrone4, organ);
+		Figure bf5 = f(pulse, bassdrone5, organ);
+		Figure bf6 = f(pulse, bassdrone6, organ);
 		
 		Figure omf1 = f(pulse, ominous1, b);
 		Figure omf2 = f(pulse, ominous2, b);
@@ -82,11 +88,14 @@ public class Demo extends Composer {
 		rpt(2, () -> add(bf));
 
 		rpt(2, () -> 
-			add(bf, l1f).
-			add(bf, l2f).
-			add(bf, l3f));
+			add(bf4, l1f).
+			add(bf5, l2f).
+			add(bf6, l3f));
 
-		// Need something else here!
+		rpt(2, () -> 
+			add(bf4, xo(1, l1f)).
+			add(bf5, xo(1, l2f)).
+			add(bf6, xo(1, l3f)));
 		
 		add(bf2, l4f);
 		add(bf3, l5f);

@@ -101,7 +101,7 @@ public class Composer {
 	}
 	
 	/**
-	 * Shift the octave a {@link Melody}. 
+	 * Shift the octave in a {@link Melody}. 
 	 * 
 	 * @param octave the octave: -1 for one octave down, 1 for one octave up, etc.
 	 * @param orig the melody to shift
@@ -112,6 +112,21 @@ public class Composer {
 		for (Chord ch : orig) {
 			result.add(xn(octave, ch));
 		}
+		return result;
+	}
+	
+	/**
+	 * Shift the octave in the melody of a {@link Figure}. 
+	 * 
+	 * @param octave the octave: -1 for one octave down, 1 for one octave up, etc.
+	 * @param orig the figure whose melody should be shifted
+	 * @return a figure with the shifted melody
+	 */
+	public Figure xo(int octave, Figure figure) {
+		Figure result = new Figure();
+		result.setRhythm(figure.getRhythm());
+		result.setMelody(xo(octave, figure.getMelody()));
+		result.setInstrument(figure.getInstrument());
 		return result;
 	}
 
