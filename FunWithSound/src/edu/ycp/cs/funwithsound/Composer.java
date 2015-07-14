@@ -107,7 +107,7 @@ public class Composer {
 	 * @param orig the melody to shift
 	 * @return the shifted melody
 	 */
-	public Melody xo(int octave, Melody orig) {
+	public Melody xm(int octave, Melody orig) {
 		Melody result = new Melody();
 		for (Chord ch : orig) {
 			result.add(xn(octave, ch));
@@ -122,10 +122,10 @@ public class Composer {
 	 * @param orig the figure whose melody should be shifted
 	 * @return a figure with the shifted melody
 	 */
-	public Figure xo(int octave, Figure orig) {
+	public Figure xf(int octave, Figure orig) {
 		Figure result = new Figure();
 		result.setRhythm(orig.getRhythm());
-		result.setMelody(xo(octave, orig.getMelody()));
+		result.setMelody(xm(octave, orig.getMelody()));
 		result.setInstrument(orig.getInstrument());
 		return result;
 	}
