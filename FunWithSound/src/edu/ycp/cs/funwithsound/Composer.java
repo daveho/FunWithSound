@@ -86,6 +86,47 @@ public class Composer {
 	}
 	
 	/**
+	 * Create a chord with one or more notes, specifically for
+	 * percussion.  The "notes" are actually percussion instruments:
+	 * see <a href="http://www.midi.org/techspecs/gm1sound.php#percussion">General
+	 * MIDI Level 1 Percussion Key Map</a>.  E.g., 35 is acoustic bass
+	 * drum, etc.  Unlike the {@link #n(int...)} method, the "notes"
+	 * are not mapped to a {@link Scale}, but instead are actual
+	 * untranslated midi note numbers.
+	 * 
+	 * @param notes the "notes" specifying percussion instruments
+	 * @return the chord
+	 */
+	public Chord pn(int... notes) {
+		Chord chord = new Chord();
+		for (int note : notes) {
+			chord.add(note);
+		}
+		return chord;
+	}
+
+	/**
+	 * Create a percussion "melody".  The notes/chords specify
+	 * percussion instruments.  See
+	 * <a href="http://www.midi.org/techspecs/gm1sound.php#percussion">General
+	 * MIDI Level 1 Percussion Key Map</a>.
+	 * 
+	 * @param chords the notes/chords
+	 * @return the percussion "melody"
+	 */
+	public Melody pm(Object... chords) {
+		Melody melody = new Melody();
+		for (Object chord : chords) {
+			if (chord instanceof Number) {
+				melody.add(pn(((Number)chord).intValue()));
+			} else if (chord instanceof Chord) {
+				melody.add((Chord)chord);
+			}
+		}
+		return melody;
+	}
+	
+	/**
 	 * Shift the octave of a note/chord.
 	 * 
 	 * @param octave the octave: -1 for one octave down, 1 for one octave up, etc.
@@ -270,24 +311,6 @@ public class Composer {
 	public Instrument i(int patch) {
 		return new Instrument(patch);
 	}
-
-//	/**
-//	 * Schedule a rhythm/melody to be played on a particular instrument
-//	 * at a specified measure.
-//	 *  
-//	 * @param measure     the measure (0 for first measure, 1 for second, etc.)
-//	 * @param rhythm      the rhythm
-//	 * @param melody      the melody
-//	 * @param instrument  the instrument
-//	 */
-//	public void at(int measure, Rhythm rhythm, Melody melody, Instrument instrument) {
-//		Figure figure = new Figure();
-//		figure.setRhythm(rhythm);
-//		figure.setMelody(melody);
-//		figure.setInstrument(instrument);
-//		figure.setStartUs(measure * tempo.getBeatsPerMeasure() * tempo.getUsPerBeat());
-//		composition.add(figure);
-//	}
 	
 	/**
 	 * Create a figure from a {@link Rhythm}, {@link Melody}, and {@link Instrument}.
