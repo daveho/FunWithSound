@@ -1,4 +1,4 @@
-package edu.ycp.cs.funwithsound;
+package io.github.daveho.funwithsound;
 
 /**
  * Event to play a {@link Figure} at a specified time.

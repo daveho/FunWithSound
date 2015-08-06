@@ -1,4 +1,4 @@
-package edu.ycp.cs.funwithsound;
+package io.github.daveho.funwithsound;
 
 /**
  * Tempo determines the absolute tempo (beats per minute) and also,

@@ -1,4 +1,4 @@
-package edu.ycp.cs.funwithsound;
+package io.github.daveho.funwithsound;
 
 public class Util {
 	public static int compareLongs(Long left, Long right) {

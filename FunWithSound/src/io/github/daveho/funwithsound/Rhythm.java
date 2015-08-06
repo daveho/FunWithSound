@@ -1,4 +1,4 @@
-package edu.ycp.cs.funwithsound;
+package io.github.daveho.funwithsound;
 
 import java.util.Iterator;
 import java.util.TreeSet;

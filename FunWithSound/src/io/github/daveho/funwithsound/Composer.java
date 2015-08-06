@@ -1,4 +1,4 @@
-package edu.ycp.cs.funwithsound;
+package io.github.daveho.funwithsound;
 
 /**
  * The composer class builds upon the model classes to provide

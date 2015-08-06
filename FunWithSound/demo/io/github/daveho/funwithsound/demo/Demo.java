@@ -1,15 +1,15 @@
-package edu.ycp.cs.funwithsound.demo;
+package io.github.daveho.funwithsound.demo;
+
+import io.github.daveho.funwithsound.Composer;
+import io.github.daveho.funwithsound.Figure;
+import io.github.daveho.funwithsound.Instrument;
+import io.github.daveho.funwithsound.Melody;
+import io.github.daveho.funwithsound.Player;
+import io.github.daveho.funwithsound.Rhythm;
+import io.github.daveho.funwithsound.Scale;
+import io.github.daveho.funwithsound.Tempo;
 
 import javax.sound.midi.MidiUnavailableException;
-
-import edu.ycp.cs.funwithsound.Composer;
-import edu.ycp.cs.funwithsound.Figure;
-import edu.ycp.cs.funwithsound.Instrument;
-import edu.ycp.cs.funwithsound.Melody;
-import edu.ycp.cs.funwithsound.Player;
-import edu.ycp.cs.funwithsound.Rhythm;
-import edu.ycp.cs.funwithsound.Scale;
-import edu.ycp.cs.funwithsound.Tempo;
 
 public class Demo extends Composer {
 	public void create() {
