@@ -7,6 +7,8 @@ import io.github.daveho.funwithsound.Rhythm;
 import io.github.daveho.funwithsound.Scale;
 import io.github.daveho.funwithsound.Tempo;
 
+import java.io.IOException;
+
 import javax.sound.midi.MidiUnavailableException;
 
 public class Demo2 extends DemoBase {
@@ -27,7 +29,7 @@ public class Demo2 extends DemoBase {
 		add(thumpf);
 	}
 	
-	public static void main(String[] args) throws MidiUnavailableException {
+	public static void main(String[] args) throws MidiUnavailableException, IOException {
 		Demo2 d = new Demo2();
 		d.create();
 		d.play();

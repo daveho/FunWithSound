@@ -32,6 +32,28 @@ public class Composer {
 	}
 	
 	/**
+	 * Create a new MIDI instrument loaded from a specified soundfont file.
+	 * The instrument will play using the default patch.
+	 * 
+	 * @param soundFont the sound font file name
+	 * @return the instrument
+	 */
+	public Instrument instr(String soundFont) {
+		return new Instrument(soundFont);
+	}
+	
+	/**
+	 * Create a new MIDI instrument loaded from a specified soundfont file.
+	 * 
+	 * @param soundFont the sound font file name
+	 * @param patch the patch
+	 * @return the instrument
+	 */
+	public Instrument instr(String soundFont, int patch) {
+		return new Instrument(InstrumentType.MIDI_SOUNDFONT, patch, soundFont);
+	}
+	
+	/**
 	 * Create a new MIDI percussion instrument.
 	 * 
 	 * @return the instrument

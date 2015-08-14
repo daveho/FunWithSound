@@ -3,13 +3,19 @@ package io.github.daveho.funwithsound;
 import io.github.daveho.gervill4beads.GervillUGen;
 import io.github.daveho.gervill4beads.Midi;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.IdentityHashMap;
 import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 
 import javax.sound.midi.MidiUnavailableException;
 import javax.sound.midi.ShortMessage;
+
+import com.sun.media.sound.SF2Soundbank;
+import com.sun.media.sound.SoftSynthesizer;
 
 import net.beadsproject.beads.core.AudioContext;
 import net.beadsproject.beads.core.Bead;
@@ -27,8 +33,10 @@ public class Player {
 	
 	private Composition composition;
 	private AudioContext ac;
+	private HashMap<String, SF2Soundbank> soundBanks;
 	
 	public Player() {
+		soundBanks = new HashMap<String, SF2Soundbank>();
 	}
 	
 	public void setComposition(Composition composition) {
@@ -41,7 +49,7 @@ public class Player {
 		return result;
 	}
 
-	public void play() throws MidiUnavailableException {
+	public void play() throws MidiUnavailableException, IOException {
 		// Create an AudioContext
 		this.ac = new AudioContext();
 		
@@ -56,8 +64,15 @@ public class Player {
 			GervillUGen gervill = instrMap.get(instrument);
 			if (gervill == null) {
 				gervill = createGervill();
-				ShortMessage programChange = Midi.createShortMessage(ShortMessage.PROGRAM_CHANGE, instrument.getPatch());
-				gervill.getSynthRecv().send(programChange, -1L);
+				if (instrument.getType() == InstrumentType.MIDI_SOUNDFONT) {
+					SoftSynthesizer synth = gervill.getSynth();
+					SF2Soundbank sb = getSoundBank(instrument);
+					synth.loadAllInstruments(sb);
+				}
+				if (instrument.getPatch() >= 0) {
+					ShortMessage programChange = Midi.createShortMessage(ShortMessage.PROGRAM_CHANGE, instrument.getPatch());
+					gervill.getSynthRecv().send(programChange, -1L);
+				}
 				instrMap.put(instrument, gervill);
 			}
 			Rhythm rhythm = f.getRhythm();
@@ -112,5 +127,18 @@ public class Player {
 		}
 		ac.stop();
 		System.out.println("Playback finished");
+	}
+
+	private SF2Soundbank getSoundBank(Instrument instrument) throws IOException {
+		SF2Soundbank sb = null;
+		if (!soundBanks.containsKey(instrument.getSoundFont())) {
+			File file = new File(instrument.getSoundFont());
+			if (file.exists()) {
+				sb = new SF2Soundbank(file);
+			}
+			soundBanks.put(instrument.getSoundFont(), sb);
+		}
+		sb = soundBanks.get(instrument.getSoundFont());
+		return sb;
 	}
 }

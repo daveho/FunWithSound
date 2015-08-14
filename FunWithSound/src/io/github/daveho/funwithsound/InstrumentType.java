@@ -8,4 +8,6 @@ public enum InstrumentType {
 	MIDI,
 	/** MIDI percussion instrument. */
 	MIDI_PERCUSSION,
+	/** MIDI instrument loaded from a soundfont. */
+	MIDI_SOUNDFONT,
 }
