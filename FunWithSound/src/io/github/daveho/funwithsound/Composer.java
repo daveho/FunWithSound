@@ -22,6 +22,25 @@ public class Composer {
 	}
 	
 	/**
+	 * Create a new MIDI instrument.
+	 * 
+	 * @param patch the MIDI patch
+	 * @return the instrument
+	 */
+	public Instrument instr(int patch) {
+		return new Instrument(patch);
+	}
+	
+	/**
+	 * Create a new MIDI percussion instrument.
+	 * 
+	 * @return the instrument
+	 */
+	public Instrument percussion() {
+		return new Instrument(InstrumentType.MIDI_PERCUSSION);
+	}
+	
+	/**
 	 * Get the composition.
 	 * 
 	 * @return the composition

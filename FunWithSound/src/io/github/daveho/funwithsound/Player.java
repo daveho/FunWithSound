@@ -42,7 +42,6 @@ public class Player {
 	}
 
 	public void play() throws MidiUnavailableException {
-		
 		// Create an AudioContext
 		this.ac = new AudioContext();
 		
@@ -68,11 +67,16 @@ public class Player {
 				Strike s = rhythm.get(i);
 				Chord c = melody.get(i);
 				for (Integer note : c) {
+					// Percussion events play on channel 10, normal MIDI
+					// events play on channel 1.  (Note that 1 is encoded as
+					// 0, and 10 is encoded as 9.)
+					int channel = instrument.getType() == InstrumentType.MIDI_PERCUSSION ? 9 : 0;
+					
 					long onTime = START_DELAY_US + e.getStartUs() + s.getStartUs();
 					long offTime = onTime + s.getDurationUs();
-					ShortMessage noteOn = Midi.createShortMessage(ShortMessage.NOTE_ON, note, s.getVelocity());
+					ShortMessage noteOn = Midi.createShortMessage(ShortMessage.NOTE_ON|channel, note, s.getVelocity());
 					gervill.getSynthRecv().send(noteOn, onTime);
-					ShortMessage noteOff = Midi.createShortMessage(ShortMessage.NOTE_OFF, note, s.getVelocity());
+					ShortMessage noteOff = Midi.createShortMessage(ShortMessage.NOTE_OFF|channel, note, s.getVelocity());
 					gervill.getSynthRecv().send(noteOff, offTime);
 					// Keep track of the time of the last note off event
 					if (offTime > lastNoteOffUs) {

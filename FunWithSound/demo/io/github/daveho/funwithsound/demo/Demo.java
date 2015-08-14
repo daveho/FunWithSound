@@ -1,25 +1,22 @@
 package io.github.daveho.funwithsound.demo;
 
-import io.github.daveho.funwithsound.Composer;
 import io.github.daveho.funwithsound.Figure;
 import io.github.daveho.funwithsound.Instrument;
 import io.github.daveho.funwithsound.Melody;
-import io.github.daveho.funwithsound.Player;
 import io.github.daveho.funwithsound.Rhythm;
 import io.github.daveho.funwithsound.Scale;
 import io.github.daveho.funwithsound.Tempo;
 
 import javax.sound.midi.MidiUnavailableException;
 
-public class Demo extends Composer {
+public class Demo extends DemoBase {
 	public void create() {
 		setScale(Scale.melodicMinor(65));
 		setTempo(new Tempo(220, 8));
 		
-		Instrument oohs = new Instrument(54);
-		Instrument organ = new Instrument(20);
-		Instrument b = new Instrument(77);
-		Instrument f = new Instrument(64);
+		Instrument oohs = instr(54);
+		Instrument organ = instr(20);
+		Instrument b = instr(77);
 
 		Rhythm leadin = r(fs(0), qs(1), fs(2), fs(3), fs(4), qs(5), fs(6), qs(7));
 		Melody low = m(-7, -6, n(-7, -5), -4, n(-5, -3), n(-6, -2), n(-6, -1), n(-5, 0));
@@ -100,12 +97,6 @@ public class Demo extends Composer {
 		add(bf2, l4f);
 		add(bf3, l5f);
 		add(bf, l6f);
-	}
-	
-	public void play() throws MidiUnavailableException {
-		Player player = new Player();
-		player.setComposition(getComposition());
-		player.play();
 	}
 	
 	public static void main(String[] args) throws MidiUnavailableException {
