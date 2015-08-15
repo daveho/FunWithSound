@@ -17,8 +17,8 @@ public class Demo2 extends DemoBase {
 
 		Instrument drums = percussion(TR808);
 		
-		Rhythm thump = rr(p(0), 2, 4);
-		Figure thumpf = pf(thump, 36, drums);
+//		Rhythm thump = rr(p(0), 2, 4);
+//		Figure thumpf = pf(thump, 36, drums);
 		
 		Rhythm hihat = rr(p(0), .5, 8);
 		Figure hihatf = pf(hihat, 42, drums);
@@ -30,19 +30,24 @@ public class Demo2 extends DemoBase {
 		Rhythm ride2 = r(p(6), p(7));
 		Figure ride2f = pf(ride2, 46, drums);
 		
-		Rhythm snare1 = r(p(6));
-		Rhythm snare2 = r(p(.5), p(6));
-		Figure snare1f = pf(snare1, 37, drums);
-		Figure snare2f = pf(snare2, 37, drums);
+		Rhythm snare1 = r(p(6), p(6.5), p(7));
+		Rhythm snare2 = r(p(0), p(.5), p(6), p(6.5), p(7));
+		Figure snare1f = pf(snare1, 75, drums);
+		Figure snare2f = pf(snare2, 75, drums);
 		
-		add(thumpf);
-		add(thumpf);
-		add(thumpf, hihatf);
-		add(thumpf, hihat2f, hihat2bf);
-		add(thumpf, hihatf, ride2f, snare1f);
-		add(thumpf, hihat2f, hihat2bf, ride2f, snare2f);
-		add(thumpf, hihat2f, hihat2bf, ride2f, snare2f);
-		add(thumpf, hihat2f, hihat2bf, ride2f, snare2f);
+		Rhythm snare3 = rr(p(0), .25, 6);
+		Figure snare3f = pf(snare3, 39, drums);
+		
+		//Rhythm 
+		
+//		add(thumpf);
+//		add(thumpf);
+//		add(thumpf, hihatf);
+//		add(thumpf, hihat2f, hihat2bf);
+		add(/*thumpf, */hihatf, ride2f, snare1f);
+		add(/*thumpf, */hihat2f, hihat2bf, ride2f, snare2f);
+		add(/*thumpf, */hihat2f, hihat2bf, ride2f, snare2f, snare3f);
+		add(/*thumpf, */hihat2f, hihat2bf, ride2f, snare2f, snare3f);
 	}
 	
 	public static void main(String[] args) throws MidiUnavailableException, IOException {
