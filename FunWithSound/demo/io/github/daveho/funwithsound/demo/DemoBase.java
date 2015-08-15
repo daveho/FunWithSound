@@ -24,6 +24,9 @@ public abstract class DemoBase extends Composer {
 	public void play() throws MidiUnavailableException, IOException {
 		Player player = new Player();
 		player.setComposition(getComposition());
+		if (hasAudition()) {
+			player.playLive(getAudition());
+		}
 		player.play();
 	}
 }

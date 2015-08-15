@@ -15,10 +15,19 @@ public class Composer {
 	private Scale scale;
 	private Composition composition;
 	private int measure;
+	private Instrument audition;
 	
 	public Composer() {
 		composition = new Composition();
 		measure = 0;
+	}
+	
+	protected boolean hasAudition() {
+		return audition != null;
+	}
+	
+	protected  Instrument getAudition() {
+		return audition;
 	}
 	
 	/**
@@ -475,5 +484,16 @@ public class Composer {
 		for (int i = 0; i < times; i++) {
 			r.run();
 		}
+	}
+	
+	/**
+	 * Audition by playing specified instrument live,
+	 * recording the midi events, and translating them into a
+	 * rhythm, melody, and figure.
+	 * 
+	 * @param instr the instrument to play live
+	 */
+	public void audition(Instrument instr) {
+		this.audition = instr;
 	}
 }

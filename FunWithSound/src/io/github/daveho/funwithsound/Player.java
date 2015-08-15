@@ -1,7 +1,10 @@
 package io.github.daveho.funwithsound;
 
+import io.github.daveho.gervill4beads.CaptureMidiMessages;
 import io.github.daveho.gervill4beads.GervillUGen;
 import io.github.daveho.gervill4beads.Midi;
+import io.github.daveho.gervill4beads.MidiMessageSource;
+import io.github.daveho.gervill4beads.ReceivedMidiMessageSource;
 
 import java.io.File;
 import java.io.IOException;
@@ -11,7 +14,9 @@ import java.util.IdentityHashMap;
 import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 
+import javax.sound.midi.MidiDevice;
 import javax.sound.midi.MidiUnavailableException;
+import javax.sound.midi.Receiver;
 import javax.sound.midi.ShortMessage;
 
 import com.sun.media.sound.SF2Soundbank;
@@ -34,9 +39,12 @@ public class Player {
 	private Composition composition;
 	private AudioContext ac;
 	private HashMap<String, SF2Soundbank> soundBanks;
+	private Instrument liveInstr;
+	private Map<Instrument, GervillUGen> instrMap;
 	
 	public Player() {
 		soundBanks = new HashMap<String, SF2Soundbank>();
+		instrMap = new IdentityHashMap<Instrument, GervillUGen>();
 	}
 	
 	public void setComposition(Composition composition) {
@@ -53,28 +61,12 @@ public class Player {
 		// Create an AudioContext
 		this.ac = new AudioContext();
 		
-		// We will create as many GervillUGens as Instruments
-		Map<Instrument, GervillUGen> instrMap = new IdentityHashMap<Instrument, GervillUGen>();
-		
 		// Convert figures to MidiEvents and schedule them to be played
 		long lastNoteOffUs = 0L;
 		for (PlayFigureEvent e : composition) {
 			Figure f = e.getFigure();
 			Instrument instrument = f.getInstrument();
-			GervillUGen gervill = instrMap.get(instrument);
-			if (gervill == null) {
-				gervill = createGervill();
-				if (instrument.getType() == InstrumentType.MIDI_SOUNDFONT) {
-					SoftSynthesizer synth = gervill.getSynth();
-					SF2Soundbank sb = getSoundBank(instrument);
-					synth.loadAllInstruments(sb);
-				}
-				if (instrument.getPatch() >= 0) {
-					ShortMessage programChange = Midi.createShortMessage(ShortMessage.PROGRAM_CHANGE, instrument.getPatch());
-					gervill.getSynthRecv().send(programChange, -1L);
-				}
-				instrMap.put(instrument, gervill);
-			}
+			GervillUGen gervill = getGervillUGen(instrument);
 			Rhythm rhythm = f.getRhythm();
 			Melody melody = f.getMelody();
 			int n = Math.min(rhythm.size(), melody.size());
@@ -116,6 +108,19 @@ public class Player {
 			}
 		});
 		
+		// If there is a live instrument, create a synthesizer for it,
+		// and arrange to feed live midi events to it
+		MidiDevice device = null;
+		if (liveInstr != null) {
+			final GervillUGen liveSynth = getGervillUGen(liveInstr);
+			ReceivedMidiMessageSource messageSource = new ReceivedMidiMessageSource(ac);
+			messageSource.addMessageListener(liveSynth);
+			
+			// Find a MIDI transmitter and feed its generated MIDI events to
+			// the message source
+			device = CaptureMidiMessages.getMidiInput(messageSource);
+		}
+		
 		// Start the AudioContext!
 		ac.start();
 		
@@ -127,6 +132,30 @@ public class Player {
 		}
 		ac.stop();
 		System.out.println("Playback finished");
+		
+		// If we opened a MIDI device, close it
+		if (device != null) {
+			device.close();
+		}
+	}
+
+	private GervillUGen getGervillUGen(Instrument instrument)
+			throws MidiUnavailableException, IOException {
+		GervillUGen gervill = instrMap.get(instrument);
+		if (gervill == null) {
+			gervill = createGervill();
+			if (instrument.getType() == InstrumentType.MIDI_SOUNDFONT) {
+				SoftSynthesizer synth = gervill.getSynth();
+				SF2Soundbank sb = getSoundBank(instrument);
+				synth.loadAllInstruments(sb);
+			}
+			if (instrument.getPatch() >= 0) {
+				ShortMessage programChange = Midi.createShortMessage(ShortMessage.PROGRAM_CHANGE, instrument.getPatch());
+				gervill.getSynthRecv().send(programChange, -1L);
+			}
+			instrMap.put(instrument, gervill);
+		}
+		return gervill;
 	}
 
 	private SF2Soundbank getSoundBank(Instrument instrument) throws IOException {
@@ -140,5 +169,9 @@ public class Player {
 		}
 		sb = soundBanks.get(instrument.getSoundFont());
 		return sb;
+	}
+
+	public void playLive(Instrument liveInstr) {
+		this.liveInstr = liveInstr;
 	}
 }

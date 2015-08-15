@@ -17,7 +17,7 @@ public class Demo2 extends DemoBase {
 
 		Instrument tr808 = percussion(TR808);
 		Instrument tr808_2 = percussion(TR808);
-		Instrument synth = instr(ARACHNO);
+		Instrument bass = instr(ARACHNO, 38);
 
 		/*
 		Rhythm hihat = rr(p(0), .5, 8);
@@ -49,10 +49,11 @@ public class Demo2 extends DemoBase {
 		Figure ride1af = pf(ride1a, 46, tr808_2);
 		Rhythm hihat1c = rr(p(6), .25, 4);
 		Figure hihat1cf = pf(hihat1c, 42, tr808);
+
+		rpt(8, () -> 
+			add(hihat1af, hihat1bf, ride1af, hihat1cf));
 		
-		add(hihat1af, hihat1bf, ride1af, hihat1cf);
-		add(hihat1af, hihat1bf, ride1af, hihat1cf);
-		add(hihat1af, hihat1bf, ride1af, hihat1cf);
+		audition(bass);
 	}
 	
 	public static void main(String[] args) throws MidiUnavailableException, IOException {
