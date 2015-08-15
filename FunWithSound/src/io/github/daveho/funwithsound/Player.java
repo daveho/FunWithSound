@@ -4,7 +4,6 @@ import io.github.daveho.gervill4beads.CaptureMidiMessages;
 import io.github.daveho.gervill4beads.GervillUGen;
 import io.github.daveho.gervill4beads.Midi;
 import io.github.daveho.gervill4beads.MidiMessageAndTimeStamp;
-import io.github.daveho.gervill4beads.MidiMessageSource;
 import io.github.daveho.gervill4beads.ReceivedMidiMessageSource;
 
 import java.io.File;
@@ -20,14 +19,13 @@ import java.util.concurrent.CountDownLatch;
 import javax.sound.midi.MidiDevice;
 import javax.sound.midi.MidiMessage;
 import javax.sound.midi.MidiUnavailableException;
-import javax.sound.midi.Receiver;
 import javax.sound.midi.ShortMessage;
-
-import com.sun.media.sound.SF2Soundbank;
-import com.sun.media.sound.SoftSynthesizer;
 
 import net.beadsproject.beads.core.AudioContext;
 import net.beadsproject.beads.core.Bead;
+
+import com.sun.media.sound.SF2Soundbank;
+import com.sun.media.sound.SoftSynthesizer;
 
 /**
  * Play a composition.
