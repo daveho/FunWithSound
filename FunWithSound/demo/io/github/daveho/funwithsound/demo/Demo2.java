@@ -14,7 +14,7 @@ import javax.sound.midi.MidiUnavailableException;
 public class Demo2 extends DemoBase {
 	public void create() {
 		setScale(Scale.melodicMinor(65));
-		setTempo(new Tempo(220, 8));
+		setTempo(new Tempo(200, 8));
 
 		Instrument tr808 = percussion(TR808);
 		Instrument tr808_kicks = percussion(TR808);
