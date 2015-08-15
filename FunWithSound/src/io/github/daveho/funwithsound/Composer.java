@@ -11,8 +11,6 @@ package io.github.daveho.funwithsound;
  * object as its product.
  */
 public class Composer {
-	private Tempo tempo;
-	private Scale scale;
 	private Composition composition;
 	private int measure;
 	private Instrument audition;
@@ -97,7 +95,7 @@ public class Composer {
 	 * @param tempo the tempo
 	 */
 	public void setTempo(Tempo tempo) {
-		this.tempo = tempo;
+		composition.setTempo(tempo);
 	}
 	
 	/**
@@ -106,7 +104,7 @@ public class Composer {
 	 * @param scale the scale
 	 */
 	public void setScale(Scale scale) {
-		this.scale = scale;
+		composition.setScale(scale);
 	}
 
 	/**
@@ -121,7 +119,24 @@ public class Composer {
 	public Chord n(int... notes) {
 		Chord chord = new Chord();
 		for (int note : notes) {
-			chord.add(scale.get(note));
+			chord.add(composition.getScale().get(note));
+		}
+		return chord;
+	}
+	
+	/**
+	 * Create a note or notes based on absolute MIDI pitch numbers.
+	 * This is useful for notes captured from a live audition.
+	 * It is also useful for playing notes that aren't part of the
+	 * current scaoe.
+	 * 
+	 * @param pitches one or more MIDI pitch numbers
+	 * @return the {@link Chord} representing the notes
+	 */
+	public Chord an(int... pitches) {
+		Chord chord = new Chord();
+		for (int pitch : pitches) {
+			chord.add(pitch);
 		}
 		return chord;
 	}
@@ -141,47 +156,6 @@ public class Composer {
 				melody.add(n(((Number)o).intValue()));
 			} else if (o instanceof Chord) {
 				melody.add((Chord)o);
-			}
-		}
-		return melody;
-	}
-	
-	/**
-	 * Create a chord with one or more notes, specifically for
-	 * percussion.  The "notes" are actually percussion instruments:
-	 * see <a href="http://www.midi.org/techspecs/gm1sound.php#percussion">General
-	 * MIDI Level 1 Percussion Key Map</a>.  E.g., 35 is acoustic bass
-	 * drum, etc.  Unlike the {@link #n(int...)} method, the "notes"
-	 * are not mapped to a {@link Scale}, but instead are actual
-	 * untranslated midi note numbers.
-	 * 
-	 * @param notes the "notes" specifying percussion instruments
-	 * @return the chord
-	 */
-	public Chord pn(int... notes) {
-		Chord chord = new Chord();
-		for (int note : notes) {
-			chord.add(note);
-		}
-		return chord;
-	}
-
-	/**
-	 * Create a percussion "melody".  The notes/chords specify
-	 * percussion instruments.  See
-	 * <a href="http://www.midi.org/techspecs/gm1sound.php#percussion">General
-	 * MIDI Level 1 Percussion Key Map</a>.
-	 * 
-	 * @param chords the notes/chords
-	 * @return the percussion "melody"
-	 */
-	public Melody pm(Object... chords) {
-		Melody melody = new Melody();
-		for (Object chord : chords) {
-			if (chord instanceof Number) {
-				melody.add(pn(((Number)chord).intValue()));
-			} else if (chord instanceof Chord) {
-				melody.add((Chord)chord);
 			}
 		}
 		return melody;
@@ -254,8 +228,8 @@ public class Composer {
 	 */
 	public Strike s(double beat, double duration, int velocity) {
 		Strike strike = new Strike();
-		strike.setStartUs(tempo.beatToUs(beat));
-		strike.setDurationUs(tempo.beatToUs(duration));
+		strike.setStartUs(composition.getTempo().beatToUs(beat));
+		strike.setDurationUs(composition.getTempo().beatToUs(duration));
 		strike.setVelocity(velocity);
 		return strike;
 	}
@@ -343,7 +317,7 @@ public class Composer {
 	 */
 	public Strike p(double beat, int velocity) {
 		Strike strike = new Strike();
-		strike.setStartUs(tempo.beatToUs(beat));
+		strike.setStartUs(composition.getTempo().beatToUs(beat));
 		strike.setDurationUs(1000000L/200L); // duration is arbitrarily 5ms
 		strike.setVelocity(velocity);
 		return strike;
@@ -379,7 +353,7 @@ public class Composer {
 		
 		for (int i = 0; i < count; i++) {
 			Strike s = new Strike(
-					(long) (first.getStartUs() + (i*spacing*tempo.getUsPerBeat())),
+					(long) (first.getStartUs() + (i*spacing*composition.getTempo().getUsPerBeat())),
 					first.getDurationUs(),
 					first.getVelocity());
 			result.add(s);
@@ -433,7 +407,7 @@ public class Composer {
 		}
 		Melody m = new Melody();
 		for (int i = 0; i < rhythm.size(); i++) {
-			m.add(pn(note));
+			m.add(an(note));
 		}
 		return f(rhythm, m, instrument);
 	}
@@ -452,6 +426,36 @@ public class Composer {
 //		System.out.printf("measure %d\n", measure);
 		// Add figures to composition, keeping track of where the
 		// beat offsets occur
+		double lastBeatOffsetUs = doAddFigures(figures);
+		
+		// Based on start offsets, determine how many measures these
+		// figures span
+		Tempo tempo = composition.getTempo();
+		double numMeasures = Math.floor(
+				lastBeatOffsetUs / (tempo.getBeatsPerMeasure() * tempo.getUsPerBeat())) + 1;
+		measure += ((int)numMeasures);
+		
+		return this;
+	}
+	
+	/**
+	 * Add figures to the composition at the current measure,
+	 * and advance by exactly one measure.  This is useful if any
+	 * of the figures play for slightly longer than one measure,
+	 * but we don't want to allow the "spillover" as being counted
+	 * as a full second measure.
+	 * 
+	 * @param figures the figures to play
+	 * @return this composer: allows calls to add to be chained
+	 */
+	public Composer add1(Figure... figures) {
+		doAddFigures(figures);
+		measure++;
+		return this;
+	}
+
+	private double doAddFigures(Figure... figures) {
+		Tempo tempo = composition.getTempo();
 		double lastBeatOffsetUs = 0;
 		for (Figure figure : figures) {
 			PlayFigureEvent evt = new PlayFigureEvent();
@@ -464,14 +468,7 @@ public class Composer {
 				}
 			}
 		}
-		
-		// Based on start offsets, determine how many measures these
-		// figures span
-		double numMeasures = Math.floor(
-				lastBeatOffsetUs / (tempo.getBeatsPerMeasure() * tempo.getUsPerBeat())) + 1;
-		measure += ((int)numMeasures);
-		
-		return this;
+		return lastBeatOffsetUs;
 	}
 	
 	/**

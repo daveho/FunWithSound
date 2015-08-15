@@ -11,9 +11,27 @@ import java.util.List;
  */
 public class Composition implements Iterable<PlayFigureEvent> {
 	private List<PlayFigureEvent> PlayFigureEvents;
+	private Scale scale;
+	private Tempo tempo;
 	
 	public Composition() {
 		PlayFigureEvents = new ArrayList<PlayFigureEvent>();
+	}
+	
+	public void setScale(Scale scale) {
+		this.scale = scale;
+	}
+	
+	public Scale getScale() {
+		return scale;
+	}
+	
+	public void setTempo(Tempo tempo) {
+		this.tempo = tempo;
+	}
+	
+	public Tempo getTempo() {
+		return tempo;
 	}
 	
 	public void add(PlayFigureEvent PlayFigureEvent) {

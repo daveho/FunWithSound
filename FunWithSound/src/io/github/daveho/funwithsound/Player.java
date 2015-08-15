@@ -3,18 +3,22 @@ package io.github.daveho.funwithsound;
 import io.github.daveho.gervill4beads.CaptureMidiMessages;
 import io.github.daveho.gervill4beads.GervillUGen;
 import io.github.daveho.gervill4beads.Midi;
+import io.github.daveho.gervill4beads.MidiMessageAndTimeStamp;
 import io.github.daveho.gervill4beads.MidiMessageSource;
 import io.github.daveho.gervill4beads.ReceivedMidiMessageSource;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.IdentityHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 
 import javax.sound.midi.MidiDevice;
+import javax.sound.midi.MidiMessage;
 import javax.sound.midi.MidiUnavailableException;
 import javax.sound.midi.Receiver;
 import javax.sound.midi.ShortMessage;
@@ -111,9 +115,16 @@ public class Player {
 		// If there is a live instrument, create a synthesizer for it,
 		// and arrange to feed live midi events to it
 		MidiDevice device = null;
+		List<MidiMessageAndTimeStamp> capturedEvents = new ArrayList<MidiMessageAndTimeStamp>();
 		if (liveInstr != null) {
 			final GervillUGen liveSynth = getGervillUGen(liveInstr);
-			ReceivedMidiMessageSource messageSource = new ReceivedMidiMessageSource(ac);
+			ReceivedMidiMessageSource messageSource = new ReceivedMidiMessageSource(ac) {
+				@Override
+				public void send(MidiMessage message, long timeStamp) {
+					capturedEvents.add(new MidiMessageAndTimeStamp(message, timeStamp));
+					super.send(message, timeStamp);
+				}
+			};
 			messageSource.addMessageListener(liveSynth);
 			
 			// Find a MIDI transmitter and feed its generated MIDI events to
@@ -136,6 +147,12 @@ public class Player {
 		// If we opened a MIDI device, close it
 		if (device != null) {
 			device.close();
+		}
+		
+		// If MIDI messages were captured, translate them to
+		// Rhythm and Melody
+		if (!capturedEvents.isEmpty()) {
+			analyzeCapturedEvents(capturedEvents);
 		}
 	}
 
@@ -173,5 +190,90 @@ public class Player {
 
 	public void playLive(Instrument liveInstr) {
 		this.liveInstr = liveInstr;
+	}
+	
+	static class NoteStart {
+		final long ts;
+		final int velocity;
+		NoteStart(long ts, int velocity) {
+			this.ts = ts;
+			this.velocity = velocity;
+		}
+	}
+
+	private void analyzeCapturedEvents(List<MidiMessageAndTimeStamp> capturedEvents) {
+//		System.out.println("Captured timestamps:");
+//		for (MidiMessageAndTimeStamp mmts : capturedEvents) {
+//			System.out.println(mmts.timeStamp);
+//		}
+		
+		Map<Integer, NoteStart> starts = new HashMap<Integer, NoteStart>();
+		
+		Rhythm rhythm = new Rhythm();
+		Melody melody = new Melody();
+		
+		Tempo tempo = composition.getTempo();
+		
+		long baseTs = -1L;
+		
+		for (MidiMessageAndTimeStamp mmts : capturedEvents) {
+			MidiMessage msg = mmts.msg;
+			long ts = mmts.timeStamp;
+			if (msg instanceof ShortMessage) {
+				ShortMessage smsg = (ShortMessage) msg;
+				if (smsg.getCommand() == ShortMessage.NOTE_ON) {
+					if (baseTs < 0L && ts >= 0L) {
+						baseTs = ts;
+						System.out.println("baseTs="+baseTs);
+					}
+					int note = smsg.getData1();
+					int velocity = smsg.getData2();
+					starts.put(note, new NoteStart(ts, velocity));
+				} else if (smsg.getCommand() == ShortMessage.NOTE_OFF) {
+					int note = smsg.getData1();
+					NoteStart start = starts.get(note);
+					if (start != null) {
+						//System.out.printf("baseTs=%d, start.ts=%d, ts=%d\n", baseTs, start.ts, ts);
+						Strike s = new Strike(start.ts - baseTs, ts - start.ts, start.velocity);
+						rhythm.add(s);
+						Chord ch = new Chord();
+						ch.add(note);
+						melody.add(ch);
+					}
+				}
+			}
+		}
+		
+		// FIXME: really should have a more general way of converting
+		// to external form
+		boolean first;
+		System.out.print("Rhythm rhythm = r(\n\t");
+		first = true;
+		for (Strike s : rhythm) {
+			double beat = s.getStartUs() / (double)tempo.getUsPerBeat();
+			double duration = s.getDurationUs() / (double)tempo.getUsPerBeat();
+			int velocity = s.getVelocity();
+			if (first) {
+				first = false;
+			} else {
+				System.out.print(", ");
+			}
+			System.out.printf("s(%.03f,%.03f,%d)", beat, duration, velocity);
+		}
+		System.out.println(");");
+
+		first = true;
+		System.out.print("Melody melody = m(\n\t");
+		for (Chord c : melody) {
+			// Each chord is guaranteed to have only one note
+			int note = c.get(0);
+			if (first) {
+				first = false;
+			} else {
+				System.out.print(", ");
+			}
+			System.out.printf("an(%d)", note);
+		}
+		System.out.println(");");
 	}
 }
