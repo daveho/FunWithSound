@@ -63,6 +63,17 @@ public class Composer {
 	}
 	
 	/**
+	 * Create a new MIDI percussion instrument using sounds loaded
+	 * from given sound font.
+	 * 
+	 * @param soundFont the sound font filename
+	 * @return the instrument
+	 */
+	public Instrument percussion(String soundFont) {
+		return new Instrument(InstrumentType.MIDI_PERCUSSION, 0, soundFont);
+	}
+	
+	/**
 	 * Get the composition.
 	 * 
 	 * @return the composition
@@ -367,6 +378,30 @@ public class Composer {
 		result.setMelody(melody);
 		result.setInstrument(instrument);
 		return result;
+	}
+	
+	/**
+	 * Create a "percussion figure", in which a rhythm specifies
+	 * how to play a single percussion "note", which really
+	 * designates a particular MIDI percussion instrument
+	 * (using the MIDI percussion key map.)  This method
+	 * avoids the necessity of creating a {@link Melody}.
+	 * 
+	 * @param rhythm       the rhythm to play
+	 * @param note         the note selecting the MIDI percussion instrument
+	 * @param instrument   the instrument (which must have type
+	 *                     {@link InstrumentType#MIDI_PERCUSSION}
+	 * @return the percussion figure
+	 */
+	public Figure pf(Rhythm rhythm, int note, Instrument instrument) {
+		if (instrument.getType() != InstrumentType.MIDI_PERCUSSION) {
+			throw new IllegalArgumentException("pf must use a percussion instrument");
+		}
+		Melody m = new Melody();
+		for (int i = 0; i < rhythm.size(); i++) {
+			m.add(pn(note));
+		}
+		return f(rhythm, m, instrument);
 	}
 
 	/**
