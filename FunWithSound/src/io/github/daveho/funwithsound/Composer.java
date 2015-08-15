@@ -355,6 +355,31 @@ public class Composer {
 	}
 	
 	/**
+	 * Create a repeated rhythm containing a specified
+	 * number of percussive strikes.
+	 * 
+	 * @param first    the first strike: the other strikes will be identical
+	 *                 except for their start time
+	 * @param spacing  the amount of time between the strikes,
+	 *                 counted in beats
+	 * @param count    how many strikes to generate
+	 * @return the rhythm
+	 */
+	public Rhythm rr(Strike first, double spacing, int count) {
+		Rhythm result = new Rhythm();
+		
+		for (int i = 0; i < count; i++) {
+			Strike s = new Strike(
+					(long) (first.getStartUs() + (i*spacing*tempo.getUsPerBeat())),
+					first.getDurationUs(),
+					first.getVelocity());
+			result.add(s);
+		}
+		
+		return result;
+	}
+	
+	/**
 	 * Create an instrument.
 	 * 
 	 * @param patch the instrument's midi patch number
