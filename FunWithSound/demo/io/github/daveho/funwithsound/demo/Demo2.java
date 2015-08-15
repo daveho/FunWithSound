@@ -17,6 +17,7 @@ public class Demo2 extends DemoBase {
 
 		Instrument tr808 = percussion(TR808);
 		Instrument tr808_2 = percussion(TR808);
+		Instrument tr808_kicks = percussion(TR808);
 		Instrument bass = instr(ARACHNO, 38);
 
 		/*
@@ -41,6 +42,9 @@ public class Demo2 extends DemoBase {
 		add(hihat2f, hihat2bf, ride2f, snare2f);
 		*/
 		
+		Rhythm kicks = r(p(0), p(4));
+		Figure kicksf = pf(kicks, 35, tr808_kicks);
+		
 		Rhythm hihat1a = r(p(0), p(2), p(2.5), p(3), p(3.5));
 		Figure hihat1af = pf(hihat1a, 42, tr808); 
 		Rhythm hihat1b = rr(p(4), .25, 4);
@@ -50,8 +54,8 @@ public class Demo2 extends DemoBase {
 		Rhythm hihat1c = rr(p(6), .25, 4);
 		Figure hihat1cf = pf(hihat1c, 42, tr808);
 
-		rpt(8, () -> 
-			add(hihat1af, hihat1bf, ride1af, hihat1cf));
+		rpt(16, () -> 
+			add(kicksf, hihat1af, hihat1bf, ride1af, hihat1cf));
 		
 		audition(bass);
 	}
