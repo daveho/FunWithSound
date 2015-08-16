@@ -38,4 +38,8 @@ public class Instrument {
 	public String getSoundFont() {
 		return soundFont;
 	}
+
+	public boolean hasSoundFont() {
+		return soundFont != null;
+	}
 }

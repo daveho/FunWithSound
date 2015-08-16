@@ -159,7 +159,7 @@ public class Player {
 		GervillUGen gervill = instrMap.get(instrument);
 		if (gervill == null) {
 			gervill = createGervill();
-			if (instrument.getType() == InstrumentType.MIDI_SOUNDFONT) {
+			if (instrument.hasSoundFont()) {
 				SoftSynthesizer synth = gervill.getSynth();
 				SF2Soundbank sb = getSoundBank(instrument);
 				if (sb != null) {
@@ -178,6 +178,7 @@ public class Player {
 	}
 
 	private SF2Soundbank getSoundBank(Instrument instrument) throws IOException {
+		System.out.println("Loading soundfont " + instrument.getSoundFont());
 		SF2Soundbank sb = null;
 		if (!soundBanks.containsKey(instrument.getSoundFont())) {
 			File file = new File(instrument.getSoundFont());
