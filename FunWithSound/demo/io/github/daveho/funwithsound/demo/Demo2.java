@@ -16,8 +16,8 @@ public class Demo2 extends DemoBase {
 		setScale(Scale.melodicMinor(65));
 		setTempo(new Tempo(200, 8));
 
-		Instrument tr808 = percussion(TR808);
-		Instrument tr808_kicks = percussion(TR808);
+		Instrument tr808 = percussion(M1);
+		Instrument tr808_kicks = percussion(M1);
 		Instrument bass = instr(ARACHNO, 38);
 		
 		Rhythm kicks = r(p(0, 120), p(4));

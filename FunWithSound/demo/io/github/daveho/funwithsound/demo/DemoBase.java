@@ -15,9 +15,8 @@ public abstract class DemoBase extends Composer {
 	// GM1 sound set.
 	public static final String ARACHNO = "/home/dhovemey/SoundFonts/arachno/Arachno SoundFont - Version 1.0.sf2";
 	
-	// Roland TR-808: http://www.hammersound.net/hs_soundfonts.html
-	// Sampled version of classic TR-808 percussion sounds.
-	public static final String TR808 = "/home/dhovemey/SoundFonts/tr808/TR-808 Drums.SF2";
+	// Sampled Korg M1 drum sounds, from http://www.hammersound.net/hs_soundfonts.html
+	public static final String M1 = "/home/dhovemey/SoundFonts/m1/HS M1 Drums.sf2";
 	
 	public abstract void create();
 
