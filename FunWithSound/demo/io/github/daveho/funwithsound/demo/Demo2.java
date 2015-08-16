@@ -19,6 +19,7 @@ public class Demo2 extends DemoBase {
 		Instrument tr808 = percussion(M1);
 		Instrument tr808_kicks = percussion(M1);
 		Instrument bass = instr(ARACHNO, 38);
+		Instrument lead = instr(ARACHNO, 88);
 		
 		Rhythm kicks = r(p(0, 120), p(4));
 		Figure kicksf = pf(kicks, 35, tr808_kicks);
@@ -31,15 +32,26 @@ public class Demo2 extends DemoBase {
 		Melody bassm = m(
 				an(29), an(34), an(32), an(32), an(32), an(32), an(34));
 		Figure bassf = f(bassr, bassm, bass);
+		
+		Rhythm chimer = r(
+				s(0.000,15.412,80), s(16,15.478,81), s(32,15.332,83), s(48,15.169,85));
+		Melody chimem = m(
+				an(60), an(60), an(60), an(60));
+		Figure chimef = f(chimer, chimem, lead);
 
+		// This is the basic percussion and bass line
 		add1(kicksf);
 		add1(kicksf);
 		add1(kicksf, basichihatf);
 		add1(kicksf, basichihatf);
-		rpt(8, () ->
+		rpt(24, () ->
 			add1(kicksf, basichihatf, bassf));
 		
-		//audition(bass);
+		// Chime-y sounds
+		at(8, chimef);
+		at(16, chimef);
+		
+//		audition(lead);
 	}
 	
 	public static void main(String[] args) throws MidiUnavailableException, IOException {

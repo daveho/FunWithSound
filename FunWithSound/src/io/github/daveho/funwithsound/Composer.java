@@ -426,14 +426,14 @@ public class Composer {
 //		System.out.printf("measure %d\n", measure);
 		// Add figures to composition, keeping track of where the
 		// beat offsets occur
-		double lastBeatOffsetUs = doAddFigures(figures);
+		double lastBeatOffsetUs = doAddFigures(this.measure, figures);
 		
 		// Based on start offsets, determine how many measures these
 		// figures span
 		Tempo tempo = composition.getTempo();
 		double numMeasures = Math.floor(
 				lastBeatOffsetUs / (tempo.getBeatsPerMeasure() * tempo.getUsPerBeat())) + 1;
-		measure += ((int)numMeasures);
+		this.measure += ((int)numMeasures);
 		
 		return this;
 	}
@@ -449,12 +449,26 @@ public class Composer {
 	 * @return this composer: allows calls to add to be chained
 	 */
 	public Composer add1(Figure... figures) {
-		doAddFigures(figures);
-		measure++;
+		doAddFigures(this.measure, figures);
+		this.measure++;
+		return this;
+	}
+	
+	/**
+	 * Add figures to play at a specified measure, without changing
+	 * the current measure.  This is useful for scheduling figures
+	 * to play at an absolute position in the composition.
+	 * 
+	 * @param measure the measure when the figures should play
+	 * @param figures the figures to play
+	 * @return this composer: allows calls to add to be chained
+	 */
+	public Composer at(int measure, Figure... figures) {
+		doAddFigures(measure, figures);
 		return this;
 	}
 
-	private double doAddFigures(Figure... figures) {
+	private double doAddFigures(int measure, Figure... figures) {
 		Tempo tempo = composition.getTempo();
 		double lastBeatOffsetUs = 0;
 		for (Figure figure : figures) {
