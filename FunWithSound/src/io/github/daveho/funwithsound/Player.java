@@ -162,7 +162,11 @@ public class Player {
 			if (instrument.getType() == InstrumentType.MIDI_SOUNDFONT) {
 				SoftSynthesizer synth = gervill.getSynth();
 				SF2Soundbank sb = getSoundBank(instrument);
-				synth.loadAllInstruments(sb);
+				if (sb != null) {
+					synth.loadAllInstruments(sb);
+				} else {
+					System.err.println("Warning: couldn't load soundfont " + instrument.getSoundFont());
+				}
 			}
 			if (instrument.getPatch() >= 0) {
 				ShortMessage programChange = Midi.createShortMessage(ShortMessage.PROGRAM_CHANGE, instrument.getPatch());
