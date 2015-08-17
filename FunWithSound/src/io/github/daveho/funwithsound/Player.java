@@ -46,7 +46,7 @@ public class Player {
 	private static final long START_DELAY_US = 1000000L;
 	
 	// Shut down this many microseconds after the last note off message.
-	private static final long IDLE_WAIT_US = 1000000L;
+	private static final long IDLE_WAIT_US = 2000000L;
 	
 	private Composition composition;
 	private AudioContext ac;
@@ -118,6 +118,9 @@ public class Player {
 				if (timestampUs >= idleTimeUs) {
 					// Notify main thread that playback is complete
 					latch.countDown();
+					
+					// I assume it's OK for a Bead to stop the AudioContext?
+					ac.stop();
 				}
 			}
 		});
@@ -181,7 +184,7 @@ public class Player {
 		} catch (InterruptedException e) {
 			System.out.println("Interrupted waiting for playback to complete");
 		}
-		ac.stop();
+//		ac.stop();
 		System.out.println("Playback finished");
 		
 		// If we opened a MIDI device, close it
