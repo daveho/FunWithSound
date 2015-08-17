@@ -10,12 +10,14 @@ import java.util.List;
  * at specified times.
  */
 public class Composition implements Iterable<PlayFigureEvent> {
-	private List<PlayFigureEvent> PlayFigureEvents;
+	private List<PlayFigureEvent> playFigureEvents;
 	private Scale scale;
 	private Tempo tempo;
+	private List<GainEvent> gainEvents;
 	
 	public Composition() {
-		PlayFigureEvents = new ArrayList<PlayFigureEvent>();
+		playFigureEvents = new ArrayList<PlayFigureEvent>();
+		gainEvents = new ArrayList<GainEvent>();
 	}
 	
 	public void setScale(Scale scale) {
@@ -35,19 +37,27 @@ public class Composition implements Iterable<PlayFigureEvent> {
 	}
 	
 	public void add(PlayFigureEvent PlayFigureEvent) {
-		PlayFigureEvents.add(PlayFigureEvent);
+		playFigureEvents.add(PlayFigureEvent);
 	}
 	
 	public int size() {
-		return PlayFigureEvents.size();
+		return playFigureEvents.size();
 	}
 	
 	public PlayFigureEvent get(int index) {
-		return PlayFigureEvents.get(index);
+		return playFigureEvents.get(index);
 	}
 	
 	@Override
 	public Iterator<PlayFigureEvent> iterator() {
-		return PlayFigureEvents.iterator();
+		return playFigureEvents.iterator();
+	}
+
+	public void addGainEvent(long ts, Instrument instr, double gain) {
+		gainEvents.add(new GainEvent(ts, instr, gain));
+	}
+	
+	public List<GainEvent> getGainEvents() {
+		return gainEvents;
 	}
 }

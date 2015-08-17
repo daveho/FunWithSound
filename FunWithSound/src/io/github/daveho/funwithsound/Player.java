@@ -23,6 +23,7 @@ import javax.sound.midi.ShortMessage;
 
 import net.beadsproject.beads.core.AudioContext;
 import net.beadsproject.beads.core.Bead;
+import net.beadsproject.beads.ugens.Gain;
 
 import com.sun.media.sound.SF2Soundbank;
 import com.sun.media.sound.SoftSynthesizer;
@@ -31,6 +32,15 @@ import com.sun.media.sound.SoftSynthesizer;
  * Play a composition.
  */
 public class Player {
+	static class InstrumentInfo {
+		final GervillUGen gervill;
+		final Gain gain;
+		public InstrumentInfo(GervillUGen gervill, Gain gain) {
+			this.gervill = gervill;
+			this.gain = gain;
+		}
+	}
+	
 	// Delay before starting playback,
 	// to avoid early audio buffer underruns.
 	private static final long START_DELAY_US = 1000000L;
@@ -42,21 +52,23 @@ public class Player {
 	private AudioContext ac;
 	private HashMap<String, SF2Soundbank> soundBanks;
 	private Instrument liveInstr;
-	private Map<Instrument, GervillUGen> instrMap;
+	private Map<Instrument, InstrumentInfo> instrMap;
 	
 	public Player() {
 		soundBanks = new HashMap<String, SF2Soundbank>();
-		instrMap = new IdentityHashMap<Instrument, GervillUGen>();
+		instrMap = new IdentityHashMap<Instrument, InstrumentInfo>();
 	}
 	
 	public void setComposition(Composition composition) {
 		this.composition = composition;
 	}
 	
-	protected GervillUGen createGervill() throws MidiUnavailableException {
-		GervillUGen result = new GervillUGen(ac, Collections.<String, Object>emptyMap());
-		ac.out.addInput(result);
-		return result;
+	private InstrumentInfo createGervill() throws MidiUnavailableException {
+		GervillUGen gervill = new GervillUGen(ac, Collections.<String, Object>emptyMap());
+		Gain gain = new Gain(ac, 1);
+		gain.addInput(gervill);
+		ac.out.addInput(gain);
+		return new InstrumentInfo(gervill, gain);
 	}
 
 	public void play() throws MidiUnavailableException, IOException {
@@ -68,7 +80,7 @@ public class Player {
 		for (PlayFigureEvent e : composition) {
 			Figure f = e.getFigure();
 			Instrument instrument = f.getInstrument();
-			GervillUGen gervill = getGervillUGen(instrument);
+			InstrumentInfo info = getGervillUGen(instrument);
 			Rhythm rhythm = f.getRhythm();
 			Melody melody = f.getMelody();
 			int n = Math.min(rhythm.size(), melody.size());
@@ -84,9 +96,9 @@ public class Player {
 					long onTime = START_DELAY_US + e.getStartUs() + s.getStartUs();
 					long offTime = onTime + s.getDurationUs();
 					ShortMessage noteOn = Midi.createShortMessage(ShortMessage.NOTE_ON|channel, note, s.getVelocity());
-					gervill.getSynthRecv().send(noteOn, onTime);
+					info.gervill.getSynthRecv().send(noteOn, onTime);
 					ShortMessage noteOff = Midi.createShortMessage(ShortMessage.NOTE_OFF|channel, note, s.getVelocity());
-					gervill.getSynthRecv().send(noteOff, offTime);
+					info.gervill.getSynthRecv().send(noteOff, offTime);
 					// Keep track of the time of the last note off event
 					if (offTime > lastNoteOffUs) {
 						lastNoteOffUs = offTime;
@@ -110,12 +122,42 @@ public class Player {
 			}
 		});
 		
+		// Sort GainEvents by timestamp, register a pre-frame hook to
+		// process them.  FIXME: this means we're only updating gain
+		// once per frame.  Should implement a proper gain envelope Bead.
+		final ArrayList<GainEvent> gainEvents = new ArrayList<GainEvent>(composition.getGainEvents());
+		Collections.sort(gainEvents, (left, right) -> (int)(left.ts - right.ts));
+		ac.invokeBeforeEveryFrame(new Bead() {
+			int next = 0;
+			@Override
+			protected void messageReceived(Bead message) {
+				if (next >= gainEvents.size()) {
+					return;
+				}
+				long timestampUs = ((long)ac.getTime()) * 1000L;
+				long endOfFrameUs = timestampUs + (long)(ac.samplesToMs(ac.getBufferSize())*1000.0);
+				while (next < gainEvents.size()) {
+					GainEvent e = gainEvents.get(next);
+					// See if this GainEvent is due to be processed in
+					// the upcoming frame
+					if (e.ts >= endOfFrameUs) {
+						// No, it's in a future frame, so nothing to do.
+						break;
+					}
+					// Set the instrument's gain
+					InstrumentInfo info = instrMap.get(e.instr);
+					info.gain.setGain((float)e.gain);
+					next++;
+				}
+			}
+		});
+		
 		// If there is a live instrument, create a synthesizer for it,
 		// and arrange to feed live midi events to it
 		MidiDevice device = null;
 		List<MidiMessageAndTimeStamp> capturedEvents = new ArrayList<MidiMessageAndTimeStamp>();
 		if (liveInstr != null) {
-			final GervillUGen liveSynth = getGervillUGen(liveInstr);
+			final InstrumentInfo liveSynth = getGervillUGen(liveInstr);
 			ReceivedMidiMessageSource messageSource = new ReceivedMidiMessageSource(ac) {
 				@Override
 				public void send(MidiMessage message, long timeStamp) {
@@ -123,7 +165,7 @@ public class Player {
 					super.send(message, timeStamp);
 				}
 			};
-			messageSource.addMessageListener(liveSynth);
+			messageSource.addMessageListener(liveSynth.gervill);
 			
 			// Find a MIDI transmitter and feed its generated MIDI events to
 			// the message source
@@ -154,13 +196,13 @@ public class Player {
 		}
 	}
 
-	private GervillUGen getGervillUGen(Instrument instrument)
+	private InstrumentInfo getGervillUGen(Instrument instrument)
 			throws MidiUnavailableException, IOException {
-		GervillUGen gervill = instrMap.get(instrument);
-		if (gervill == null) {
-			gervill = createGervill();
+		InstrumentInfo info = instrMap.get(instrument);
+		if (info == null) {
+			info = createGervill();
 			if (instrument.hasSoundFont()) {
-				SoftSynthesizer synth = gervill.getSynth();
+				SoftSynthesizer synth = info.gervill.getSynth();
 				SF2Soundbank sb = getSoundBank(instrument);
 				if (sb != null) {
 					synth.loadAllInstruments(sb);
@@ -170,11 +212,11 @@ public class Player {
 			}
 			if (instrument.getPatch() >= 0) {
 				ShortMessage programChange = Midi.createShortMessage(ShortMessage.PROGRAM_CHANGE, instrument.getPatch());
-				gervill.getSynthRecv().send(programChange, -1L);
+				info.gervill.getSynthRecv().send(programChange, -1L);
 			}
-			instrMap.put(instrument, gervill);
+			instrMap.put(instrument, info);
 		}
-		return gervill;
+		return info;
 	}
 
 	private SF2Soundbank getSoundBank(Instrument instrument) throws IOException {

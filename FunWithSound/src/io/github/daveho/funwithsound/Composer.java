@@ -31,7 +31,8 @@ public class Composer {
 	}
 	
 	/**
-	 * Create a new MIDI instrument.
+	 * Create a new MIDI instrument using the built-in "emergency" MIDI
+	 * soundbank.
 	 * 
 	 * @param patch the MIDI patch
 	 * @return the instrument
@@ -540,5 +541,16 @@ public class Composer {
 	 */
 	public void audition(Instrument instr) {
 		this.audition = instr;
+	}
+	
+	/**
+	 * Set the volume (gain) on given instrument, effective
+	 * from the beginning of the composition.
+	 * 
+	 * @param instr the instrument whose gain to set
+	 * @param gain the gain, between 0 (silent) and 1 (loudest)
+	 */
+	public void v(Instrument instr, double gain) {
+		composition.addGainEvent(0L, instr, gain);
 	}
 }

@@ -4,8 +4,6 @@ import io.github.daveho.funwithsound.Figure;
 import io.github.daveho.funwithsound.Instrument;
 import io.github.daveho.funwithsound.Melody;
 import io.github.daveho.funwithsound.Rhythm;
-import io.github.daveho.funwithsound.Scale;
-import io.github.daveho.funwithsound.Tempo;
 
 import java.io.IOException;
 
@@ -19,7 +17,7 @@ public class Demo2 extends DemoBase {
 		Instrument drums = percussion(M1);
 		Instrument drums_kicks = percussion(M1);
 		Instrument bass = instr(ARACHNO, 38);
-		Instrument lead = instr(ARACHNO, 88);
+		Instrument newage = instr(ARACHNO, 88);
 		
 		Rhythm kicks = r(p(0, 120), p(4));
 		Figure kicksf = pf(kicks, 35, drums_kicks);
@@ -37,7 +35,7 @@ public class Demo2 extends DemoBase {
 				s(0.000,15.412,80), s(16,15.478,81), s(32,15.332,83), s(48,15.169,85));
 		Melody chimem = m(
 				an(60), an(60), an(60), an(60));
-		Figure chimef = f(chimer, chimem, lead);
+		Figure chimef = f(chimer, chimem, newage);
 
 		// This is the basic percussion and bass line
 		add1(kicksf);
@@ -50,6 +48,9 @@ public class Demo2 extends DemoBase {
 		// Chime-y sounds
 		at(8, chimef);
 		at(16, chimef);
+		
+		// Turn down the volume a bit on the chime-y part
+		v(newage, 0.3);
 		
 //		audition(lead);
 	}
