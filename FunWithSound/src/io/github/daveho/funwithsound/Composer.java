@@ -5,9 +5,11 @@ package io.github.daveho.funwithsound;
  * a simple domain-specific language for defining compositions
  * consisting {@link Rhythm} and {@link Melody} objects
  * rendered using {@link Instrument}.  Note that the
- * {@link #setTempo(Tempo)} and {@link #setScale(Scale)}
- * methods must be called before any of the composition methods
- * can be used.  The composer produces a {@link Composition}
+ * tempo and scale must be set before other methods are called.
+ * Use {{@link #tempo(int, int)}} to set the tempo and one of
+ * {@link #major(int)}, {@link #naturalMinor(int)}, {@link #harmonicMinor(int)},
+ * or {@link #melodicMinor(int)} to set the scale.
+ * The composer produces a {@link Composition}
  * object as its product.
  */
 public class Composer {
@@ -88,23 +90,55 @@ public class Composer {
 	public Composition getComposition() {
 		return composition;
 	}
-	
+
 	/**
-	 * Set the {@link Tempo} for the composition.
+	 * Set the tempo for the composition.
 	 * 
-	 * @param tempo the tempo
+	 * @param beatsPerMinute   number of beats per minute
+	 * @param beatsPerMeasure  number of beats per measure
 	 */
-	public void setTempo(Tempo tempo) {
-		composition.setTempo(tempo);
+	public void tempo(int beatsPerMinute, int beatsPerMeasure) {
+		composition.setTempo(new Tempo(beatsPerMinute, beatsPerMeasure));
 	}
 	
 	/**
-	 * Set the {@link Scale} for the composition.
+	 * Set the scale for the composition to a major scale,
+	 * starting with the specified MIDI note number.
 	 * 
-	 * @param scale the scale
+	 * @param start the start note of the scale
 	 */
-	public void setScale(Scale scale) {
-		composition.setScale(scale);
+	public void major(int start) {
+		composition.setScale(Scale.major(start));
+	}
+	
+	/**
+	 * Set the scale for the composition to a natural minor scale,
+	 * starting with the specified MIDI note number.
+	 * 
+	 * @param start the start note of the scale
+	 */
+	public void naturalMinor(int start) {
+		composition.setScale(Scale.naturalMinor(start));
+	}
+	
+	/**
+	 * Set the scale for the composition to a harmonic minor scale,
+	 * starting with the specified MIDI note number.
+	 * 
+	 * @param start the start note of the scale
+	 */
+	public void harmonicMinor(int start) {
+		composition.setScale(Scale.harmonicMinor(start));
+	}
+	
+	/**
+	 * Set the scale for the composition to a melodic minor scale,
+	 * starting with the specified MIDI note number.
+	 * 
+	 * @param start the start note of the scale
+	 */
+	public void melodicMinor(int start) {
+		composition.setScale(Scale.melodicMinor(start));
 	}
 
 	/**

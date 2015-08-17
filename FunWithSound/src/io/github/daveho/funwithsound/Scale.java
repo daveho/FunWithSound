@@ -21,7 +21,7 @@ public class Scale implements Iterable<Integer> {
 	
 	private List<Integer> pitches;
 	
-	public Scale() {
+	Scale() {
 		pitches = new ArrayList<Integer>();
 	}
 	

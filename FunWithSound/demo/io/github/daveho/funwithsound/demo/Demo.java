@@ -4,8 +4,6 @@ import io.github.daveho.funwithsound.Figure;
 import io.github.daveho.funwithsound.Instrument;
 import io.github.daveho.funwithsound.Melody;
 import io.github.daveho.funwithsound.Rhythm;
-import io.github.daveho.funwithsound.Scale;
-import io.github.daveho.funwithsound.Tempo;
 
 import java.io.IOException;
 
@@ -13,8 +11,8 @@ import javax.sound.midi.MidiUnavailableException;
 
 public class Demo extends DemoBase {
 	public void create() {
-		setScale(Scale.melodicMinor(65));
-		setTempo(new Tempo(220, 8));
+		melodicMinor(65);
+		tempo(220, 8);
 		
 		Instrument oohs = instr(ARACHNO, 54);
 		Instrument organ = instr(ARACHNO, 20);
