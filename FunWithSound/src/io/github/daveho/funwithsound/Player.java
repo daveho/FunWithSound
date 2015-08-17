@@ -24,6 +24,7 @@ import javax.sound.midi.ShortMessage;
 import net.beadsproject.beads.core.AudioContext;
 import net.beadsproject.beads.core.Bead;
 import net.beadsproject.beads.ugens.Gain;
+import net.beadsproject.beads.ugens.RecordToFile;
 
 import com.sun.media.sound.SF2Soundbank;
 import com.sun.media.sound.SoftSynthesizer;
@@ -53,6 +54,7 @@ public class Player {
 	private HashMap<String, SF2Soundbank> soundBanks;
 	private Instrument liveInstr;
 	private Map<Instrument, InstrumentInfo> instrMap;
+	private String outputFile;
 	
 	public Player() {
 		soundBanks = new HashMap<String, SF2Soundbank>();
@@ -61,6 +63,10 @@ public class Player {
 	
 	public void setComposition(Composition composition) {
 		this.composition = composition;
+	}
+
+	public void setOutputFile(String outputFile) {
+		this.outputFile = outputFile;
 	}
 	
 	private InstrumentInfo createGervill() throws MidiUnavailableException {
@@ -119,6 +125,8 @@ public class Player {
 					// Notify main thread that playback is complete
 					latch.countDown();
 					
+					System.out.println("Ready to shut down?");
+					
 					// I assume it's OK for a Bead to stop the AudioContext?
 					ac.stop();
 				}
@@ -175,17 +183,29 @@ public class Player {
 			device = CaptureMidiMessages.getMidiInput(messageSource);
 		}
 		
-		// Start the AudioContext!
-		ac.start();
-		
-		// Wait for playback to complete, then stop the AudioContext
-		try {
-			latch.await();
-		} catch (InterruptedException e) {
-			System.out.println("Interrupted waiting for playback to complete");
+		if (outputFile != null) {
+			System.out.print("Saving audio data to " + outputFile + "...");
+			System.out.flush();
+			File f = new File(outputFile);
+			RecordToFile recorder = new RecordToFile(ac, 2, f);
+			recorder.addInput(ac.out);
+			ac.out.addDependent(recorder);
+			// Render to file
+			ac.logTime(true);
+//			ac.runNonRealTime();
+			ac.runForNMillisecondsNonRealTime(idleTimeUs / 1000L);
+			System.out.println("done!");
+		} else {
+			// Start the AudioContext! (for real-time output)
+			ac.start();
+			// Wait for playback to complete, then stop the AudioContext
+			try {
+				latch.await();
+			} catch (InterruptedException e) {
+				System.out.println("Interrupted waiting for playback to complete");
+			}
+			System.out.println("Playback finished");
 		}
-//		ac.stop();
-		System.out.println("Playback finished");
 		
 		// If we opened a MIDI device, close it
 		if (device != null) {

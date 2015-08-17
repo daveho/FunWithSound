@@ -80,6 +80,7 @@ public class Demo2 extends DemoBase {
 	
 	public static void main(String[] args) throws MidiUnavailableException, IOException {
 		Demo2 d = new Demo2();
+//		d.setOutputFile("demo2.wav");
 		d.demo();
 	}
 }

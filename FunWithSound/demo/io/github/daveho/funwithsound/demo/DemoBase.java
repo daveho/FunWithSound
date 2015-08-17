@@ -17,8 +17,14 @@ public abstract class DemoBase extends Composer {
 	
 	// Sampled Korg M1 drum sounds, from http://www.hammersound.net/hs_soundfonts.html
 	public static final String M1 = "/home/dhovemey/SoundFonts/m1/HS M1 Drums.sf2";
+
+	private String outputFile;
 	
 	public abstract void create();
+	
+	public void setOutputFile(String outputFile) {
+		this.outputFile = outputFile;
+	}
 	
 	public void demo() throws MidiUnavailableException, IOException {
 		create();
@@ -28,7 +34,9 @@ public abstract class DemoBase extends Composer {
 	public void play() throws MidiUnavailableException, IOException {
 		Player player = new Player();
 		player.setComposition(getComposition());
-		if (hasAudition()) {
+		if (outputFile != null) {
+			player.setOutputFile(outputFile);
+		}else if (hasAudition()) {
 			player.playLive(getAudition());
 		}
 		player.play();
