@@ -52,6 +52,12 @@ public class Demo2 extends DemoBase {
 		// Turn down the volume a bit on the chime-y part
 		v(newage, 0.3);
 		
+		// Turn the volume up as the chime-y part repeats
+		v(16, newage, 0.4);
+		v(17, newage, 0.5);
+		v(18, newage, 0.6);
+		v(19, newage, 0.7);
+		
 //		audition(lead);
 	}
 	

@@ -553,4 +553,17 @@ public class Composer {
 	public void v(Instrument instr, double gain) {
 		composition.addGainEvent(0L, instr, gain);
 	}
+	
+	/**
+	 * Set the volume (gain) on given instrument, effective
+	 * from the beginning of the specified measure.
+	 * 
+	 * @param measure the measure when the volume change should take effect
+	 * @param instr the instrument whose gain to set
+	 * @param gain the gain, between 0 (silent) and 1 (loudest)
+	 */
+	public void v(int measure, Instrument instr, double gain) {
+		int beat = measure * composition.getTempo().getBeatsPerMeasure();
+		composition.addGainEvent(composition.getTempo().beatToUs(beat), instr, gain);
+	}
 }
