@@ -42,13 +42,16 @@ public class Demo2 extends DemoBase {
 				s(0.000,5.932,72), s(0.045,6.100,105), s(7,0.981,91), s(8,2.008,100),
 				s(10,0.891,91), s(10.984,1.809,100), s(13,2.693,83), s(15.994,7.290,91),
 				s(16.032,7.467,96), s(24,1.888,78), s(26,0.806,83), s(27,1.856,78),
-				s(29,2.813,74), s(32.034,6.295,78), s(32.107,6.375,66), s(39,0.923,83),
+				s(29,2.813,74), s(32.034,6.295,78), s(32.107,6.375,91), s(39,0.923,83),
 				s(40.064,2.037,91), s(42,0.726,74), s(43.066,1.946,74), s(45,2.909,105),
 				s(48.060,6.329,100), s(55,1.067,58), s(56,7.867,96));
 		Melody lead1m = m(
-			an(72), an(65), an(65), an(67), an(68), an(67), an(65), an(72),
-			an(65), an(72), an(70), an(68), an(70), an(65), an(72), an(65),
-			an(67), an(68), an(70), an(68), an(65), an(63), an(65));
+			an(72), an(65), an(65), an(67),
+			an(68), an(67), an(65), an(72),
+			an(65), an(72), an(70), an(68),
+			an(70), an(65), an(72), an(65),
+			an(67), an(68), an(70), an(68),
+			an(65), an(63), an(65));
 		Figure lead1f = f(lead1r, lead1m, lead);
 
 		// This is the basic percussion and bass line
@@ -77,7 +80,6 @@ public class Demo2 extends DemoBase {
 	
 	public static void main(String[] args) throws MidiUnavailableException, IOException {
 		Demo2 d = new Demo2();
-		d.create();
-		d.play();
+		d.demo();
 	}
 }

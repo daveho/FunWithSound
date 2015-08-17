@@ -101,7 +101,6 @@ public class Demo extends DemoBase {
 	
 	public static void main(String[] args) throws MidiUnavailableException, IOException {
 		Demo d = new Demo();
-		d.create();
-		d.play();
+		d.demo();
 	}
 }

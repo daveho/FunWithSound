@@ -19,6 +19,11 @@ public abstract class DemoBase extends Composer {
 	public static final String M1 = "/home/dhovemey/SoundFonts/m1/HS M1 Drums.sf2";
 	
 	public abstract void create();
+	
+	public void demo() throws MidiUnavailableException, IOException {
+		create();
+		play();
+	}
 
 	public void play() throws MidiUnavailableException, IOException {
 		Player player = new Player();
