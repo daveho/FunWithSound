@@ -25,13 +25,11 @@ import processing.core.*;
  */
 public class FunWithSound {
 	PApplet parent;
-	Composer composer;
 	Player player;
 	boolean playing;
 	
 	public FunWithSound(PApplet parent) {
 		this.parent = parent;
-		composer = new Composer();
 		player = new Player();
 		playing = false;
 		
@@ -44,12 +42,8 @@ public class FunWithSound {
 		player.stopPlaying();
 	}
 	
-	public Composer composer() {
-		return composer;
-	}
-	
-	public void play() {
-		player.setComposition(composer.getComposition());
+	public void play(Composer c) {
+		player.setComposition(c.getComposition());
 		player.startPlaying();
 	}
 }
