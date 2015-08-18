@@ -46,24 +46,24 @@ public class Demo extends DemoBase {
 		Rhythm linger = r(s(0, 6.5));
 		Melody lead6 = xm(-1, m(n(-7, 3, 7)));
 		
-		Figure lf1 = f(leadin, low, oohs);
-		Figure lf2 = f(leadin, mid, oohs);
-		Figure lf3 = f(leadin, hi, oohs);
+		final Figure lf1 = f(leadin, low, oohs);
+		final Figure lf2 = f(leadin, mid, oohs);
+		final Figure lf3 = f(leadin, hi, oohs);
 		
-		Figure bf = f(pulse, bassdrone, organ);
+		final Figure bf = f(pulse, bassdrone, organ);
 		Figure bf2 = f(pulse, bassdrone2, organ);
 		Figure bf3 = f(pulse, bassdrone3, organ);
-		Figure bf4 = f(pulse, bassdrone4, organ);
-		Figure bf5 = f(pulse, bassdrone5, organ);
-		Figure bf6 = f(pulse, bassdrone6, organ);
+		final Figure bf4 = f(pulse, bassdrone4, organ);
+		final Figure bf5 = f(pulse, bassdrone5, organ);
+		final Figure bf6 = f(pulse, bassdrone6, organ);
 		
-		Figure omf1 = f(pulse, ominous1, b);
-		Figure omf2 = f(pulse, ominous2, b);
-		Figure omf3 = f(pulse, ominous3, b);
+		final Figure omf1 = f(pulse, ominous1, b);
+		final Figure omf2 = f(pulse, ominous2, b);
+		final Figure omf3 = f(pulse, ominous3, b);
 		
-		Figure l1f = f(pulse, lead1, oohs);
-		Figure l2f = f(pulse, lead2, oohs);
-		Figure l3f = f(lead3r, lead3, oohs);
+		final Figure l1f = f(pulse, lead1, oohs);
+		final Figure l2f = f(pulse, lead2, oohs);
+		final Figure l3f = f(lead3r, lead3, oohs);
 		
 		Figure l4f = f(lead4r, lead4, oohs);
 		Figure l5f = f(pulse, lead5, oohs);
@@ -77,22 +77,35 @@ public class Demo extends DemoBase {
 		add(lf2, bf);
 		add(lf3, bf);
 
-		rpt(2, () ->
-			add(lf1, bf, omf1).
-			add(lf2, bf, omf2).
-			add(lf3, bf, omf3));
+		rpt(2, new Runnable() {
+			public void run() {
+				add(lf1, bf, omf1);
+				add(lf2, bf, omf2);
+				add(lf3, bf, omf3);
+			}
+		});
 		
-		rpt(2, () -> add(bf));
+		rpt(2, new Runnable() {
+			public void run() {
+				add(bf);
+			}
+		});
 
-		rpt(2, () -> 
-			add(bf4, l1f).
-			add(bf5, l2f).
-			add(bf6, l3f));
+		rpt(2, new Runnable() {
+			public void run() {
+				add(bf4, l1f);
+				add(bf5, l2f);
+				add(bf6, l3f);
+			}
+		});
 
-		rpt(2, () -> 
-			add(bf4, xf(1, l1f)).
-			add(bf5, xf(1, l2f)).
-			add(bf6, xf(1, l3f)));
+		rpt(2, new Runnable() {
+			public void run() {
+				add(bf4, xf(1, l1f));
+				add(bf5, xf(1, l2f));
+				add(bf6, xf(1, l3f));
+			}
+		});
 		
 		add(bf2, l4f);
 		add(bf3, l5f);

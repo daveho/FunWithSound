@@ -10,6 +10,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.IdentityHashMap;
 import java.util.List;
@@ -137,7 +138,18 @@ public class Player {
 		// process them.  FIXME: this means we're only updating gain
 		// once per frame.  Should implement a proper gain envelope Bead.
 		final ArrayList<GainEvent> gainEvents = new ArrayList<GainEvent>(composition.getGainEvents());
-		Collections.sort(gainEvents, (left, right) -> (int)(left.ts - right.ts));
+		Collections.sort(gainEvents, new Comparator<GainEvent>() {
+			@Override
+			public int compare(GainEvent o1, GainEvent o2) {
+				if (o1.ts < o2.ts) {
+					return -1;
+				} else if (o1.ts > o2.ts) {
+					return 1;
+				} else {
+					return 0;
+				}
+			}
+		});
 		ac.invokeBeforeEveryFrame(new Bead() {
 			int next = 0;
 			@Override
@@ -166,7 +178,7 @@ public class Player {
 		// If there is a live instrument, create a synthesizer for it,
 		// and arrange to feed live midi events to it
 		MidiDevice device = null;
-		List<MidiMessageAndTimeStamp> capturedEvents = new ArrayList<MidiMessageAndTimeStamp>();
+		final List<MidiMessageAndTimeStamp> capturedEvents = new ArrayList<MidiMessageAndTimeStamp>();
 		if (liveInstr != null) {
 			final InstrumentInfo liveSynth = getGervillUGen(liveInstr);
 			ReceivedMidiMessageSource messageSource = new ReceivedMidiMessageSource(ac) {
