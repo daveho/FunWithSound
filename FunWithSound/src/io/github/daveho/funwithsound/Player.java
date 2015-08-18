@@ -56,6 +56,12 @@ public class Player {
 	private Instrument liveInstr;
 	private Map<Instrument, InstrumentInfo> instrMap;
 	private String outputFile;
+	private long idleTimeUs;
+	private CountDownLatch latch;
+	private ArrayList<GainEvent> gainEvents;
+	private ArrayList<MidiMessageAndTimeStamp> capturedEvents;
+	private MidiDevice device;
+	private boolean playing;
 	
 	public Player() {
 		soundBanks = new HashMap<String, SF2Soundbank>();
@@ -78,66 +84,131 @@ public class Player {
 		return new InstrumentInfo(gervill, gain);
 	}
 
+	/**
+	 * Play the composition synchronously (if playing live),
+	 * or render it to an output file (if {@link #setOutputFile(String)}
+	 * was called.)
+	 * 
+	 * @throws MidiUnavailableException
+	 * @throws IOException
+	 */
 	public void play() throws MidiUnavailableException, IOException {
+		prepareToPlay();
+		
+		if (outputFile != null) {
+			renderToOutputFile();
+		} else {
+			playLiveAndWait();
+		}
+		
+		onPlayingFinished();
+	}
+	
+	/**
+	 * Start playing the composition asynchronously.
+	 */
+	public void startPlaying() {
+		try {
+			prepareToPlay();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		ac.start();
+		this.playing = true;
+	}
+	
+	public void stopPlaying() {
+		if (playing) {
+			if (latch.getCount() > 0) {
+				ac.stop();
+			}
+		}
+	}
+
+	private void onPlayingFinished() {
+		// If we opened a MIDI device, close it
+		if (device != null) {
+			device.close();
+		}
+		
+		// If MIDI messages were captured, translate them to
+		// Rhythm and Melody
+		if (!capturedEvents.isEmpty()) {
+			analyzeCapturedEvents(capturedEvents);
+		}
+	}
+
+	private void playLiveAndWait() {
+		// Start the AudioContext! (for real-time output)
+		ac.start();
+		// Wait for playback to complete, then stop the AudioContext
+		try {
+			latch.await();
+		} catch (InterruptedException e) {
+			System.out.println("Interrupted waiting for playback to complete");
+		}
+		System.out.println("Playback finished");
+	}
+
+	private void renderToOutputFile() throws IOException {
+		System.out.print("Saving audio data to " + outputFile + "...");
+		System.out.flush();
+		File f = new File(outputFile);
+		RecordToFile recorder = new RecordToFile(ac, 2, f);
+		recorder.addInput(ac.out);
+		ac.out.addDependent(recorder);
+		// Render to file
+		ac.logTime(true);
+//			ac.runNonRealTime();
+		ac.runForNMillisecondsNonRealTime(idleTimeUs / 1000L);
+		System.out.println("done!");
+	}
+
+	private void prepareToPlay() throws MidiUnavailableException, IOException {
 		// Create an AudioContext
 		this.ac = new AudioContext();
 		
-		// Convert figures to MidiEvents and schedule them to be played
-		long lastNoteOffUs = 0L;
-		for (PlayFigureEvent e : composition) {
-			Figure f = e.getFigure();
-			Instrument instrument = f.getInstrument();
-			InstrumentInfo info = getGervillUGen(instrument);
-			Rhythm rhythm = f.getRhythm();
-			Melody melody = f.getMelody();
-			int n = Math.min(rhythm.size(), melody.size());
-			for (int i = 0; i < n; i++) {
-				Strike s = rhythm.get(i);
-				Chord c = melody.get(i);
-				for (Integer note : c) {
-					// Percussion events play on channel 10, normal MIDI
-					// events play on channel 1.  (Note that 1 is encoded as
-					// 0, and 10 is encoded as 9.)
-					int channel = instrument.getType() == InstrumentType.MIDI_PERCUSSION ? 9 : 0;
-					
-					long onTime = START_DELAY_US + e.getStartUs() + s.getStartUs();
-					long offTime = onTime + s.getDurationUs();
-					ShortMessage noteOn = Midi.createShortMessage(ShortMessage.NOTE_ON|channel, note, s.getVelocity());
-					info.gervill.getSynthRecv().send(noteOn, onTime);
-					ShortMessage noteOff = Midi.createShortMessage(ShortMessage.NOTE_OFF|channel, note, s.getVelocity());
-					info.gervill.getSynthRecv().send(noteOff, offTime);
-					// Keep track of the time of the last note off event
-					if (offTime > lastNoteOffUs) {
-						lastNoteOffUs = offTime;
-					}
-				}
-			}
-		}
-		
-		final long idleTimeUs = lastNoteOffUs + IDLE_WAIT_US;
+		this.idleTimeUs = prepareComposition();
 
 		// Register a shutdown hook to detect when playback is finished
-		final CountDownLatch latch = new CountDownLatch(1); 
-		ac.invokeAfterEveryFrame(new Bead() {
-			@Override
-			protected void messageReceived(Bead message) {
-				long timestampUs = ((long)ac.getTime()) * 1000L;
-				if (timestampUs >= idleTimeUs) {
-					// Notify main thread that playback is complete
-					latch.countDown();
-					
-					System.out.println("Ready to shut down?");
-					
-					// I assume it's OK for a Bead to stop the AudioContext?
-					ac.stop();
-				}
-			}
-		});
+		this.latch = new CountDownLatch(1); 
+		addShutdownHook(idleTimeUs);
+
+		// Add gain events (and a handler to handle them)
+		addGainEvents();
 		
+		// If there is a live instrument, create a synthesizer for it,
+		// and arrange to feed live midi events to it
+		prepareForAudition();
+	}
+
+	private void prepareForAudition() throws MidiUnavailableException,
+			IOException {
+		this.device = null;
+		this.capturedEvents = new ArrayList<MidiMessageAndTimeStamp>();
+		if (liveInstr != null) {
+			final InstrumentInfo liveSynth = getGervillUGen(liveInstr);
+			ReceivedMidiMessageSource messageSource = new ReceivedMidiMessageSource(ac) {
+				@Override
+				public void send(MidiMessage message, long timeStamp) {
+					capturedEvents.add(new MidiMessageAndTimeStamp(message, timeStamp));
+					super.send(message, timeStamp);
+				}
+			};
+			messageSource.addMessageListener(liveSynth.gervill);
+			
+			// Find a MIDI transmitter and feed its generated MIDI events to
+			// the message source
+			device = CaptureMidiMessages.getMidiInput(messageSource);
+		}
+	}
+
+	private void addGainEvents() {
 		// Sort GainEvents by timestamp, register a pre-frame hook to
 		// process them.  FIXME: this means we're only updating gain
 		// once per frame.  Should implement a proper gain envelope Bead.
-		final ArrayList<GainEvent> gainEvents = new ArrayList<GainEvent>(composition.getGainEvents());
+		this.gainEvents = new ArrayList<GainEvent>(composition.getGainEvents());
 		Collections.sort(gainEvents, new Comparator<GainEvent>() {
 			@Override
 			public int compare(GainEvent o1, GainEvent o2) {
@@ -174,61 +245,61 @@ public class Player {
 				}
 			}
 		});
-		
-		// If there is a live instrument, create a synthesizer for it,
-		// and arrange to feed live midi events to it
-		MidiDevice device = null;
-		final List<MidiMessageAndTimeStamp> capturedEvents = new ArrayList<MidiMessageAndTimeStamp>();
-		if (liveInstr != null) {
-			final InstrumentInfo liveSynth = getGervillUGen(liveInstr);
-			ReceivedMidiMessageSource messageSource = new ReceivedMidiMessageSource(ac) {
-				@Override
-				public void send(MidiMessage message, long timeStamp) {
-					capturedEvents.add(new MidiMessageAndTimeStamp(message, timeStamp));
-					super.send(message, timeStamp);
+	}
+
+	private void addShutdownHook(final long idleTimeUs) {
+		ac.invokeAfterEveryFrame(new Bead() {
+			@Override
+			protected void messageReceived(Bead message) {
+				long timestampUs = ((long)ac.getTime()) * 1000L;
+				if (timestampUs >= idleTimeUs) {
+					// Notify main thread that playback is complete
+					latch.countDown();
+					
+					System.out.println("Ready to shut down?");
+					
+					// I assume it's OK for a Bead to stop the AudioContext?
+					ac.stop();
 				}
-			};
-			messageSource.addMessageListener(liveSynth.gervill);
-			
-			// Find a MIDI transmitter and feed its generated MIDI events to
-			// the message source
-			device = CaptureMidiMessages.getMidiInput(messageSource);
-		}
-		
-		if (outputFile != null) {
-			System.out.print("Saving audio data to " + outputFile + "...");
-			System.out.flush();
-			File f = new File(outputFile);
-			RecordToFile recorder = new RecordToFile(ac, 2, f);
-			recorder.addInput(ac.out);
-			ac.out.addDependent(recorder);
-			// Render to file
-			ac.logTime(true);
-//			ac.runNonRealTime();
-			ac.runForNMillisecondsNonRealTime(idleTimeUs / 1000L);
-			System.out.println("done!");
-		} else {
-			// Start the AudioContext! (for real-time output)
-			ac.start();
-			// Wait for playback to complete, then stop the AudioContext
-			try {
-				latch.await();
-			} catch (InterruptedException e) {
-				System.out.println("Interrupted waiting for playback to complete");
 			}
-			System.out.println("Playback finished");
+		});
+	}
+
+	private long prepareComposition() throws MidiUnavailableException, IOException {
+		// Convert figures to MidiEvents and schedule them to be played
+		long lastNoteOffUs = 0L;
+		for (PlayFigureEvent e : composition) {
+			Figure f = e.getFigure();
+			Instrument instrument = f.getInstrument();
+			InstrumentInfo info = getGervillUGen(instrument);
+			Rhythm rhythm = f.getRhythm();
+			Melody melody = f.getMelody();
+			int n = Math.min(rhythm.size(), melody.size());
+			for (int i = 0; i < n; i++) {
+				Strike s = rhythm.get(i);
+				Chord c = melody.get(i);
+				for (Integer note : c) {
+					// Percussion events play on channel 10, normal MIDI
+					// events play on channel 1.  (Note that 1 is encoded as
+					// 0, and 10 is encoded as 9.)
+					int channel = instrument.getType() == InstrumentType.MIDI_PERCUSSION ? 9 : 0;
+					
+					long onTime = START_DELAY_US + e.getStartUs() + s.getStartUs();
+					long offTime = onTime + s.getDurationUs();
+					ShortMessage noteOn = Midi.createShortMessage(ShortMessage.NOTE_ON|channel, note, s.getVelocity());
+					info.gervill.getSynthRecv().send(noteOn, onTime);
+					ShortMessage noteOff = Midi.createShortMessage(ShortMessage.NOTE_OFF|channel, note, s.getVelocity());
+					info.gervill.getSynthRecv().send(noteOff, offTime);
+					// Keep track of the time of the last note off event
+					if (offTime > lastNoteOffUs) {
+						lastNoteOffUs = offTime;
+					}
+				}
+			}
 		}
 		
-		// If we opened a MIDI device, close it
-		if (device != null) {
-			device.close();
-		}
-		
-		// If MIDI messages were captured, translate them to
-		// Rhythm and Melody
-		if (!capturedEvents.isEmpty()) {
-			analyzeCapturedEvents(capturedEvents);
-		}
+		final long idleTimeUs = lastNoteOffUs + IDLE_WAIT_US;
+		return idleTimeUs;
 	}
 
 	private InstrumentInfo getGervillUGen(Instrument instrument)
