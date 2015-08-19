@@ -9,7 +9,7 @@ String SOUNDFONTS = "/home/dhovemey/SoundFonts";
 String ARACHNO = SOUNDFONTS + "/arachno/Arachno SoundFont - Version 1.0.sf2";
 
 class MyComp extends Composer {
-  public void create() {
+  void create() {
     tempo(220, 8);
     melodicMinor(65);
     
