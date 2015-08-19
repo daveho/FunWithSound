@@ -59,13 +59,18 @@ public class Demo2 extends DemoBase {
 		add1(kicksf);
 		add1(kicksf, basichihatf);
 		add1(kicksf, basichihatf);
-		v(bass, 0.6); // quiet the bass just a bit
+		v(bass, 0.4); // quiet the bass just a bit
 		rpt(24, new Runnable(){
 			@Override
 			public void run() {
 				add1(kicksf, basichihatf, bassf);
 			}
 		});
+		
+		// Gradual volume increase for bass part
+		v(5, bass, .5);
+		v(6, bass, .6);
+		v(7, bass, .7);
 		
 		// Chime-y sounds
 		at(8, chimef);

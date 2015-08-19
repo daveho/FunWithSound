@@ -24,6 +24,7 @@ import javax.sound.midi.ShortMessage;
 
 import net.beadsproject.beads.core.AudioContext;
 import net.beadsproject.beads.core.Bead;
+import net.beadsproject.beads.core.UGen;
 import net.beadsproject.beads.ugens.Gain;
 import net.beadsproject.beads.ugens.RecordToFile;
 
@@ -34,12 +35,17 @@ import com.sun.media.sound.SoftSynthesizer;
  * Play a composition.
  */
 public class Player {
+	/**
+	 * The GervillUGen and effects chain Beads for
+	 * a specific {@link Instrument}.
+	 */
 	static class InstrumentInfo {
-		final GervillUGen gervill;
-		final Gain gain;
-		public InstrumentInfo(GervillUGen gervill, Gain gain) {
+		GervillUGen gervill;
+		Gain gain;
+		List<GainEvent> gainEvents;
+		public InstrumentInfo(GervillUGen gervill) {
 			this.gervill = gervill;
-			this.gain = gain;
+			this.gainEvents = new ArrayList<GainEvent>();
 		}
 	}
 	
@@ -77,11 +83,10 @@ public class Player {
 	}
 	
 	private InstrumentInfo createGervill() throws MidiUnavailableException {
+		// Note that the GervillUGen isn't connected to an effects chain,
+		// or the AudioContext output, at this point.
 		GervillUGen gervill = new GervillUGen(ac, Collections.<String, Object>emptyMap());
-		Gain gain = new Gain(ac, 1);
-		gain.addInput(gervill);
-		ac.out.addInput(gain);
-		return new InstrumentInfo(gervill, gain);
+		return new InstrumentInfo(gervill);
 	}
 
 	/**
@@ -161,7 +166,6 @@ public class Player {
 		ac.out.addDependent(recorder);
 		// Render to file
 		ac.logTime(true);
-//			ac.runNonRealTime();
 		ac.runForNMillisecondsNonRealTime(idleTimeUs / 1000L);
 		System.out.println("done!");
 	}
@@ -176,8 +180,12 @@ public class Player {
 		this.latch = new CountDownLatch(1); 
 		addShutdownHook(idleTimeUs);
 
-		// Add gain events (and a handler to handle them)
+		// Add gain events
 		addGainEvents();
+		
+		// Prepare instrument effects (and connect the GervillUGens
+		// to the AudioContext's output)
+		configureInstrumentEffects();
 		
 		// If there is a live instrument, create a synthesizer for it,
 		// and arrange to feed live midi events to it
@@ -206,46 +214,38 @@ public class Player {
 	}
 
 	private void addGainEvents() {
-		// Sort GainEvents by timestamp, register a pre-frame hook to
-		// process them.  FIXME: this means we're only updating gain
-		// once per frame.  Should implement a proper gain envelope Bead.
-		this.gainEvents = new ArrayList<GainEvent>(composition.getGainEvents());
-		Collections.sort(gainEvents, new Comparator<GainEvent>() {
-			@Override
-			public int compare(GainEvent o1, GainEvent o2) {
-				if (o1.ts < o2.ts) {
-					return -1;
-				} else if (o1.ts > o2.ts) {
-					return 1;
-				} else {
-					return 0;
-				}
-			}
-		});
-		ac.invokeBeforeEveryFrame(new Bead() {
-			int next = 0;
-			@Override
-			protected void messageReceived(Bead message) {
-				if (next >= gainEvents.size()) {
-					return;
-				}
-				long timestampUs = ((long)ac.getTime()) * 1000L;
-				long endOfFrameUs = timestampUs + (long)(ac.samplesToMs(ac.getBufferSize())*1000.0);
-				while (next < gainEvents.size()) {
-					GainEvent e = gainEvents.get(next);
-					// See if this GainEvent is due to be processed in
-					// the upcoming frame
-					if (e.ts >= endOfFrameUs) {
-						// No, it's in a future frame, so nothing to do.
-						break;
+		// Distribute GainEvents by instrument
+		for (GainEvent e : composition.getGainEvents()) {
+			InstrumentInfo info = instrMap.get(e.instr);
+			info.gainEvents.add(e);
+		}
+		
+		// Sort the GainEvents by timestamp for each instrument
+		for (Map.Entry<Instrument, InstrumentInfo> entry : instrMap.entrySet()) {
+			Collections.sort(entry.getValue().gainEvents, new Comparator<GainEvent>() {
+				@Override
+				public int compare(GainEvent o1, GainEvent o2) {
+					if (o1.ts < o2.ts) {
+						return -1;
+					} else if (o1.ts > o2.ts) {
+						return 1;
+					} else {
+						return 0;
 					}
-					// Set the instrument's gain
-					InstrumentInfo info = instrMap.get(e.instr);
-					info.gain.setGain((float)e.gain);
-					next++;
 				}
-			}
-		});
+			}); 
+		}
+	}
+	
+	private void configureInstrumentEffects() {
+		for (Map.Entry<Instrument, InstrumentInfo> entry : instrMap.entrySet()) {
+			InstrumentInfo info = entry.getValue();
+			
+			UGen gainEnvelope = new InstrumentGainEnvelope(ac, info.gainEvents);
+			info.gain = new Gain(ac, 2, gainEnvelope);
+			info.gain.addInput(info.gervill);
+			ac.out.addInput(info.gain);
+		}
 	}
 
 	private void addShutdownHook(final long idleTimeUs) {
