@@ -13,7 +13,7 @@ class MyComp extends Composer {
     tempo(220, 8);
     melodicMinor(65);
     
-    Instrument organ = instr(ARACHNO, 19);
+    Instrument organ = instr(ARACHNO, 20);
     
     // This just plays a minor scale
     Rhythm tr = r(s(0, 1), s(1, 1), s(2, 1), s(3, 1), s(4, 1), s(5, 1), s(6, 1), s(7, 1));
@@ -21,7 +21,7 @@ class MyComp extends Composer {
     Figure tf = f(tr, tm, organ);
     
     add1(tf);
-    add1(xf(2, tf));
+    add1(xf(1, tf));
   }
 }
 
