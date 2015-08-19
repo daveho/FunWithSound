@@ -123,6 +123,7 @@ public class Player {
 			if (latch.getCount() > 0) {
 				ac.stop();
 			}
+			onPlayingFinished();
 		}
 	}
 
