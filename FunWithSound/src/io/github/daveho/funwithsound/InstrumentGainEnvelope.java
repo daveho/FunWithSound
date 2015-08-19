@@ -18,7 +18,7 @@ class InstrumentGainEnvelope extends UGen {
 	private int nextEvent;
 	private float nextGain;
 	private long effectiveSampleCount;
-	private boolean end;
+//	private boolean end;
 	
 	public InstrumentGainEnvelope(AudioContext ac, List<GainEvent> gainEvents) {
 		super(ac, 1);
@@ -37,13 +37,13 @@ class InstrumentGainEnvelope extends UGen {
 		// to be processed, or if the next effective timestamp
 		// is in a later audio frame, just fill the output buffer
 		// with the current gain.
-		if (end || sampleCount + bufferSize < effectiveSampleCount) {
+		if (sampleCount + bufferSize <= effectiveSampleCount) {
 			Arrays.fill(bufOut[0], gain);
 			sampleCount += bufferSize;
 			return;
 		}
 		
-		// Slow path: the gain in changing at least once during this frame.
+		// Slow path: the gain is changing at least once during this frame.
 		long s = sampleCount;
 		for (int i = 0; i < bufferSize; i++) {
 			if (s >= effectiveSampleCount) {
@@ -60,9 +60,8 @@ class InstrumentGainEnvelope extends UGen {
 	
 	private void findNextGainEvent() {
 		if (nextEvent >= gainEvents.size()) {
-			//System.out.println("No more gain events?");
+			System.out.println("No more gain events?");
 			// No more GainEvents to process
-			end = true;
 			effectiveSampleCount = Long.MAX_VALUE;
 			return;
 		}
@@ -70,7 +69,7 @@ class InstrumentGainEnvelope extends UGen {
 		// Determine sample number of given microsecond timestamp.
 		this.effectiveSampleCount = (long)ac.msToSamples(e.ts / 1000L);
 		this.nextGain = (float)e.gain; 
-		//System.out.printf("Change gain to %.03f at sample %d\n", nextGain, effectiveSampleCount);
+		System.out.printf("Change gain to %.03f at sample %d\n", nextGain, effectiveSampleCount);
 		this.nextEvent++;
 	}
 }

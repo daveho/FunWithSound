@@ -64,7 +64,6 @@ public class Player {
 	private String outputFile;
 	private long idleTimeUs;
 	private CountDownLatch latch;
-	private ArrayList<GainEvent> gainEvents;
 	private ArrayList<MidiMessageAndTimeStamp> capturedEvents;
 	private MidiDevice device;
 	private boolean playing;
