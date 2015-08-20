@@ -246,6 +246,20 @@ public class Composer {
 	}
 
 	/**
+	 * Combine multiple figures into a single figure.
+	 * 
+	 * @param figures the figures to combine
+	 * @return the combined figure
+	 */
+	public Figure gf(Figure... figures) {
+		CompositeFigure result = new CompositeFigure();
+		for (Figure f : figures) {
+			result.add(f);
+		}
+		return result;
+	}
+
+	/**
 	 * Create a full-velocity strike.
 	 * 
 	 * @param beat      offset in beats
@@ -442,20 +456,20 @@ public class Composer {
 	}
 
 	/**
-	 * Add figures to play simultaneously in the current measure in
+	 * Add a figure to play in the current measure in
 	 * the current {@link Composition}.  The start times of the
 	 * {@link Strike}s are checked to determine how many measures
 	 * are being added (usually one, but it's definitely possible
 	 * and useful to add longer figures that comprise multiple measures.)
 	 * 
-	 * @param figures the figures to play
+	 * @param figure the figure to play
 	 * @return this composer: allows calls to add to be chained
 	 */
-	public Composer add(Figure... figures) {
+	public Composer add(Figure figure) {
 //		System.out.printf("measure %d\n", measure);
 		// Add figures to composition, keeping track of where the
 		// beat offsets occur
-		double lastBeatOffsetUs = doAddFigures(this.measure, figures);
+		double lastBeatOffsetUs = doAddFigure(this.measure, figure);
 		
 		// Based on start offsets, determine how many measures these
 		// figures span
@@ -468,64 +482,107 @@ public class Composer {
 	}
 	
 	/**
-	 * Add figures to the composition at the current measure,
-	 * and advance by exactly one measure.  This is useful if any
-	 * of the figures play for slightly longer than one measure,
+	 * Repeatedly call {@link #add(Figure)} a specified number of times.
+	 * 
+	 * @param n       number of times to add the figure
+	 * @param figure  the figure to add
+	 * @return this composer: allows calls to be chained
+	 */
+	public Composer addn(int n, Figure figure) {
+		for (int i = 0; i < n; i++) {
+			add(figure);
+		}
+		return this;
+	}
+	
+	/**
+	 * Call the {@link #add(Figure)} method on a series of figures.
+	 * This will add them to the composition sequentially, starting at
+	 * the current measure.
+	 * 
+	 * @param figures the figures to play sequentially
+	 * @return this composer: allows calls to be chained
+	 */
+	public Composer addseq(Figure... figures) {
+		for (Figure f : figures) {
+			add(f);
+		}
+		return this;
+	}
+	
+	/**
+	 * Repeatedly call {@link #addseq(Figure...)} a specified number of times.
+	 * 
+	 * @param n        number of times
+	 * @param figures  the sequence of figures to repeatedly add
+	 * @return this composer: allows calls to be chained
+	 */
+	public Composer addseqn(int n, Figure... figures) {
+		for (int i = 0; i < n; i++) {
+			addseq(figures);
+		}
+		return this;
+	}
+	
+	/**
+	 * Add a figure to the composition at the current measure,
+	 * and advance by exactly one measure.  This is useful if
+	 * the figure plays for slightly longer than one measure,
 	 * but we don't want to allow the "spillover" as being counted
 	 * as a full second measure.
 	 * 
-	 * @param figures the figures to play
+	 * @param figure the figure to play
 	 * @return this composer: allows calls to add to be chained
 	 */
-	public Composer add1(Figure... figures) {
-		doAddFigures(this.measure, figures);
+	public Composer add1(Figure figure) {
+		doAddFigure(this.measure, figure);
 		this.measure++;
 		return this;
 	}
 	
 	/**
-	 * Add figures to play at a specified measure, without changing
-	 * the current measure.  This is useful for scheduling figures
+	 * Repeatedly call {@link #add1n(int, Figure)} a specified number of times.
+	 * 
+	 * @param n       number of times to add the figure
+	 * @param figure  the figure to add
+	 * @return this composer: allows calls to be chained
+	 */
+	public Composer add1n(int n, Figure figure) {
+		for (int i = 0; i < n; i++) {
+			add1(figure);
+		}
+		return this;
+	}
+	
+	/**
+	 * Add a figure to play at a specified measure, without changing
+	 * the current measure.  This is useful for scheduling a figure
 	 * to play at an absolute position in the composition.
 	 * 
 	 * @param measure the measure when the figures should play
-	 * @param figures the figures to play
+	 * @param figure the figure to play
 	 * @return this composer: allows calls to add to be chained
 	 */
-	public Composer at(int measure, Figure... figures) {
-		doAddFigures(measure, figures);
+	public Composer at(int measure, Figure figure) {
+		doAddFigure(measure, figure);
 		return this;
 	}
 
-	private double doAddFigures(int measure, Figure... figures) {
+	private double doAddFigure(int measure, Figure figure) {
 		Tempo tempo = composition.getTempo();
 		double lastBeatOffsetUs = 0;
-		for (Figure figure : figures) {
-			for (SimpleFigure sf : figure) {
-				PlayFigureEvent evt = new PlayFigureEvent();
-				evt.setFigure(sf);
-				evt.setStartUs(measure * tempo.getBeatsPerMeasure() * tempo.getUsPerBeat());
-				composition.add(evt);
-				for (Strike strike : sf.getRhythm()) {
-					if (strike.getStartUs() > lastBeatOffsetUs) {
-						lastBeatOffsetUs = strike.getStartUs();
-					}
+		for (SimpleFigure sf : figure) {
+			PlayFigureEvent evt = new PlayFigureEvent();
+			evt.setFigure(sf);
+			evt.setStartUs(measure * tempo.getBeatsPerMeasure() * tempo.getUsPerBeat());
+			composition.add(evt);
+			for (Strike strike : sf.getRhythm()) {
+				if (strike.getStartUs() > lastBeatOffsetUs) {
+					lastBeatOffsetUs = strike.getStartUs();
 				}
 			}
 		}
 		return lastBeatOffsetUs;
-	}
-	
-	/**
-	 * Repeat given runnable specified number of times.
-	 * 
-	 * @param times number of times to repat
-	 * @param r the runnable
-	 */
-	public void rpt(int times, Runnable r) {
-		for (int i = 0; i < times; i++) {
-			r.run();
-		}
 	}
 	
 	/**

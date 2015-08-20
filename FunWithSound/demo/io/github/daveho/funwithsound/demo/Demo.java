@@ -73,43 +73,21 @@ public class Demo extends DemoBase {
 		add(lf2);
 		add(lf3);
 
-		add(lf1, bf);
-		add(lf2, bf);
-		add(lf3, bf);
+		add(gf(lf1, bf));
+		add(gf(lf2, bf));
+		add(gf(lf3, bf));
 
-		rpt(2, new Runnable() {
-			public void run() {
-				add(lf1, bf, omf1);
-				add(lf2, bf, omf2);
-				add(lf3, bf, omf3);
-			}
-		});
+		addseqn(2, gf(lf1, bf, omf1), gf(lf2, bf, omf2), gf(lf3, bf, omf3));
 		
-		rpt(2, new Runnable() {
-			public void run() {
-				add(bf);
-			}
-		});
+		addn(2, bf);
 
-		rpt(2, new Runnable() {
-			public void run() {
-				add(bf4, l1f);
-				add(bf5, l2f);
-				add(bf6, l3f);
-			}
-		});
+		addseqn(2, gf(bf4, l1f), gf(bf5, l2f), gf(bf6, l3f));
 
-		rpt(2, new Runnable() {
-			public void run() {
-				add(bf4, xf(1, l1f));
-				add(bf5, xf(1, l2f));
-				add(bf6, xf(1, l3f));
-			}
-		});
+		addseqn(2, gf(bf4, xf(1, l1f)), gf(bf5, xf(1, l2f)), gf(bf6, xf(1, l3f)));
 		
-		add(bf2, l4f);
-		add(bf3, l5f);
-		add(bf, l6f);
+		add(gf(bf2, l4f));
+		add(gf(bf3, l5f));
+		add(gf(bf, l6f));
 	}
 	
 	public static void main(String[] args) throws MidiUnavailableException, IOException {

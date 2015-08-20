@@ -57,15 +57,10 @@ public class Demo2 extends DemoBase {
 		// This is the basic percussion and bass line
 		add1(kicksf);
 		add1(kicksf);
-		add1(kicksf, basichihatf);
-		add1(kicksf, basichihatf);
+		add1(gf(kicksf, basichihatf));
+		add1(gf(kicksf, basichihatf));
+		add1n(24, gf(kicksf, basichihatf, bassf));
 		v(bass, 0.4); // quiet the bass just a bit
-		rpt(24, new Runnable(){
-			@Override
-			public void run() {
-				add1(kicksf, basichihatf, bassf);
-			}
-		});
 		
 		// Gradual volume increase for bass part
 		v(5, bass, .5);

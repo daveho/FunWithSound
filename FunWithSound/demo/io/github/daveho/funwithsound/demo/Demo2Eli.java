@@ -40,14 +40,9 @@ public class Demo2Eli extends DemoBase {
 		// This is the basic percussion and bass line
 		add1(kicksf);
 		add1(kicksf);
-		add1(kicksf, basichihatf);
-		add1(kicksf, basichihatf);
-		rpt(24, new Runnable() {
-			@Override
-			public void run() {
-				add1(kicksf, basichihatf, bassf);
-			}
-		});
+		add1(gf(kicksf, basichihatf));
+		add1(gf(kicksf, basichihatf));
+		add1n(24, gf(kicksf, basichihatf, bassf));
 		
 		// Chime-y sounds
 		at(8, chimef);
