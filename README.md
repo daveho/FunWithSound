@@ -3,9 +3,11 @@ FunWithSound
 
 Library intended to make it easy to create music using [Processing](http://processessing.org) and [Beads](http://www.beadsproject.net).  It can also be used from plain Java code.
 
-This is a work in progress.  However, it actually works: see the [Demo](https://github.com/daveho/FunWithSound/blob/master/FunWithSound/demo/io/github/daveho/funwithsound/demo/Demo.java) and [Demo2](https://github.com/daveho/FunWithSound/blob/master/FunWithSound/demo/io/github/daveho/funwithsound/demo/Demo2.java) programs for a couple quick examples.  Also, see the sketches [FWSDemo](https://github.com/daveho/FunWithSound/blob/master/FunWithSoundProcessingLib/examples/FWSDemo/FWSDemo.pde) and [FWSDemo2](https://github.com/daveho/FunWithSound/blob/master/FunWithSoundProcessingLib/examples/FWSDemo2/FWSDemo2.pde) for examples of using the library with Processing.  (Processing library download coming soon...)
+This is a work in progress.  However, it actually works: see the [Demo](https://github.com/daveho/FunWithSound/blob/master/FunWithSound/demo/io/github/daveho/funwithsound/demo/Demo.java) and [Demo2](https://github.com/daveho/FunWithSound/blob/master/FunWithSound/demo/io/github/daveho/funwithsound/demo/Demo2.java) programs for a couple quick examples.  Also, see the sketches [FWSDemo](https://github.com/daveho/FunWithSound/blob/master/FunWithSoundProcessingLib/examples/FWSDemo/FWSDemo.pde) and [FWSDemo2](https://github.com/daveho/FunWithSound/blob/master/FunWithSoundProcessingLib/examples/FWSDemo2/FWSDemo2.pde) for examples of using the library with Processing.
 
 Note that you need Processing 3.0 or later to use FunWithSound.
+
+See the [Releases](https://github.com/daveho/FunWithSound/releases) page for downloadable releases, including a Processing library.
 
 There is some pretty decent documentation on the [wiki](https://github.com/daveho/FunWithSound/wiki).
 
