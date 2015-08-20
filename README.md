@@ -7,9 +7,11 @@ This is a work in progress.  However, it actually works: see the [Demo](https://
 
 Note that you need Processing 3.0 or later to use FunWithSound.
 
-There is not really any documentation at the moment.  It will be coming soon.
+There is some pretty decent documentation on the [wiki](https://github.com/daveho/FunWithSound/wiki).
 
 The project depends on [Gervill4Beads](https://github.com/daveho/Gervill4Beads).  To run the Java demos, just have both projects checked out in the same Eclipse workspace.  You'll need to run the `fetchlibs.sh` script in the Gervill4Beads directory to download all of the required libraries.
+
+You can build the Java and Processing libraries from the command line by running the `build.sh` script.  This script assumes that you have Gervill4Beads checked out next to FunWithSound.
 
 The code is distributed under the [MIT license](https://github.com/daveho/FunWithSound/blob/master/LICENSE.txt).
 
