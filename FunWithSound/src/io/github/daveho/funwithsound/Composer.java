@@ -234,10 +234,14 @@ public class Composer {
 	 * @return a figure with the shifted melody
 	 */
 	public Figure xf(int octave, Figure orig) {
-		Figure result = new Figure();
-		result.setRhythm(orig.getRhythm());
-		result.setMelody(xm(octave, orig.getMelody()));
-		result.setInstrument(orig.getInstrument());
+		CompositeFigure result = new CompositeFigure();
+		for (SimpleFigure sfo : orig) {
+			SimpleFigure sf = new SimpleFigure();
+			sf.setRhythm(sfo.getRhythm());
+			sf.setMelody(xm(octave, sfo.getMelody()));
+			sf.setInstrument(sfo.getInstrument());
+			result.add(sf);
+		}
 		return result;
 	}
 
@@ -406,7 +410,7 @@ public class Composer {
 	 * @return the figure
 	 */
 	public Figure f(Rhythm rhythm, Melody melody, Instrument instrument) {
-		Figure result = new Figure();
+		SimpleFigure result = new SimpleFigure();
 		result.setRhythm(rhythm);
 		result.setMelody(melody);
 		result.setInstrument(instrument);
@@ -497,13 +501,15 @@ public class Composer {
 		Tempo tempo = composition.getTempo();
 		double lastBeatOffsetUs = 0;
 		for (Figure figure : figures) {
-			PlayFigureEvent evt = new PlayFigureEvent();
-			evt.setFigure(figure);
-			evt.setStartUs(measure * tempo.getBeatsPerMeasure() * tempo.getUsPerBeat());
-			composition.add(evt);
-			for (Strike strike : figure.getRhythm()) {
-				if (strike.getStartUs() > lastBeatOffsetUs) {
-					lastBeatOffsetUs = strike.getStartUs();
+			for (SimpleFigure sf : figure) {
+				PlayFigureEvent evt = new PlayFigureEvent();
+				evt.setFigure(sf);
+				evt.setStartUs(measure * tempo.getBeatsPerMeasure() * tempo.getUsPerBeat());
+				composition.add(evt);
+				for (Strike strike : sf.getRhythm()) {
+					if (strike.getStartUs() > lastBeatOffsetUs) {
+						lastBeatOffsetUs = strike.getStartUs();
+					}
 				}
 			}
 		}

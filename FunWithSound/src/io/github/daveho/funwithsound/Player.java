@@ -269,7 +269,7 @@ public class Player {
 		// Convert figures to MidiEvents and schedule them to be played
 		long lastNoteOffUs = 0L;
 		for (PlayFigureEvent e : composition) {
-			Figure f = e.getFigure();
+			SimpleFigure f = e.getFigure();
 			Instrument instrument = f.getInstrument();
 			InstrumentInfo info = getGervillUGen(instrument);
 			Rhythm rhythm = f.getRhythm();

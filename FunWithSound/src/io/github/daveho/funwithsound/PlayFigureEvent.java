@@ -1,21 +1,21 @@
 package io.github.daveho.funwithsound;
 
 /**
- * Event to play a {@link Figure} at a specified time.
+ * Event to play a {@link SimpleFigure} at a specified time.
  */
 public class PlayFigureEvent {
-	private Figure figure;
+	private SimpleFigure figure;
 	long startUs;
 	
 	public PlayFigureEvent() {
 		
 	}
 	
-	public void setFigure(Figure figure) {
+	public void setFigure(SimpleFigure figure) {
 		this.figure = figure;
 	}
 	
-	public Figure getFigure() {
+	public SimpleFigure getFigure() {
 		return figure;
 	}
 	
