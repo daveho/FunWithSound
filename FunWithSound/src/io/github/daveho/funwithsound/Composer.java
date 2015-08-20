@@ -380,13 +380,13 @@ public class Composer {
 	 *                 except for their start time
 	 * @param spacing  the amount of time between the strikes,
 	 *                 counted in beats
-	 * @param count    how many strikes to generate
+	 * @param n    how many strikes to generate
 	 * @return the rhythm
 	 */
-	public Rhythm rr(Strike first, double spacing, int count) {
+	public Rhythm rr(Strike first, double spacing, int n) {
 		Rhythm result = new Rhythm();
 		
-		for (int i = 0; i < count; i++) {
+		for (int i = 0; i < n; i++) {
 			Strike s = new Strike(
 					(long) (first.getStartUs() + (i*spacing*composition.getTempo().getUsPerBeat())),
 					first.getDurationUs(),
