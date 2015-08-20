@@ -316,8 +316,11 @@ public class Player {
 					System.err.println("Warning: couldn't load soundfont " + instrument.getSoundFont());
 				}
 			}
-			if (instrument.getPatch() >= 0) {
-				ShortMessage programChange = Midi.createShortMessage(ShortMessage.PROGRAM_CHANGE, instrument.getPatch());
+			int patch = instrument.getPatch();
+			if (patch >= 1) {
+				// The MIDI patches are numbered 1..128, but encoded as 0..127
+				patch--;
+				ShortMessage programChange = Midi.createShortMessage(ShortMessage.PROGRAM_CHANGE, patch);
 				info.gervill.getSynthRecv().send(programChange, -1L);
 			}
 			instrMap.put(instrument, info);

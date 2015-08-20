@@ -14,9 +14,9 @@ public class Demo extends DemoBase {
 		melodicMinor(65);
 		tempo(220, 8);
 		
-		Instrument oohs = instr(ARACHNO, 54);
-		Instrument organ = instr(ARACHNO, 20);
-		Instrument b = instr(ARACHNO, 77);
+		Instrument oohs = instr(ARACHNO, 55);
+		Instrument organ = instr(ARACHNO, 21);
+		Instrument b = instr(ARACHNO, 78);
 
 		Rhythm leadin = r(fs(0), qs(1), fs(2), fs(3), fs(4), qs(5), fs(6), qs(7));
 		Melody low = m(-7, -6, n(-7, -5), -4, n(-5, -3), n(-6, -2), n(-6, -1), n(-5, 0));

@@ -16,9 +16,9 @@ public class Demo2 extends DemoBase {
 
 		Instrument drums = percussion(M1);
 		Instrument drums_kicks = percussion(M1);
-		Instrument bass = instr(ARACHNO, 38);
-		Instrument newage = instr(ARACHNO, 88);
-		Instrument lead = instr(ARACHNO, 11);
+		Instrument bass = instr(ARACHNO, 39);
+		Instrument newage = instr(ARACHNO, 89);
+		Instrument lead = instr(ARACHNO, 12);
 		
 		Rhythm kicks = r(p(0, 120), p(4));
 		final Figure kicksf = pf(kicks, 35, drums_kicks);

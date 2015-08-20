@@ -16,8 +16,8 @@ public class Demo2Eli extends DemoBase {
 
 		Instrument tr808 = percussion(M1);
 		Instrument tr808_kicks = percussion(M1);
-		Instrument bass = instr(ARACHNO, 30);
-		Instrument lead = instr(ARACHNO, 83); // <--- change this number
+		Instrument bass = instr(ARACHNO, 31);
+		Instrument lead = instr(ARACHNO, 84); // <--- change this number
 		
 		Rhythm kicks = r(p(5, 125), p(10));
 		final Figure kicksf = pf(kicks, 30, tr808_kicks);

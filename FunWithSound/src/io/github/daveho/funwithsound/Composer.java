@@ -34,7 +34,7 @@ public class Composer {
 	 * Create a new MIDI instrument using the built-in "emergency" MIDI
 	 * soundbank.
 	 * 
-	 * @param patch the MIDI patch
+	 * @param patch the MIDI patch (starting from 1)
 	 * @return the instrument
 	 */
 	public Instrument instr(int patch) {
@@ -56,7 +56,7 @@ public class Composer {
 	 * Create a new MIDI instrument loaded from a specified soundfont file.
 	 * 
 	 * @param soundFont the sound font file name
-	 * @param patch the patch
+	 * @param patch the patch (starting from 1)
 	 * @return the instrument
 	 */
 	public Instrument instr(String soundFont, int patch) {
