@@ -398,16 +398,6 @@ public class Composer {
 	}
 	
 	/**
-	 * Create an instrument.
-	 * 
-	 * @param patch the instrument's midi patch number
-	 * @return the instrument
-	 */
-	public Instrument i(int patch) {
-		return new Instrument(patch);
-	}
-	
-	/**
 	 * Create a figure from a {@link Rhythm}, {@link Melody}, and {@link Instrument}.
 	 * 
 	 * @param rhythm  the rhythm
