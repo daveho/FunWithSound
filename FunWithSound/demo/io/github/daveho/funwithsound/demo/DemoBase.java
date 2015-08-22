@@ -28,6 +28,10 @@ public abstract class DemoBase extends Composer {
 	// From: http://www.suonoelettronico.com/soundfont_bank_download.asp
 	public static final String TR909 = SOUNDFONT_DIR+"/tr909/Roland_TR-909_batteria_elettronica.sf2";
 	
+	// Minimoog soundfont
+	// From: http://www.suonoelettronico.com/soundfont_scaricare_sf2.asp?nome=Minimoog%2053%20suoni
+	public static final String MINIMOOG = SOUNDFONT_DIR+"/minimoog/minimoog_leads.sf2";
+	
 	private String outputFile;
 	
 	public abstract void create();

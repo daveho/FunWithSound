@@ -31,6 +31,15 @@ public class Composer {
 	}
 	
 	/**
+	 * Return the current measure.
+	 * 
+	 * @return the current measure
+	 */
+	public int m() {
+		return this.measure;
+	}
+	
+	/**
 	 * Create a new MIDI instrument using the built-in "emergency" MIDI
 	 * soundbank.
 	 * 
