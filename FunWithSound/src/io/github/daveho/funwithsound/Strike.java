@@ -28,13 +28,9 @@ public class Strike {
 		}
 	};
 
-	private long startUs;
-	private long durationUs;
-	private int velocity;
-	
-	public Strike() {
-		
-	}
+	private final long startUs;
+	private final long durationUs;
+	private final int velocity;
 	
 	public Strike(long startUs, long durationUs, int velocity) {
 		this.startUs = startUs;
@@ -42,24 +38,12 @@ public class Strike {
 		this.velocity = velocity;
 	}
 	
-	public void setStartUs(long startUs) {
-		this.startUs = startUs;
-	}
-	
 	public long getStartUs() {
 		return startUs;
 	}
 	
-	public void setDurationUs(long durationUs) {
-		this.durationUs = durationUs;
-	}
-	
 	public long getDurationUs() {
 		return durationUs;
-	}
-	
-	public void setVelocity(int velocity) {
-		this.velocity = velocity;
 	}
 	
 	public int getVelocity() {

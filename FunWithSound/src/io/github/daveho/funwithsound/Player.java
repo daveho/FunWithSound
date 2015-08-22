@@ -178,6 +178,10 @@ public class Player {
 		// Register a shutdown hook to detect when playback is finished
 		this.latch = new CountDownLatch(1); 
 		addShutdownHook(idleTimeUs);
+		
+		// If there is a live instrument, create a synthesizer for it,
+		// and arrange to feed live midi events to it
+		prepareForAudition();
 
 		// Add gain events
 		addGainEvents();
@@ -185,10 +189,6 @@ public class Player {
 		// Prepare instrument effects (and connect the GervillUGens
 		// to the AudioContext's output)
 		configureInstrumentEffects();
-		
-		// If there is a live instrument, create a synthesizer for it,
-		// and arrange to feed live midi events to it
-		prepareForAudition();
 	}
 
 	private void prepareForAudition() throws MidiUnavailableException,
@@ -200,6 +200,14 @@ public class Player {
 			ReceivedMidiMessageSource messageSource = new ReceivedMidiMessageSource(ac) {
 				@Override
 				public void send(MidiMessage message, long timeStamp) {
+					if (liveInstr.getType() == InstrumentType.MIDI_PERCUSSION) {
+						// Percussion messages should on channel 10
+						if (message instanceof ShortMessage) {
+							ShortMessage smsg = (ShortMessage) message;
+							message = Midi.createShortMessage(smsg.getStatus()|9, smsg.getData1(), smsg.getData2());
+						}
+					}
+					
 					capturedEvents.add(new MidiMessageAndTimeStamp(message, timeStamp));
 					super.send(message, timeStamp);
 				}

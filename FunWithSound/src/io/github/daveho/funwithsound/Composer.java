@@ -280,11 +280,10 @@ public class Composer {
 	 * @return the strike
 	 */
 	public Strike s(double beat, double duration, int velocity) {
-		Strike strike = new Strike();
-		strike.setStartUs(composition.getTempo().beatToUs(beat));
-		strike.setDurationUs(composition.getTempo().beatToUs(duration));
-		strike.setVelocity(velocity);
-		return strike;
+		return new Strike(
+				composition.getTempo().beatToUs(beat),
+				composition.getTempo().beatToUs(duration),
+				velocity);
 	}
 	
 	/**
@@ -369,11 +368,8 @@ public class Composer {
 	 * @return the strike
 	 */
 	public Strike p(double beat, int velocity) {
-		Strike strike = new Strike();
-		strike.setStartUs(composition.getTempo().beatToUs(beat));
-		strike.setDurationUs(1000000L/200L); // duration is arbitrarily 5ms
-		strike.setVelocity(velocity);
-		return strike;
+		// duration is arbitrarily 5ms
+		return new Strike(composition.getTempo().beatToUs(beat), 1000000L/200L, velocity);
 	}
 	
 	/**
@@ -412,6 +408,42 @@ public class Composer {
 			result.add(s);
 		}
 		
+		return result;
+	}
+	
+	/**
+	 * Create a rhythm by combining the strikes in one or more
+	 * Rhythms.
+	 * 
+	 * @param rhythms the rhythms to combine
+	 * @return the single combined rhythm
+	 */
+	public Rhythm gr(Rhythm... rhythms) {
+		Rhythm result = new Rhythm();
+		for (Rhythm r : rhythms) {
+			for (Strike s : r) {
+				result.add(s);
+			}
+		}
+		return result;
+	}
+	
+	/**
+	 * Create a rhythm by shifting the start beat of all of
+	 * the strikes in a given rhythm by a specified shift.
+	 * 
+	 * @param shift   the shift (amount to add to each start beat)
+	 * @param orig  the original rhythm
+	 * @return the shifted rhythm
+	 */
+	public Rhythm sr(double shift, Rhythm orig) {
+		Rhythm result = new Rhythm();
+		for (Strike s : orig) {
+			result.add(new Strike(
+					s.getStartUs() + composition.getTempo().beatToUs(shift),
+					s.getDurationUs(),
+					s.getVelocity()));
+		}
 		return result;
 	}
 	
