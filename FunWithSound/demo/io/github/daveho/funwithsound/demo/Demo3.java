@@ -48,6 +48,10 @@ public class Demo3 extends DemoBase {
 		Melody hihatm = m(
 			an(42), an(42), an(42), an(42), an(46), an(42), an(42), an(42), an(42), an(42), an(46), an(42), an(42), an(42), an(42), an(46), an(42), an(42), an(42), an(42), an(42), an(42), an(46));
 		Figure hihatf = f(hihatr, hihatm, drumkit_hihats);
+		
+		// Another bass drum pattern
+		Rhythm kick2r = r(s(0,1.9,127), s(3,.9, 95), s(4,.9,127));
+		Figure kick2f = pf(kick2r, 36, drumkit);
 
 
 		//add1n(16, gf(met_kickf, met_hihatf));
@@ -55,6 +59,8 @@ public class Demo3 extends DemoBase {
 		at(2, hihatf);
 		at(6, hihatf);
 		at(10, hihatf);
+		
+		add1n(4, kick2f);
 		
 		audition(accent_perc);
 	}
