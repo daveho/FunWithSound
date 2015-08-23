@@ -4,7 +4,6 @@ import io.github.daveho.funwithsound.Figure;
 import io.github.daveho.funwithsound.Instrument;
 import io.github.daveho.funwithsound.Melody;
 import io.github.daveho.funwithsound.Rhythm;
-import io.github.daveho.funwithsound.Strike;
 
 import java.io.IOException;
 
@@ -24,6 +23,7 @@ public class Demo3 extends DemoBase {
 		Instrument drumkit_hihats = percussion(TR808);
 		Instrument accent_perc = percussion(ARACHNO);
 		Instrument synth = instr(MINIMOOG, 3);
+		Instrument lead = instr(ARACHNO, 95); // really cool lead sound
 
 		// This is basically just a metronome, don't need it now that there is a proper
 		// underlying rhythm
@@ -74,6 +74,13 @@ public class Demo3 extends DemoBase {
 				an(75), an(72), an(75), an(75), an(74), an(75), an(72), an(75), an(75), an(74), an(75), an(72), an(75), an(75), an(74), an(75), an(72), an(75), an(75), an(74));
 		Figure acc1f = f(acc1r, acc1m, accent_perc);
 		
+		// overlay bit
+		Rhythm over1r = r(
+				s(0.000,2.204,99), s(1.889,0.971,96), s(2.845,5.078,80), s(7.769,1.992,93), s(9.660,1.090,96), s(10.690,1.946,85), s(12.640,3.251,102), s(15.967,1.987,90), s(17.999,0.908,90), s(18.907,1.835,83), s(20.671,2.306,73), s(22.887,0.996,85), s(23.899,6.774,90), s(30.696,1.166,79), s(31.786,16.059,102));
+		Melody over1m = m(
+				an(64), an(65), an(62), an(64), an(65), an(67), an(65), an(64), an(65), an(64), an(62), an(60), an(62), an(60), an(62));
+		Figure over1f = f(over1r, over1m, lead);
+		
 		// Pow!
 		Rhythm powr = r(
 				s(0.000,16.046,110), s(16.013,7.876,106), s(23.881,4.025,90), s(27.846,4.201,96), s(32.039,15.972,110), s(47.977,8.115,110), s(56.016,3.941,102), s(59.873,4.225,102), s(64.109,32.071,106));
@@ -86,7 +93,6 @@ public class Demo3 extends DemoBase {
 		int here;
 
 		//add1n(16, gf(met_kickf, met_hihatf));
-
 		add1n(16, kicksf);
 		at(2, hihatf);
 		at(6, gf(hihatf, yelpf));
@@ -97,19 +103,19 @@ public class Demo3 extends DemoBase {
 		here = m();
 		add1n(12, kicksf);
 		at(here, gf(hihatf, yelpf, acc1f, powf)); // <-- POW!
-		at(here+4, gf(hihatf, yelpf, acc1f));
+		at(here+4, gf(hihatf, yelpf, acc1f, over1f));
 		at(here+8, gf(hihatf, yelpf, acc1f));
 
 		here = m();
 		add1n(12, kicksf);
 		at(here, gf(hihatf, yelpf, acc1f, powf)); // <-- POW!
-		at(here+4, gf(hihatf, yelpf, acc1f));
+		at(here+4, gf(hihatf, yelpf, acc1f, over1f));
 		at(here+8, gf(hihatf, yelpf, acc1f));
 
 		add1n(2, kicksf);
 		add1n(2, kick2f);
 		
-		//audition(synth);
+		audition(lead);
 	}
 	
 	public static void main(String[] args) throws MidiUnavailableException, IOException {
