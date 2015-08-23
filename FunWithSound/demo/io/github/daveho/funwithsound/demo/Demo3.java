@@ -55,9 +55,17 @@ public class Demo3 extends DemoBase {
 		Figure kick2f = pf(kick2r, 36, drumkit);
 		
 		Rhythm yelpr = r(
-				s(0.000,0.257,110), s(4.136,0.211,118), s(8.133,0.291,118), s(11.934,0.292,118), s(16.155,0.291,127), s(20.059,0.312,118), s(24.149,0.245,118), s(27.959,0.172,127));
+				s(0.000,0.257,110),
+				//s(4.136,0.211,118),
+				s(8.133,0.291,118),
+				//s(11.934,0.292,118),
+				s(16.155,0.291,127),
+				//s(20.059,0.312,118),
+				s(24.149,0.245,118)//,
+				//s(27.959,0.172,127)
+				);
 		Melody yelpm = m(
-				an(78), an(78), an(78), an(78), an(78), an(78), an(78), an(78));
+				an(78), an(78), an(78), an(78)/*, an(78), an(78), an(78), an(78)*/);
 		Figure yelpf = f(yelpr, yelpm, accent_perc);
 		
 		Rhythm acc1r = r(
@@ -73,8 +81,7 @@ public class Demo3 extends DemoBase {
 			an(64,71), an(65,72), an(67,74), an(69,76), an(64,71), an(65,72), an(67,74), an(69,76), an(62,69));
 		Figure powf = f(powr, powm, synth);
 		
-		
-		v(synth, 0.7);
+		v(synth, 0.5);
 
 		int here;
 
@@ -88,15 +95,21 @@ public class Demo3 extends DemoBase {
 		add1n(4, kick2f);
 		
 		here = m();
-
 		add1n(12, kicksf);
 		at(here, gf(hihatf, yelpf, acc1f, powf)); // <-- POW!
 		at(here+4, gf(hihatf, yelpf, acc1f));
 		at(here+8, gf(hihatf, yelpf, acc1f));
 
-		add1n(4, kick2f);
+		here = m();
+		add1n(12, kicksf);
+		at(here, gf(hihatf, yelpf, acc1f, powf)); // <-- POW!
+		at(here+4, gf(hihatf, yelpf, acc1f));
+		at(here+8, gf(hihatf, yelpf, acc1f));
 
-		audition(synth);
+		add1n(2, kicksf);
+		add1n(2, kick2f);
+		
+		//audition(synth);
 	}
 	
 	public static void main(String[] args) throws MidiUnavailableException, IOException {
