@@ -57,15 +57,15 @@ public class Demo3 extends DemoBase {
 		Rhythm yelpr = r(
 				s(0.000,0.257,110),
 				//s(4.136,0.211,118),
-				s(8.133,0.291,118),
+				//s(8.133,0.291,118),
 				//s(11.934,0.292,118),
-				s(16.155,0.291,127),
+				s(16.155,0.291,127)//,
 				//s(20.059,0.312,118),
-				s(24.149,0.245,118)//,
+				//s(24.149,0.245,118)//,
 				//s(27.959,0.172,127)
 				);
 		Melody yelpm = m(
-				an(78), an(78), an(78), an(78)/*, an(78), an(78), an(78), an(78)*/);
+				an(78), an(78)/*, an(78), an(78), an(78), an(78), an(78), an(78)*/);
 		Figure yelpf = f(yelpr, yelpm, accent_perc);
 		
 		Rhythm acc1r = r(
@@ -103,7 +103,7 @@ public class Demo3 extends DemoBase {
 		here = m();
 		add1n(12, kicksf);
 		at(here, gf(hihatf, yelpf, acc1f, powf)); // <-- POW!
-		at(here+4, gf(hihatf, yelpf, acc1f, over1f));
+		at(here+4, gf(hihatf, yelpf, acc1f));
 		at(here+8, gf(hihatf, yelpf, acc1f));
 
 		here = m();
