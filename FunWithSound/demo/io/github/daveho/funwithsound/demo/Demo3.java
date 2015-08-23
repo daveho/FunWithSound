@@ -24,6 +24,8 @@ public class Demo3 extends DemoBase {
 		Instrument accent_perc = percussion(ARACHNO);
 		Instrument synth = instr(MINIMOOG, 3);
 		Instrument lead = instr(ARACHNO, 95); // really cool lead sound
+		
+		Instrument lead2 = instr(MINIMOOG, 7);
 
 		// This is basically just a metronome, don't need it now that there is a proper
 		// underlying rhythm
@@ -74,6 +76,19 @@ public class Demo3 extends DemoBase {
 				an(75), an(72), an(75), an(75), an(74), an(75), an(72), an(75), an(75), an(74), an(75), an(72), an(75), an(75), an(74), an(75), an(72), an(75), an(75), an(74));
 		Figure acc1f = f(acc1r, acc1m, accent_perc);
 		
+		// Pow!
+		Rhythm powr = r(
+				s(0.000,16.046,110), s(16.013,7.876,106), s(23.881,4.025,90), s(27.846,4.201,96), s(32.039,15.972,110), s(47.977,8.115,110), s(56.016,3.941,102), s(59.873,4.225,102), s(64.109,32.071,106));
+		Melody powm = m(
+			an(64,71), an(65,72), an(67,74), an(69,76), an(64,71), an(65,72), an(67,74), an(69,76), an(62,69));
+		Figure powf = f(powr, powm, synth);
+		
+		Rhythm over0r = r(
+				s(0.000,2.066,96), s(1.982,2.937,93), s(4.798,1.008,96), s(5.905,7.104,102), s(12.838,0.914,96), s(13.999,7.239,110), s(21.168,0.701,110), s(21.948,3.917,102), s(25.782,4.563,106));
+		Melody over0m = m(
+				an(89), an(96), an(93), an(91), an(93), an(89), an(91), an(86), an(88));
+		Figure over0f = f(sr(2, over0r), xm(-1, over0m), lead);
+		
 		// overlay bit
 		Rhythm over1r = r(
 				s(0.000,2.204,99), s(1.889,0.971,96), s(2.845,5.078,80), s(7.769,1.992,93), s(9.660,1.090,96), s(10.690,1.946,85), s(12.640,3.251,102), s(15.967,1.987,90), s(17.999,0.908,90), s(18.907,1.835,83), s(20.671,2.306,73), s(22.887,0.996,85), s(23.899,6.774,90), s(30.696,1.166,79), s(31.786,16.059,102));
@@ -81,12 +96,11 @@ public class Demo3 extends DemoBase {
 				an(64), an(65), an(62), an(64), an(65), an(67), an(65), an(64), an(65), an(64), an(62), an(60), an(62), an(60), an(62));
 		Figure over1f = f(over1r, over1m, lead);
 		
-		// Pow!
-		Rhythm powr = r(
-				s(0.000,16.046,110), s(16.013,7.876,106), s(23.881,4.025,90), s(27.846,4.201,96), s(32.039,15.972,110), s(47.977,8.115,110), s(56.016,3.941,102), s(59.873,4.225,102), s(64.109,32.071,106));
-		Melody powm = m(
-			an(64,71), an(65,72), an(67,74), an(69,76), an(64,71), an(65,72), an(67,74), an(69,76), an(62,69));
-		Figure powf = f(powr, powm, synth);
+		Rhythm over2r = r(
+				s(0.000,1.283,110), s(1.800,0.551,106), s(3.224,0.243,106), s(3.743,0.496,96), s(4.675,2.697,106), s(7.740,1.332,102), s(9.686,0.835,106), s(11.260,0.307,102), s(11.826,0.442,87), s(12.637,0.661,106), s(13.830,0.618,99), s(14.636,0.697,96), s(15.722,7.094,110), s(22.756,0.838,93), s(23.807,6.522,96), s(30.754,17.013,85), s(31.804,15.981,96));
+		Melody over2m = m(
+				an(79), an(79), an(79), an(79), an(77), an(79), an(79), an(79), an(79), an(77), an(74), an(77), an(76), an(77), an(74), an(74), an(81));
+		Figure over2f = f(over2r, over2m, lead);
 		
 		v(synth, 0.5);
 
@@ -108,14 +122,13 @@ public class Demo3 extends DemoBase {
 
 		here = m();
 		add1n(12, kicksf);
-		at(here, gf(hihatf, yelpf, acc1f, powf)); // <-- POW!
+		at(here, gf(hihatf, yelpf, acc1f, powf, over0f)); // <-- POW!
 		at(here+4, gf(hihatf, yelpf, acc1f, over1f));
-		at(here+8, gf(hihatf, yelpf, acc1f));
+		at(here+8, gf(hihatf, yelpf, acc1f, over2f));
 
-		add1n(2, kicksf);
-		add1n(2, kick2f);
+		add1n(6, kicksf);
 		
-		audition(lead);
+		audition(lead2);
 	}
 	
 	public static void main(String[] args) throws MidiUnavailableException, IOException {
