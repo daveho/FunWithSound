@@ -14,29 +14,17 @@ public class Demo3 extends DemoBase {
 	public void create() {
 		tempo(200, 8);
 		major(51);
-
-		/*
-		Instrument met_kicks = percussion(TR808);
-		Instrument met_hihat = percussion(TR808);
-		*/
+		
+		// NOTE: this composition sounds terrible without the
+		// soundfonts.  See DemoBase for links to the soundfont files needed.
+		
 		Instrument drumkit = percussion(TR909);
 		Instrument drumkit_hihats = percussion(TR808);
 		Instrument accent_perc = percussion(ARACHNO);
 		Instrument synth = instr(MINIMOOG, 3);
 		Instrument lead = instr(ARACHNO, 95); // really cool lead sound
 		
-		Instrument lead2 = instr(MINIMOOG, 7);
-
-		// This is basically just a metronome, don't need it now that there is a proper
-		// underlying rhythm
-		/*
-		Strike kick = s(0, 40);
-		Rhythm met_kickr = rr(kick, 4, 2);
-		Figure met_kickf = pf(met_kickr, 36, met_kicks);
-		Strike tap = s(0, 80);
-		Rhythm met_hihatr = rr(tap, 1, 8);
-		Figure met_hihatf = pf(met_hihatr, 42, met_hihat);
-		*/
+//		Instrument lead2 = instr(MINIMOOG, 7);
 
 		// This is weird but cool
 		Rhythm kicksr = r(
@@ -128,7 +116,7 @@ public class Demo3 extends DemoBase {
 
 		add1n(6, kicksf);
 		
-		audition(lead2);
+//		audition(lead2);
 	}
 	
 	public static void main(String[] args) throws MidiUnavailableException, IOException {
