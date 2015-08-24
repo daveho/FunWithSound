@@ -373,12 +373,12 @@ public class Composer {
 	 * Higher velocity generally means a louder percussion sound when played.
 	 * 
 	 * @param beat offset in beats
-	 * @param velocity, in the range 0..127
+	 * @param velocity velocity, in the range 0..127
 	 * @return the strike
 	 */
 	public Strike p(double beat, int velocity) {
 		// duration is arbitrarily 5ms
-		return new Strike(composition.getTempo().beatToUs(beat), 1000000L/200L, velocity);
+		return s(beat, 1000000L/200L, velocity);
 	}
 	
 	/**
@@ -659,5 +659,15 @@ public class Composer {
 	public void v(int measure, Instrument instr, double gain) {
 		int beat = measure * composition.getTempo().getBeatsPerMeasure();
 		composition.addGainEvent(composition.getTempo().beatToUs(beat), instr, gain);
+	}
+	
+	/**
+	 * Add an effect to the effects chain for given instrument.
+	 * 
+	 * @param instr   the instrument
+	 * @param effect  the effect to add
+	 */
+	public void addfx(Instrument instr, AddEffect effect) {
+		composition.addEffect(instr, effect);
 	}
 }

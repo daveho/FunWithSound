@@ -1,8 +1,10 @@
 package io.github.daveho.funwithsound;
 
 import java.util.ArrayList;
+import java.util.IdentityHashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 /**
  * A composition is a collection of {@link PlayFigureEvent}s specifying
@@ -14,10 +16,12 @@ public class Composition implements Iterable<PlayFigureEvent> {
 	private Scale scale;
 	private Tempo tempo;
 	private List<GainEvent> gainEvents;
+	private Map<Instrument, List<AddEffect>> fxMap;
 	
 	public Composition() {
 		playFigureEvents = new ArrayList<PlayFigureEvent>();
 		gainEvents = new ArrayList<GainEvent>();
+		fxMap = new IdentityHashMap<Instrument, List<AddEffect>>();
 	}
 	
 	public void setScale(Scale scale) {
@@ -59,5 +63,25 @@ public class Composition implements Iterable<PlayFigureEvent> {
 	
 	public List<GainEvent> getGainEvents() {
 		return gainEvents;
+	}
+	
+	public Map<Instrument, List<AddEffect>> getEffectsMap() {
+		return fxMap;
+	}
+	
+	/**
+	 * Add an effect to a specified {@link Instrument}.
+	 * Each effect is appended onto the instrument's effects chain.
+	 * 
+	 * @param instr   the {@link Instrument}
+	 * @param effect  the {@link AddEffect} which adds the effect
+	 */
+	public void addEffect(Instrument instr, AddEffect effect) {
+		List<AddEffect> fx = fxMap.get(instr);
+		if (fx == null) {
+			fx = new ArrayList<AddEffect>();
+			fxMap.put(instr, fx);
+		}
+		fx.add(effect);
 	}
 }

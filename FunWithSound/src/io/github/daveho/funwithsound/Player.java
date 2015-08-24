@@ -35,20 +35,6 @@ import com.sun.media.sound.SoftSynthesizer;
  * Play a composition.
  */
 public class Player {
-	/**
-	 * The GervillUGen and effects chain Beads for
-	 * a specific {@link Instrument}.
-	 */
-	static class InstrumentInfo {
-		GervillUGen gervill;
-		Gain gain;
-		List<GainEvent> gainEvents;
-		public InstrumentInfo(GervillUGen gervill) {
-			this.gervill = gervill;
-			this.gainEvents = new ArrayList<GainEvent>();
-		}
-	}
-	
 	// Delay before starting playback,
 	// to avoid early audio buffer underruns.
 	private static final long START_DELAY_US = 1000000L;
@@ -248,9 +234,16 @@ public class Player {
 		for (Map.Entry<Instrument, InstrumentInfo> entry : instrMap.entrySet()) {
 			InstrumentInfo info = entry.getValue();
 			
+			List<AddEffect> fx = composition.getEffectsMap().get(entry.getKey());
+			if (fx != null) {
+				for (AddEffect effect : fx) {
+					info.endOfChain = effect.apply(ac, info);
+				}
+			}
+			
 			UGen gainEnvelope = new InstrumentGainEnvelope(ac, info.gainEvents);
 			info.gain = new Gain(ac, 2, gainEnvelope);
-			info.gain.addInput(info.gervill);
+			info.gain.addInput(info.endOfChain);
 			ac.out.addInput(info.gain);
 		}
 	}
@@ -350,6 +343,12 @@ public class Player {
 		return sb;
 	}
 
+	/**
+	 * Use live input from a MIDI keyboard to play given {@link Instrument},
+	 * capturing the input MIDI messages.
+	 * 
+	 * @param liveInstr the live {@link Instrument}
+	 */
 	public void playLive(Instrument liveInstr) {
 		this.liveInstr = liveInstr;
 	}
