@@ -123,7 +123,8 @@ public class Demo4 extends DemoBase {
 		// Sax comes in at measure 6
 		at(6, saxf);
 		
-		// Sax cuts out for 4 measures, then comes back in at measure 18
+		// Sax cuts out for 4 measures, then comes back in at measure 18 ---
+		// with STRINGS
 		at(18, gf(stringf, saxf));
 		
 		at(26, stringf);
