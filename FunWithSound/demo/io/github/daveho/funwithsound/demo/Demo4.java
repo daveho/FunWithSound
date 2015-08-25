@@ -4,6 +4,7 @@ import java.io.IOException;
 
 import javax.sound.midi.MidiUnavailableException;
 
+import io.github.daveho.funwithsound.AddDelay;
 import io.github.daveho.funwithsound.AddReverb;
 import io.github.daveho.funwithsound.Figure;
 import io.github.daveho.funwithsound.Instrument;
@@ -18,6 +19,8 @@ public class Demo4 extends DemoBase {
 		major(51);
 		
 		Instrument drumkit = percussion(TR808);
+		//addfx(drumkit, new AddReverb());
+		addfx(drumkit, new AddDelay(250.0, .8, .4));
 		
 		
 		Rhythm r = rr(p(0, 127), 2, 4);
@@ -29,7 +32,6 @@ public class Demo4 extends DemoBase {
 		add1n(4, f);
 		
 		
-		addfx(drumkit, new AddReverb());
 	}
 
 	public static void main(String[] args) throws MidiUnavailableException, IOException {
