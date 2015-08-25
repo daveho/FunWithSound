@@ -77,7 +77,7 @@ public class Demo4 extends DemoBase {
 				s(16,2.285,78), s(18.053,3.940,96),
 				s(22,1.003,99), s(23,0.560,79), s(23.4,0.495,102), s(24,6.881,75),
 				
-				s(31,0.825,99), s(32,2.288,99), s(34,3.914,87),
+				s(31,0.825,99), s(32,2.288,99), s(34.05,3.914,87),
 				s(38,0.824,73), s(39,0.623,77), s(39.45,0.516,99),
 				s(40,2.002,68), s(42,4.173,83),
 				s(46,0.902,93), s(47,0.631,69), s(47.4,0.509,93),
@@ -100,20 +100,25 @@ public class Demo4 extends DemoBase {
 		Figure bassf = f(sr(2, bassr), bassm, bass);
 		
 		int n = 26;
-		add1n(n, gf(/*f,*/ gf(/*f2, */prf, prf2)));
+
+		// Kick/snare
+		add1n(n, gf(prf, prf2));
+
+		// Hihats, hand claps
 		for (int i = 0; i < n; i += 2) {
 			at(i, gf(pf,clickf));
 		}
-//		at(2, gf(pf,clickf));
-//		at(4, gf(pf,clickf));
-//		at(6, gf(pf,clickf));
-		
-		at(6, saxf);
-		at(14, saxf);
-		
+
+		// Bass comes in at measure 2
 		for (int i = 2; i < n; i += 4) {
 			at(i, bassf);
 		}
+		
+		// Sax comes in at measure 6
+		at(6, saxf);
+		
+		// Sax cuts out for 4 measures, then comes back in at measure 18
+		at(18, saxf);
 		
 		//audition(bass);
 	}
