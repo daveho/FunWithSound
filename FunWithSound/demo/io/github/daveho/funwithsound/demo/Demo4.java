@@ -105,7 +105,7 @@ public class Demo4 extends DemoBase {
 				an(57), an(60), an(59), an(55), an(60), an(57), an(62), an(55), an(57), an(60), an(59), an(55), an(57), an(60), an(53), an(52), an(57), an(60), an(55), an(59), an(60), an(57), an(62), an(55), an(57), an(60), an(59), an(55), an(57), an(60), an(52), an(60));
 		Figure stringf = f(stringr, stringm, str);
 		
-		int n =36;
+		int n =38;
 
 		// Kick/snare
 		add1n(n, gf(prf, prf2));
