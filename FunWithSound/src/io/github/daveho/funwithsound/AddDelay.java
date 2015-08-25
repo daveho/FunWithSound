@@ -4,11 +4,21 @@ import net.beadsproject.beads.core.AudioContext;
 import net.beadsproject.beads.core.UGen;
 import net.beadsproject.beads.ugens.CombFilter;
 
+/**
+ * Add a delay effect.
+ */
 public class AddDelay implements AddEffect {
 	private double delayMs;
 	private double passThruGain;
 	private double delayGain;
-	
+
+	/**
+	 * Constructor.
+	 * 
+	 * @param delayMs       the delay in milliseconds
+	 * @param passThruGain  the gain for the original signal
+	 * @param delayGain     the gain for the delayed signal
+	 */
 	public AddDelay(double delayMs, double passThruGain, double delayGain) {
 		this.delayMs = delayMs;
 		this.passThruGain = passThruGain;
