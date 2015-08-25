@@ -50,6 +50,10 @@ public class Demo4 extends DemoBase {
 		addfx(bb, new AddDelay(750.0, 1.0, 0.7));
 		v(bb, 0.5);
 		
+		Instrument bass = instr(ARACHNO, 34);
+		addfx(bass, new AddReverb());
+		v(bass, .5);
+		
 		Rhythm pr = r(
 				s(0.000,1.984,118), s(2,0.646,118), s(2.826,0.248,118), s(3.281,2.587,118), s(6,0.892,118), s(6.830,0.250,127), s(7.270,2.773,106), s(10,0.742,118), s(11,0.253,118), s(11.382,0.710,99), s(13,0.657,118), s(14,0.492,118), s(14.387,0.808,118));
 		Melody pm = m(
@@ -83,7 +87,19 @@ public class Demo4 extends DemoBase {
 				an(57), an(59), an(60), an(64), an(60), an(52), an(53), an(60), an(64), an(60), an(52), an(53), an(59), an(60), an(59), an(57), an(55), an(57), an(59), an(60), an(64), an(60), an(52), an(53), an(60), an(64), an(60), an(52), an(53), an(59), an(60), an(59), an(57));
 		Figure saxf = f(saxr, saxm, sax);
 		
-		int n = 20;
+		Rhythm bassr = r(
+				s(0.000,0.476,110), s(1,0.182,106), s(1.4,6.187,96),
+				s(8,0.765,118), s(9,0.494,72), s(9.35,1.549,110), s(11,5.230,106),
+				s(16,0.856,106), s(17,0.485,61), s(17.4,1.630,106), s(18.9,4.190,93),
+				s(23,0.496,106), s(24,0.380,106), s(24.4,0.492,110), s(25.5,5.161,110));
+		Melody bassm = m(
+				an(33), an(33), an(33),
+				an(33), an(28), an(29), an(41),
+				an(38), an(28), an(29), an(41),
+				an(31), an(31), an(33), an(33));
+		Figure bassf = f(sr(2, bassr), bassm, bass);
+		
+		int n = 26;
 		add1n(n, gf(/*f,*/ gf(/*f2, */prf, prf2)));
 		for (int i = 0; i < n; i += 2) {
 			at(i, gf(pf,clickf));
@@ -91,9 +107,15 @@ public class Demo4 extends DemoBase {
 //		at(2, gf(pf,clickf));
 //		at(4, gf(pf,clickf));
 //		at(6, gf(pf,clickf));
-		at(4, saxf);
 		
-		audition(bb);
+		at(6, saxf);
+		at(14, saxf);
+		
+		for (int i = 2; i < n; i += 4) {
+			at(i, bassf);
+		}
+		
+		//audition(bass);
 	}
 
 	public static void main(String[] args) throws MidiUnavailableException, IOException {
