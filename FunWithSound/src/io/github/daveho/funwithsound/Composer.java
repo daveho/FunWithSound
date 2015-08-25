@@ -16,10 +16,12 @@ public class Composer {
 	private Composition composition;
 	private int measure;
 	private Instrument audition;
+	private double percussiveStrikeDuration;
 	
 	public Composer() {
 		composition = new Composition();
 		measure = 0;
+		percussiveStrikeDuration = 0.25;
 	}
 	
 	protected boolean hasAudition() {
@@ -28,6 +30,19 @@ public class Composer {
 	
 	protected  Instrument getAudition() {
 		return audition;
+	}
+	
+	/**
+	 * Set the duration of a percussive strike (created by the
+	 * {@link #p(double)} and {@link #p(double, int)} methods.
+	 * The default value is 0.25 (a quarter beat).  Note that the
+	 * percussion sounds in some soundfonts don't play correctly
+	 * if the strike duration is too short.
+	 * 
+	 * @param beats duration of percussive strikes, in beats
+	 */
+	public void pdur(double beats) {
+		percussiveStrikeDuration = beats;
 	}
 	
 	/**
@@ -377,8 +392,7 @@ public class Composer {
 	 * @return the strike
 	 */
 	public Strike p(double beat, int velocity) {
-		// duration is arbitrarily 5ms
-		return s(beat, 1000000L/200L, velocity);
+		return s(beat, this.percussiveStrikeDuration, velocity);
 	}
 	
 	/**

@@ -160,6 +160,7 @@ public class Player {
 		this.ac = new AudioContext();
 		
 		this.idleTimeUs = prepareComposition();
+		System.out.printf("Idle time at %d us\n", this.idleTimeUs);
 
 		// Register a shutdown hook to detect when playback is finished
 		this.latch = new CountDownLatch(1); 
@@ -206,10 +207,10 @@ public class Player {
 		}
 	}
 
-	private void addGainEvents() {
+	private void addGainEvents() throws MidiUnavailableException, IOException {
 		// Distribute GainEvents by instrument
 		for (GainEvent e : composition.getGainEvents()) {
-			InstrumentInfo info = instrMap.get(e.instr);
+			InstrumentInfo info = getGervillUGen(e.instr);
 			info.gainEvents.add(e);
 		}
 		
@@ -270,6 +271,7 @@ public class Player {
 		// Convert figures to MidiEvents and schedule them to be played
 		long lastNoteOffUs = 0L;
 		for (PlayFigureEvent e : composition) {
+//			System.out.printf("PlayFigureEvent start time=%d\n", e.getStartUs());
 			SimpleFigure f = e.getFigure();
 			Instrument instrument = f.getInstrument();
 			InstrumentInfo info = getGervillUGen(instrument);
@@ -278,6 +280,7 @@ public class Player {
 			int n = Math.min(rhythm.size(), melody.size());
 			for (int i = 0; i < n; i++) {
 				Strike s = rhythm.get(i);
+//				System.out.printf("Strike start time=%d, duration=%d\n", s.getStartUs(), s.getDurationUs());
 				Chord c = melody.get(i);
 				for (Integer note : c) {
 					// Percussion events play on channel 10, normal MIDI
@@ -286,6 +289,7 @@ public class Player {
 					int channel = instrument.getType() == InstrumentType.MIDI_PERCUSSION ? 9 : 0;
 					
 					long onTime = START_DELAY_US + e.getStartUs() + s.getStartUs();
+//					System.out.printf("Note on at %d\n", onTime);
 					long offTime = onTime + s.getDurationUs();
 					ShortMessage noteOn = Midi.createShortMessage(ShortMessage.NOTE_ON|channel, note, s.getVelocity());
 					info.gervill.getSynthRecv().send(noteOn, onTime);

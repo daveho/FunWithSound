@@ -39,6 +39,17 @@ public class Tempo {
 	public long beatToUs(double beat) {
 		return (long) (beat * usPerBeat);
 	}
+
+	/**
+	 * Convert a timestamp or duration in microseconds to a number
+	 * of beats.
+	 * 
+	 * @param us timestamp or duration in microseconds
+	 * @return equivalent number of beats
+	 */
+	public double usToBeat(long us) {
+		return (double)us / (double)getUsPerBeat();
+	}
 	
 	/**
 	 * Determine the offset in microseconds of the beginning of the specified
