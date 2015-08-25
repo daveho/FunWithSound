@@ -45,10 +45,10 @@ public class Demo4 extends DemoBase {
 		params.roomSize = .95;
 		addfx(sax, new AddReverb(params));
 		
-		Instrument bb = instr(ARACHNO, 99);
-		addfx(bb, new AddDelay(375.0, 1.0, 0.7));
-		addfx(bb, new AddDelay(750.0, 1.0, 0.7));
-		v(bb, 0.5);
+		Instrument str = instr(ARACHNO, 41);
+//		addfx(str, new AddDelay(375.0, 1.0, 0.7));
+//		addfx(str, new AddDelay(750.0, 1.0, 0.7));
+		v(str, 0.35);
 		
 		Instrument bass = instr(ARACHNO, 34);
 		addfx(bass, new AddReverb());
@@ -99,7 +99,13 @@ public class Demo4 extends DemoBase {
 				an(31), an(31), an(33), an(33));
 		Figure bassf = f(sr(2, bassr), bassm, bass);
 		
-		int n = 26;
+		Rhythm stringr = r(
+				s(0.000,3.970,85), s(0.044,3.835,90), s(3.922,3.746,79), s(3.995,3.491,96), s(7.706,3.825,81), s(7.790,3.862,75), s(11.608,4.033,78), s(11.647,4.086,74), s(15.573,4.024,74), s(15.864,3.679,73), s(19.619,4.210,76), s(19.662,4.075,96), s(23.734,3.914,93), s(23.970,7.482,74), s(27.707,3.763,96), s(31.681,4.024,99), s(31.718,3.365,87), s(31.795,3.922,78), s(36.026,3.328,99), s(36.151,3.217,73), s(39.738,3.993,79), s(39.756,4.059,90), s(43.800,4.011,78), s(43.809,4.064,85), s(47.762,4.102,73), s(47.947,3.640,73), s(51.762,4.153,78), s(51.785,3.922,106), s(55.816,3.641,99), s(55.892,3.619,76), s(59.725,4.068,106), s(59.783,4.017,99));
+		Melody stringm = m(
+				an(57), an(60), an(59), an(55), an(60), an(57), an(62), an(55), an(57), an(60), an(59), an(55), an(57), an(60), an(53), an(52), an(57), an(60), an(55), an(59), an(60), an(57), an(62), an(55), an(57), an(60), an(59), an(55), an(57), an(60), an(52), an(60));
+		Figure stringf = f(stringr, stringm, str);
+		
+		int n =36;
 
 		// Kick/snare
 		add1n(n, gf(prf, prf2));
@@ -118,9 +124,11 @@ public class Demo4 extends DemoBase {
 		at(6, saxf);
 		
 		// Sax cuts out for 4 measures, then comes back in at measure 18
-		at(18, saxf);
+		at(18, gf(stringf, saxf));
 		
-		//audition(bass);
+		at(26, stringf);
+		
+		audition(str);
 	}
 
 	public static void main(String[] args) throws MidiUnavailableException, IOException {
