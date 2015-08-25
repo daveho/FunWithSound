@@ -15,8 +15,7 @@
 
 package io.github.daveho.funwithsound.demo;
 
-import io.github.daveho.funwithsound.AddFlanger;
-import io.github.daveho.funwithsound.AddFlanger.Params;
+import io.github.daveho.funwithsound.AddDelay;
 import io.github.daveho.funwithsound.AddReverb;
 import io.github.daveho.funwithsound.Figure;
 import io.github.daveho.funwithsound.Instrument;
@@ -42,14 +41,14 @@ public class Demo4 extends DemoBase {
 		v(hh, 0.5);
 		
 		Instrument sax = instr(ARACHNO, 66);
-//		Params params = AddFlanger.defaultParams();
-//		params.minDelayMs = 20.0;
-//		params.maxDelayMs = 25.0;
-//		params.h = 0.5;
-//		addfx(synth, new AddFlanger(params));
 		AddReverb.Params params = AddReverb.defaultParams();
 		params.roomSize = .95;
 		addfx(sax, new AddReverb(params));
+		
+		Instrument bb = instr(ARACHNO, 99);
+		addfx(bb, new AddDelay(375.0, 1.0, 0.7));
+		addfx(bb, new AddDelay(750.0, 1.0, 0.7));
+		v(bb, 0.5);
 		
 		Rhythm pr = r(
 				s(0.000,1.984,118), s(2,0.646,118), s(2.826,0.248,118), s(3.281,2.587,118), s(6,0.892,118), s(6.830,0.250,127), s(7.270,2.773,106), s(10,0.742,118), s(11,0.253,118), s(11.382,0.710,99), s(13,0.657,118), s(14,0.492,118), s(14.387,0.808,118));
@@ -84,7 +83,7 @@ public class Demo4 extends DemoBase {
 				an(57), an(59), an(60), an(64), an(60), an(52), an(53), an(60), an(64), an(60), an(52), an(53), an(59), an(60), an(59), an(57), an(55), an(57), an(59), an(60), an(64), an(60), an(52), an(53), an(60), an(64), an(60), an(52), an(53), an(59), an(60), an(59), an(57));
 		Figure saxf = f(saxr, saxm, sax);
 		
-		int n = 12;
+		int n = 20;
 		add1n(n, gf(/*f,*/ gf(/*f2, */prf, prf2)));
 		for (int i = 0; i < n; i += 2) {
 			at(i, gf(pf,clickf));
@@ -94,7 +93,7 @@ public class Demo4 extends DemoBase {
 //		at(6, gf(pf,clickf));
 		at(4, saxf);
 		
-		audition(sax);
+		audition(bb);
 	}
 
 	public static void main(String[] args) throws MidiUnavailableException, IOException {
