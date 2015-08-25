@@ -15,6 +15,6 @@ The project depends on [Gervill4Beads](https://github.com/daveho/Gervill4Beads).
 
 You can build the Java and Processing libraries from the command line by running the `build.sh` script.  This script assumes that you have Gervill4Beads checked out next to FunWithSound.
 
-The code is distributed under the [MIT license](https://github.com/daveho/FunWithSound/blob/master/LICENSE.txt).
+The code is distributed under the [Apache License 2.0](https://github.com/daveho/FunWithSound/blob/master/LICENSE.md).
 
 Contact: [David Hovemeyer](mailto:david.hovemeyer@gmail.com)
