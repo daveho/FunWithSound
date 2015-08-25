@@ -39,7 +39,7 @@ public class Demo4 extends DemoBase {
 		Instrument drumkit2 = percussion(TR909);
 		Instrument drumkit3 = percussion(TR808);
 		
-		Instrument synth = instr(ARACHNO, 95);
+		Instrument sax = instr(ARACHNO, 66);
 //		Params params = AddFlanger.defaultParams();
 //		params.minDelayMs = 20.0;
 //		params.maxDelayMs = 25.0;
@@ -47,7 +47,7 @@ public class Demo4 extends DemoBase {
 //		addfx(synth, new AddFlanger(params));
 		AddReverb.Params params = AddReverb.defaultParams();
 		params.roomSize = .95;
-		addfx(synth, new AddReverb(params));
+		addfx(sax, new AddReverb(params));
 		
 		Rhythm pr = r(
 				s(0.000,1.984,118), s(2,0.646,118), s(2.826,0.248,118), s(3.281,2.587,118), s(6,0.892,118), s(6.830,0.250,127), s(7.270,2.773,106), s(10,0.742,118), s(11,0.253,118), s(11.382,0.710,99), s(13,0.657,118), s(14,0.492,118), s(14.387,0.808,118));
@@ -64,13 +64,23 @@ public class Demo4 extends DemoBase {
 		Melody clickm = m(an(39));
 		Figure clickf = f(clickr, clickm, drumkit);
 		
-		add1n(8, gf(/*f,*/ gf(/*f2, */prf, prf2)));
-		at(0, gf(pf,clickf));
-		at(2, gf(pf,clickf));
-		at(4, gf(pf,clickf));
-		at(6, gf(pf,clickf));
+		Rhythm saxr = r(
+				s(0.000,2.023,110), s(2.023,4.009,102), s(5.964,0.930,79), s(6.904,0.723,90), s(7.363,0.501,99), s(7.895,2.023,79), s(9.858,4.111,102), s(13.850,0.863,81), s(14.744,0.657,71), s(15.229,0.572,75), s(15.837,2.285,78), s(18.053,3.940,96), s(21.926,1.003,99), s(22.882,0.560,79), s(23.341,0.495,102), s(23.905,6.881,75), s(30.769,0.825,99), s(31.660,2.288,99), s(33.956,3.914,87), s(37.924,0.824,73), s(38.786,0.623,77), s(39.229,0.516,99), s(39.771,2.002,68), s(41.764,4.173,83), s(45.849,0.902,93), s(46.782,0.631,69), s(47.346,0.509,93), s(47.854,2.009,72), s(49.798,4.067,96), s(53.789,1.097,90), s(54.844,0.551,80), s(55.292,0.501,102), s(55.810,7.515,90));
+		Melody saxm = m(
+				an(57), an(59), an(60), an(64), an(60), an(52), an(53), an(60), an(64), an(60), an(52), an(53), an(59), an(60), an(59), an(57), an(55), an(57), an(59), an(60), an(64), an(60), an(52), an(53), an(60), an(64), an(60), an(52), an(53), an(59), an(60), an(59), an(57));
+		Figure saxf = f(saxr, saxm, sax);
 		
-		audition(synth);
+		int n = 12;
+		add1n(n, gf(/*f,*/ gf(/*f2, */prf, prf2)));
+		for (int i = 0; i < n; i += 2) {
+			at(i, gf(pf,clickf));
+		}
+//		at(2, gf(pf,clickf));
+//		at(4, gf(pf,clickf));
+//		at(6, gf(pf,clickf));
+		at(4, saxf);
+		
+		audition(sax);
 	}
 
 	public static void main(String[] args) throws MidiUnavailableException, IOException {
