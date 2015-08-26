@@ -137,6 +137,7 @@ public class Demo3 extends DemoBase {
 	public static void main(String[] args) throws MidiUnavailableException, IOException {
 		Demo3 demo = new Demo3();
 		demo.create();
+//		demo.setOutputFile("demo3.wav");
 		demo.play();
 	}
 }
