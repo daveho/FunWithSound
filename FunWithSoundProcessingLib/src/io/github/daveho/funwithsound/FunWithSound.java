@@ -234,12 +234,7 @@ public class FunWithSound {
 		}
 		
 		player = createPlayer();
-		
 		player.setComposition(c.getComposition());
-		if (c.hasAudition()) {
-			player.playLive(c.getAudition());
-		}
-		
 		player.startPlaying();
 	}
 
@@ -250,7 +245,8 @@ public class FunWithSound {
 				super.prepareToPlay();
 				
 				// Get the MidiMessageSource so we can send MidiMessages
-				// to the Gervill instance playing the live audition part.
+				// to the Gervill instance playing the live audition part
+				// (if there is one)
 				messageSource = getMessageSource();
 			}
 		};

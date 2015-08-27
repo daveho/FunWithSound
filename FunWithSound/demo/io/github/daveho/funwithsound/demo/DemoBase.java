@@ -65,8 +65,6 @@ public abstract class DemoBase extends Composer {
 		player.setComposition(getComposition());
 		if (outputFile != null) {
 			player.setOutputFile(outputFile);
-		}else if (hasAudition()) {
-			player.playLive(getAudition());
 		}
 		player.play();
 	}

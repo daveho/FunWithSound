@@ -32,6 +32,7 @@ public class Composition implements Iterable<PlayFigureEvent> {
 	private Tempo tempo;
 	private List<GainEvent> gainEvents;
 	private Map<Instrument, List<AddEffect>> fxMap;
+	private Instrument audition;
 	
 	public Composition() {
 		playFigureEvents = new ArrayList<PlayFigureEvent>();
@@ -98,5 +99,23 @@ public class Composition implements Iterable<PlayFigureEvent> {
 			fxMap.put(instr, fx);
 		}
 		fx.add(effect);
+	}
+	
+	/**
+	 * Get the audition instrument.
+	 * 
+	 * @return the audition instrument, or null if none
+	 */
+	protected  Instrument getAudition() {
+		return audition;
+	}
+
+	/**
+	 * Set the audition instrument.
+	 * 
+	 * @param instr the audition instrument to set
+	 */
+	public void setAudition(Instrument instr) {
+		this.audition = instr;
 	}
 }

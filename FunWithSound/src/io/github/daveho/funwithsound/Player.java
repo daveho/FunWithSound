@@ -1,4 +1,3 @@
-// FunWithSound - A Java/Processing library for music composition
 // Copyright 2015, David Hovemeyer <david.hovemeyer@gmail.com>
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -235,6 +234,9 @@ public class Player {
 
 	private void prepareForAudition() throws MidiUnavailableException,
 			IOException {
+		// Check the composition to see if there is an audition part
+		this.liveInstr = composition.getAudition();
+		
 		this.device = null;
 		this.capturedEvents = new ArrayList<MidiMessageAndTimeStamp>();
 		if (liveInstr != null) {
@@ -343,7 +345,7 @@ public class Player {
 	}
 
 	private long prepareComposition() throws MidiUnavailableException, IOException {
-		// Convert figures to MidiEvents and schedule them to be played
+		// Convert figures to MidiMessages and schedule them to be played
 		long lastNoteOffUs = 0L;
 		for (PlayFigureEvent e : composition) {
 //			System.out.printf("PlayFigureEvent start time=%d\n", e.getStartUs());

@@ -32,7 +32,6 @@ package io.github.daveho.funwithsound;
 public class Composer {
 	private Composition composition;
 	private int measure;
-	private Instrument audition;
 	private double percussiveStrikeDuration;
 	
 	public Composer() {
@@ -40,14 +39,6 @@ public class Composer {
 		major(51); // Default scale is E flat major rooted in octave 3
 		measure = 0;
 		percussiveStrikeDuration = 0.25;
-	}
-	
-	protected boolean hasAudition() {
-		return audition != null;
-	}
-	
-	protected  Instrument getAudition() {
-		return audition;
 	}
 	
 	/**
@@ -666,7 +657,8 @@ public class Composer {
 	 * @param instr the instrument to play live
 	 */
 	public void audition(Instrument instr) {
-		this.audition = instr;
+//		this.audition = instr;
+		composition.setAudition(instr);
 	}
 	
 	/**
