@@ -2,7 +2,7 @@ import io.github.daveho.funwithsound.*;
 
 FunWithSound fws = new FunWithSound(this);
 
-class WachetAuf extends Composer {
+class MyComp extends Composer {
   void create() {
     tempo(200, 8);
     major(51); //  E flat major
@@ -27,7 +27,7 @@ class WachetAuf extends Composer {
   }
 }
 
-WachetAuf c = new WachetAuf();
+MyComp c = new MyComp();
 
 void setup() {
   size(400,400);
