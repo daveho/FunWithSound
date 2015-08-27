@@ -30,6 +30,7 @@ Processing demo programs:
 * [FWSDemo](https://github.com/daveho/FunWithSound/blob/master/FunWithSoundProcessingLib/examples/FWSDemo/FWSDemo.pde)
 * [FWSDemo2](https://github.com/daveho/FunWithSound/blob/master/FunWithSoundProcessingLib/examples/FWSDemo2/FWSDemo2.pde)
 * [WachetAuf](https://github.com/daveho/FunWithSound/blob/master/FunWithSoundProcessingLib/examples/WachetAuf/WachetAuf.pde)
+* [AuditionTest](https://github.com/daveho/FunWithSound/blob/master/FunWithSoundProcessingLib/examples/AuditionTest/AuditionTest.pde)
 
 ## Technical stuff, compiling from source
 
