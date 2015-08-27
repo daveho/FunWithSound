@@ -20,10 +20,12 @@ package io.github.daveho.funwithsound;
  * a simple domain-specific language for defining compositions
  * consisting {@link Rhythm} and {@link Melody} objects
  * rendered using {@link Instrument}.  Note that the
- * tempo and scale must be set before other methods are called.
- * Use {{@link #tempo(int, int)}} to set the tempo and one of
+ * tempo must be set before other methods are called.
+ * Use {{@link #tempo(int, int)}} to set the tempo.
+ * The default scale is E-flat major (rooted at MIDI note 51),
+ * but you can change the scale by calling
  * {@link #major(int)}, {@link #naturalMinor(int)}, {@link #harmonicMinor(int)},
- * or {@link #melodicMinor(int)} to set the scale.
+ * or {@link #melodicMinor(int)}.
  * The composer produces a {@link Composition}
  * object as its product.
  */
@@ -35,6 +37,7 @@ public class Composer {
 	
 	public Composer() {
 		composition = new Composition();
+		major(51); // Default scale is E flat major rooted in octave 3
 		measure = 0;
 		percussiveStrikeDuration = 0.25;
 	}
