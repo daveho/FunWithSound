@@ -151,13 +151,26 @@ public class FunWithSound {
 	}
 	
 	private static final int Y = 10;
-	private static final int X_INIT = 10;
 	private static final int W = 11;
 	private static final int H = 60;
 	
 	private static final int BLACK_KEYS = 0x54A; // bits indicate black keys
 	
+	private static int totalWidth;
+	static {
+		// Determine the total width of the piano keyboard
+		for (int note = LOW_NOTE, cyc = 9; note <= HIGH_NOTE; note++, cyc++) {
+			if (((1 << (cyc%12)) & BLACK_KEYS) == 0) {
+				// White key
+				totalWidth += W;
+			}
+		}
+	}
+	
 	private void drawKeyboard() {
+		// Center the keyboard horizonally
+		int xInit = (parent.width - totalWidth) / 2;
+		
 		int cyc;
 		int x;
 		
@@ -166,7 +179,7 @@ public class FunWithSound {
 		
 		// Draw the white keys first
 		cyc = 9;  // cyc%12==0 means a C, note 21 is an A (9 half steps above C)
-		x = X_INIT;
+		x = xInit;
 		for (int note = LOW_NOTE; note <= HIGH_NOTE; note++) {
 			if (((1 << (cyc%12)) & BLACK_KEYS) == 0) {
 				// White key
@@ -188,7 +201,7 @@ public class FunWithSound {
 		
 		// Then draw the black keys
 		cyc = 9;
-		x = X_INIT;
+		x = xInit;
 		for (int note = 21; note <= 108; note++) {
 			if (((1 << (cyc%12)) & BLACK_KEYS) != 0) {
 				// Black key
