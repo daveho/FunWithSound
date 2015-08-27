@@ -89,6 +89,15 @@ public class Player {
 		return (long) (timeMs * 1000.0);
 	}
 	
+	/**
+	 * Check whether the player is playing asynchronously.
+	 * 
+	 * @return true if the player is playing, false if not
+	 */
+	public boolean isPlaying() {
+		return playing;
+	}
+	
 	public void setComposition(Composition composition) {
 		this.composition = composition;
 	}
@@ -226,14 +235,9 @@ public class Player {
 
 	private void prepareForAudition() throws MidiUnavailableException,
 			IOException {
-		System.out.println("prepareForAudition");
-		
-		// Check to see if the composition has a live part
-		
 		this.device = null;
 		this.capturedEvents = new ArrayList<MidiMessageAndTimeStamp>();
 		if (liveInstr != null) {
-			System.out.println("Live instr");
 			// Create a message source to feed MIDI events to the Gervill instance
 			createMessageSource();
 			
@@ -425,7 +429,6 @@ public class Player {
 	 * @param liveInstr the live {@link Instrument}
 	 */
 	public void playLive(Instrument liveInstr) {
-		System.out.println("playLive called");
 		this.liveInstr = liveInstr;
 	}
 	
@@ -461,7 +464,7 @@ public class Player {
 				if (smsg.getCommand() == ShortMessage.NOTE_ON) {
 					if (baseTs < 0L && ts >= 0L) {
 						baseTs = ts;
-						System.out.println("baseTs="+baseTs);
+//						System.out.println("baseTs="+baseTs);
 					}
 					int note = smsg.getData1();
 					int velocity = smsg.getData2();

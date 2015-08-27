@@ -27,6 +27,7 @@ import javax.sound.midi.MidiUnavailableException;
 import javax.sound.midi.ShortMessage;
 
 import processing.core.PApplet;
+import processing.core.PConstants;
 
 /**
  * FunWithSound Processing library.
@@ -34,31 +35,16 @@ import processing.core.PApplet;
  * @author David Hovemeyer
  */
 public class FunWithSound {
+	private static final int HIGH_NOTE = 108;
+	private static final int LOW_NOTE = 21;
 	PApplet parent;
 	Player player;
-	boolean playing;
+	ReceivedMidiMessageSource messageSource;
 	int startNote; // which note corresponds to the leftmost keyboard key
 	BitSet noteOn;
-	ReceivedMidiMessageSource messageSource;
 	
 	public FunWithSound(PApplet parent) {
 		this.parent = parent;
-		player = new Player() {
-			@Override
-			protected void prepareToPlay() throws MidiUnavailableException, IOException {
-				super.prepareToPlay();
-				
-				// Get the MidiMessageSource so we can send MidiMessages
-				// to the Gervill instance playing the live audition part.
-				messageSource = getMessageSource();
-				if (messageSource != null) {
-					System.out.println("Live audition!");
-				} else {
-					System.out.println("No live audition");
-				}
-			}
-		};
-		playing = false;
 		startNote = 60;  // is always a C
 		noteOn = new BitSet();
 		
@@ -70,8 +56,10 @@ public class FunWithSound {
 	}
 
 	public void dispose() {
-		// Make sure player has stopped
-		player.forceStopPlaying();
+		if (player != null) {
+			// Make sure player has stopped
+			player.forceStopPlaying();
+		}
 	}
 	
 	public void draw() {
@@ -81,7 +69,9 @@ public class FunWithSound {
 	
 	// Post-draw hook: see if playing has finished
 	public void post() {
-		player.checkForEndOfPlaying();
+		if (player != null) {
+			player.checkForEndOfPlaying();
+		}
 	}
 
 	// Map of keys to offsets from current start note.
@@ -107,23 +97,45 @@ public class FunWithSound {
 	public void onKeyPress(char key) {
 		if (OFFSET_MAP.containsKey(key)) {
 			int note = startNote+OFFSET_MAP.get(key);
-			noteOn.set(note);
-			if (messageSource != null) {
-				ShortMessage msg = Midi.createShortMessage(ShortMessage.NOTE_ON, note, 127);
-				messageSource.send(msg, player.getCurrentTimestamp());
+			if (note >= 0) {
+				noteOn.set(note);
+				if (messageSource != null) {
+					ShortMessage msg = Midi.createShortMessage(ShortMessage.NOTE_ON, note, 127);
+					messageSource.send(msg, player.getCurrentTimestamp());
+				}
+			}
+		} else if (parent.key == PConstants.CODED && parent.keyCode == PConstants.UP) {
+			attemptOctaveChange(1);
+		} else if (parent.key == PConstants.CODED && parent.keyCode == PConstants.DOWN) {
+			attemptOctaveChange(-1);
+		}
+	}
+
+	public void onKeyRelease(char key) {
+		if (OFFSET_MAP.containsKey(key)) {
+			int note = startNote+OFFSET_MAP.get(key);
+			if (note >= 0) {
+				noteOn.clear(note);
+				if (messageSource != null) {
+					ShortMessage msg = Midi.createShortMessage(ShortMessage.NOTE_OFF, note);
+					messageSource.send(msg, player.getCurrentTimestamp());
+				}
 			}
 		}
 	}
 	
-	public void onKeyRelease(char key) {
-		if (OFFSET_MAP.containsKey(key)) {
-			int note = startNote+OFFSET_MAP.get(key);
-			noteOn.clear(note);
-			if (messageSource != null) {
-				ShortMessage msg = Midi.createShortMessage(ShortMessage.NOTE_OFF, note);
-				messageSource.send(msg, player.getCurrentTimestamp());
-			}
+	private void attemptOctaveChange(int octave) {
+		int nextStartNote = startNote + octave*12;
+		if (nextStartNote < LOW_NOTE-12 || nextStartNote > HIGH_NOTE) {
+			return;
 		}
+		
+		// Don't update the octave if any notes are on
+		if (!noteOn.isEmpty()) {
+			return;
+		}
+		
+		startNote = nextStartNote;
 	}
 	
 	private static final int Y = 10;
@@ -143,7 +155,7 @@ public class FunWithSound {
 		// Draw the white keys first
 		cyc = 9;  // cyc%12==0 means a C, note 21 is an A (9 half steps above C)
 		x = X_INIT;
-		for (int note = 21; note <= 108; note++) {
+		for (int note = LOW_NOTE; note <= HIGH_NOTE; note++) {
 			if (((1 << (cyc%12)) & BLACK_KEYS) == 0) {
 				// White key
 				if (noteOn.get(note)) {
@@ -185,10 +197,37 @@ public class FunWithSound {
 	}
 
 	public void play(Composer c) {
+		// Make sure there isn't a player playing currently
+		if (player != null) {
+			player.checkForEndOfPlaying();
+			if (player.isPlaying()) {
+				return;
+			} else {
+				player = null;
+				messageSource = null;
+			}
+		}
+		
+		player = createPlayer();
+		
 		player.setComposition(c.getComposition());
 		if (c.hasAudition()) {
 			player.playLive(c.getAudition());
 		}
+		
 		player.startPlaying();
+	}
+
+	private Player createPlayer() {
+		return new Player() {
+			@Override
+			protected void prepareToPlay() throws MidiUnavailableException, IOException {
+				super.prepareToPlay();
+				
+				// Get the MidiMessageSource so we can send MidiMessages
+				// to the Gervill instance playing the live audition part.
+				messageSource = getMessageSource();
+			}
+		};
 	}
 }
