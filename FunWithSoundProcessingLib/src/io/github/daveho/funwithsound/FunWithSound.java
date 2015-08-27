@@ -15,6 +15,8 @@
 
 package io.github.daveho.funwithsound;
 
+import java.awt.event.KeyAdapter;
+import java.lang.reflect.Field;
 import java.util.BitSet;
 import java.util.HashMap;
 import java.util.Map;
@@ -43,13 +45,10 @@ public class FunWithSound {
 		
 		parent.registerMethod("dispose", this);
 		parent.registerMethod("draw", this);
-		System.out.println("Hey ya");
-		parent.registerMethod("keyEvent", this);
-		System.out.println("Smooooooove");
 		
 		System.out.println("Starting ##library.name## version ##library.prettyVersion##");
 	}
-	
+
 	public void dispose() {
 		player.stopPlaying();
 	}
@@ -59,61 +58,46 @@ public class FunWithSound {
 		drawKeyboard();
 	}
 
-	// Map of key codes to offsets from current start note.
+	// Map of keys to offsets from current start note.
 	//  e r   y u i    are the black keys
 	// s d f g h j k l are the white keys
-	private static final Map<Integer, Integer> NOTE_MAP = new HashMap<Integer,Integer>();
+	private static final Map<Character, Integer> OFFSET_MAP = new HashMap<Character,Integer>();
 	static {
-		NOTE_MAP.put(java.awt.event.KeyEvent.VK_S, 0);
-		NOTE_MAP.put(java.awt.event.KeyEvent.VK_E, 1);
-		NOTE_MAP.put(java.awt.event.KeyEvent.VK_D, 2);
-		NOTE_MAP.put(java.awt.event.KeyEvent.VK_R, 3);
-		NOTE_MAP.put(java.awt.event.KeyEvent.VK_F, 4);
-		NOTE_MAP.put(java.awt.event.KeyEvent.VK_G, 5);
-		NOTE_MAP.put(java.awt.event.KeyEvent.VK_Y, 6);
-		NOTE_MAP.put(java.awt.event.KeyEvent.VK_H, 7);
-		NOTE_MAP.put(java.awt.event.KeyEvent.VK_U, 8);
-		NOTE_MAP.put(java.awt.event.KeyEvent.VK_J, 9);
-		NOTE_MAP.put(java.awt.event.KeyEvent.VK_I, 10);
-		NOTE_MAP.put(java.awt.event.KeyEvent.VK_K, 11);
-		NOTE_MAP.put(java.awt.event.KeyEvent.VK_L, 12);
+		OFFSET_MAP.put('s', 0);
+		OFFSET_MAP.put('e', 1);
+		OFFSET_MAP.put('d', 2);
+		OFFSET_MAP.put('r', 3);
+		OFFSET_MAP.put('f', 4);
+		OFFSET_MAP.put('g', 5);
+		OFFSET_MAP.put('y', 6);
+		OFFSET_MAP.put('h', 7);
+		OFFSET_MAP.put('u', 8);
+		OFFSET_MAP.put('j', 9);
+		OFFSET_MAP.put('i', 10);
+		OFFSET_MAP.put('k', 11);
+		OFFSET_MAP.put('l', 12);
 	}
 	
-	public void keyEvent(KeyEvent e) {
-		//System.out.println("key event!!!");
-		
-		int action = e.getAction();
-		if (action == KeyEvent.PRESS) {
-			System.out.println("Press");
-		} else if (action == KeyEvent.RELEASE) {
-			System.out.println("Release");
+	public void onKeyPress(char key) {
+		if (OFFSET_MAP.containsKey(key)) {
+			int offset = OFFSET_MAP.get(key);
+			noteOn.set(startNote+offset);
 		}
-/*
-		java.awt.event.KeyEvent e = (java.awt.event.KeyEvent) e_.getNative();
-		
-		boolean isPress = (e.getModifiers() & java.awt.event.KeyEvent.KEY_PRESSED) != 0;
-		boolean isRelease = (e.getModifiers() & java.awt.event.KeyEvent.KEY_RELEASED) != 0;
-		if (!(isPress || isRelease)) {
-			return;
+	}
+	
+	public void onKeyRelease(char key) {
+		if (OFFSET_MAP.containsKey(key)) {
+			int offset = OFFSET_MAP.get(key);
+			noteOn.clear(startNote+offset);
 		}
-
-		System.out.println("press or release");
-		
-		if (NOTE_MAP.containsKey(e.getKeyCode())) {
-			int offset = NOTE_MAP.get(e.getKeyCode());
-			if (isPress) {
-				noteOn.set(startNote + offset);
-			} else {
-				noteOn.clear(startNote + offset);
-			}
-		}
-*/
 	}
 	
 	private static final int Y = 10;
 	private static final int X_INIT = 10;
 	private static final int W = 11;
 	private static final int H = 60;
+	
+	private static final int BLACK_KEYS = 0x54A; // bits indicate black keys
 	
 	private void drawKeyboard() {
 		int cyc;
@@ -126,13 +110,10 @@ public class FunWithSound {
 		cyc = 9;  // cyc%12==0 means a C, note 21 is an A (9 half steps above C)
 		x = X_INIT;
 		for (int note = 21; note <= 108; note++) {
-			switch (cyc%12) {
-			case 1: case 3: case 6: case 8: case 10:
-				// Black key
-				break;
-			default:
+			if (((1 << (cyc%12)) & BLACK_KEYS) == 0) {
 				// White key
 				if (noteOn.get(note)) {
+					// Note is being played
 					parent.fill(0,0,255);
 				} else if (note >= startNote && note <= startNote+12) {
 					// This note is in the active octave
@@ -142,7 +123,6 @@ public class FunWithSound {
 				}
 				parent.rect(x, Y, W, H);
 				x += W;
-				break;
 			}
 			
 			cyc++;
@@ -152,20 +132,18 @@ public class FunWithSound {
 		cyc = 9;
 		x = X_INIT;
 		for (int note = 21; note <= 108; note++) {
-			switch (cyc%12) {
-			case 1: case 3: case 6: case 8: case 10:
+			if (((1 << (cyc%12)) & BLACK_KEYS) != 0) {
 				// Black key
 				if (noteOn.get(note)) {
+					// Note is being played
 					parent.fill(0,0,255);
 				} else {
 					parent.fill(0);
 				}
 				parent.rect(x-((W/2)-2)-1, Y, W-2, (H*3)/5);
-				break;
-			default:
+			} else {
 				// White key
 				x += W;
-				break;
 			}
 			
 			cyc++;
