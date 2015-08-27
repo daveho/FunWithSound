@@ -28,6 +28,7 @@ import javax.sound.midi.ShortMessage;
 
 import processing.core.PApplet;
 import processing.core.PConstants;
+import processing.event.KeyEvent;
 
 /**
  * FunWithSound Processing library.
@@ -50,6 +51,7 @@ public class FunWithSound {
 		
 		parent.registerMethod("dispose", this);
 		parent.registerMethod("draw", this);
+		parent.registerMethod("keyEvent", this);
 		parent.registerMethod("post", this);
 		
 		System.out.println("Starting ##library.name## version ##library.prettyVersion##");
@@ -94,10 +96,19 @@ public class FunWithSound {
 		OFFSET_MAP.put('l', 12);
 	}
 	
-	public void onKeyPress(char key) {
+	public void keyEvent(KeyEvent e) {
+		if (e.getAction() == KeyEvent.PRESS) {
+			onKeyPress();
+		} else if (e.getAction() == KeyEvent.RELEASE) {
+			onKeyRelease();
+		}
+	}
+	
+	private void onKeyPress() {
+		char key = parent.key;
 		if (OFFSET_MAP.containsKey(key)) {
 			int note = startNote+OFFSET_MAP.get(key);
-			if (note >= 0) {
+			if (note >= 0 && !noteOn.get(note)) {
 				noteOn.set(note);
 				if (messageSource != null) {
 					ShortMessage msg = Midi.createShortMessage(ShortMessage.NOTE_ON, note, 127);
@@ -111,10 +122,11 @@ public class FunWithSound {
 		}
 	}
 
-	public void onKeyRelease(char key) {
+	private void onKeyRelease() {
+		char key = parent.key;
 		if (OFFSET_MAP.containsKey(key)) {
 			int note = startNote+OFFSET_MAP.get(key);
-			if (note >= 0) {
+			if (note >= 0 && noteOn.get(note)) {
 				noteOn.clear(note);
 				if (messageSource != null) {
 					ShortMessage msg = Midi.createShortMessage(ShortMessage.NOTE_OFF, note);
