@@ -68,6 +68,10 @@ public class Player {
 	private ArrayList<MidiMessageAndTimeStamp> capturedEvents;
 	private MidiDevice device;
 	private boolean playing;
+
+	// This delivers midi messages to the Gervill instance
+	// handling the live audition part.
+	private ReceivedMidiMessageSource messageSource;
 	
 	public Player() {
 		soundBanks = new HashMap<String, SF2Soundbank>();
@@ -122,7 +126,7 @@ public class Player {
 		ac.start();
 		this.playing = true;
 	}
-	
+
 	public void stopPlaying() {
 		if (playing) {
 			if (latch.getCount() > 0) {
@@ -170,7 +174,15 @@ public class Player {
 		System.out.println("done!");
 	}
 
-	private void prepareToPlay() throws MidiUnavailableException, IOException {
+	/**
+	 * Prepare the Beads AudioContext to play the composition and
+	 * (if there is one) the live audition part.
+	 * Subclasses may override.
+	 * 
+	 * @throws MidiUnavailableException
+	 * @throws IOException
+	 */
+	protected void prepareToPlay() throws MidiUnavailableException, IOException {
 		// Create an AudioContext
 		this.ac = new AudioContext();
 		
@@ -195,31 +207,56 @@ public class Player {
 
 	private void prepareForAudition() throws MidiUnavailableException,
 			IOException {
+		System.out.println("prepareForAudition");
+		
+		// Check to see if the composition has a live part
+		
 		this.device = null;
 		this.capturedEvents = new ArrayList<MidiMessageAndTimeStamp>();
 		if (liveInstr != null) {
-			final InstrumentInfo liveSynth = getGervillUGen(liveInstr);
-			ReceivedMidiMessageSource messageSource = new ReceivedMidiMessageSource(ac) {
-				@Override
-				public void send(MidiMessage message, long timeStamp) {
-					if (liveInstr.getType() == InstrumentType.MIDI_PERCUSSION) {
-						// Percussion messages should on channel 10
-						if (message instanceof ShortMessage) {
-							ShortMessage smsg = (ShortMessage) message;
-							message = Midi.createShortMessage(smsg.getStatus()|9, smsg.getData1(), smsg.getData2());
-						}
-					}
-					
-					capturedEvents.add(new MidiMessageAndTimeStamp(message, timeStamp));
-					super.send(message, timeStamp);
-				}
-			};
-			messageSource.addMessageListener(liveSynth.gervill);
+			System.out.println("Live instr");
+			// Create a message source to feed MIDI events to the Gervill instance
+			createMessageSource();
 			
 			// Find a MIDI transmitter and feed its generated MIDI events to
 			// the message source
-			device = CaptureMidiMessages.getMidiInput(messageSource);
+			try {
+				device = CaptureMidiMessages.getMidiInput(messageSource);
+			} catch (MidiUnavailableException e) {
+				System.out.println("Warning: no MIDI input device found for live audition");
+			}
 		}
+	}
+
+	private void createMessageSource() throws MidiUnavailableException,
+			IOException {
+		final InstrumentInfo liveSynth = getGervillUGen(liveInstr);
+		this.messageSource = new ReceivedMidiMessageSource(ac) {
+			@Override
+			public void send(MidiMessage message, long timeStamp) {
+				if (liveInstr.getType() == InstrumentType.MIDI_PERCUSSION) {
+					// Percussion messages should on channel 10
+					if (message instanceof ShortMessage) {
+						ShortMessage smsg = (ShortMessage) message;
+						message = Midi.createShortMessage(smsg.getStatus()|9, smsg.getData1(), smsg.getData2());
+					}
+				}
+				
+				capturedEvents.add(new MidiMessageAndTimeStamp(message, timeStamp));
+				super.send(message, timeStamp);
+			}
+		};
+		messageSource.addMessageListener(liveSynth.gervill);
+	}
+	
+	/**
+	 * Get the MidiMessageSource that will deliver MIDI messages to
+	 * the Gervill instance being used to play the live audition part.
+	 * 
+	 * @return the MidiMessageSource, or null if there is no live audition part
+	 */
+	public ReceivedMidiMessageSource getMessageSource() {
+		return messageSource;
 	}
 
 	private void addGainEvents() throws MidiUnavailableException, IOException {
@@ -369,6 +406,7 @@ public class Player {
 	 * @param liveInstr the live {@link Instrument}
 	 */
 	public void playLive(Instrument liveInstr) {
+		System.out.println("playLive called");
 		this.liveInstr = liveInstr;
 	}
 	

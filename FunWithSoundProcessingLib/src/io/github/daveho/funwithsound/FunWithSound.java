@@ -6,7 +6,7 @@
  * Copyright ##copyright## ##author##
  *
  * This library is distributed under the terms of the
- * <a href="http://opensource.org/licenses/MIT">MIT license</a>.
+ * <a href="http://opensource.org/licenses/Apache-2.0">Apache License 2.0</a>.
  * 
  * @author      ##author##
  * @modified    ##date##
@@ -15,14 +15,18 @@
 
 package io.github.daveho.funwithsound;
 
-import java.awt.event.KeyAdapter;
-import java.lang.reflect.Field;
+import io.github.daveho.gervill4beads.Midi;
+import io.github.daveho.gervill4beads.ReceivedMidiMessageSource;
+
+import java.io.IOException;
 import java.util.BitSet;
 import java.util.HashMap;
 import java.util.Map;
 
-import processing.core.*;
-import processing.event.KeyEvent;
+import javax.sound.midi.MidiUnavailableException;
+import javax.sound.midi.ShortMessage;
+
+import processing.core.PApplet;
 
 /**
  * FunWithSound Processing library.
@@ -35,10 +39,25 @@ public class FunWithSound {
 	boolean playing;
 	int startNote; // which note corresponds to the leftmost keyboard key
 	BitSet noteOn;
+	ReceivedMidiMessageSource messageSource;
 	
 	public FunWithSound(PApplet parent) {
 		this.parent = parent;
-		player = new Player();
+		player = new Player() {
+			@Override
+			protected void prepareToPlay() throws MidiUnavailableException, IOException {
+				super.prepareToPlay();
+				
+				// Get the MidiMessageSource so we can send MidiMessages
+				// to the Gervill instance playing the live audition part.
+				messageSource = getMessageSource();
+				if (messageSource != null) {
+					System.out.println("Live audition!");
+				} else {
+					System.out.println("No live audition");
+				}
+			}
+		};
 		playing = false;
 		startNote = 60;  // is always a C
 		noteOn = new BitSet();
@@ -80,15 +99,23 @@ public class FunWithSound {
 	
 	public void onKeyPress(char key) {
 		if (OFFSET_MAP.containsKey(key)) {
-			int offset = OFFSET_MAP.get(key);
-			noteOn.set(startNote+offset);
+			int note = startNote+OFFSET_MAP.get(key);
+			noteOn.set(note);
+			if (messageSource != null) {
+				ShortMessage msg = Midi.createShortMessage(ShortMessage.NOTE_ON, note, 127);
+				messageSource.send(msg, -1L);
+			}
 		}
 	}
 	
 	public void onKeyRelease(char key) {
 		if (OFFSET_MAP.containsKey(key)) {
-			int offset = OFFSET_MAP.get(key);
-			noteOn.clear(startNote+offset);
+			int note = startNote+OFFSET_MAP.get(key);
+			noteOn.clear(note);
+			if (messageSource != null) {
+				ShortMessage msg = Midi.createShortMessage(ShortMessage.NOTE_OFF, note);
+				messageSource.send(msg, -1L);
+			}
 		}
 	}
 	
@@ -152,6 +179,9 @@ public class FunWithSound {
 
 	public void play(Composer c) {
 		player.setComposition(c.getComposition());
+		if (c.hasAudition()) {
+			player.playLive(c.getAudition());
+		}
 		player.startPlaying();
 	}
 }
