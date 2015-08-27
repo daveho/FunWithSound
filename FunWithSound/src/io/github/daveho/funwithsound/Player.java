@@ -77,6 +77,17 @@ public class Player {
 		soundBanks = new HashMap<String, SF2Soundbank>();
 		instrMap = new IdentityHashMap<Instrument, InstrumentInfo>();
 	}
+
+	/**
+	 * Get the current timestamp in microseconds from the
+	 * AudioContext.
+	 * 
+	 * @return the current timestamp in microseconds
+	 */
+	public long getCurrentTimestamp() {
+		double timeMs = ac.getTime();
+		return (long) (timeMs * 1000.0);
+	}
 	
 	public void setComposition(Composition composition) {
 		this.composition = composition;
@@ -126,13 +137,21 @@ public class Player {
 		ac.start();
 		this.playing = true;
 	}
+	
+	public void checkForEndOfPlaying() {
+		if (playing && latch.getCount() == 0) {
+			onPlayingFinished();
+			playing = false;
+		}
+	}
 
-	public void stopPlaying() {
+	public void forceStopPlaying() {
 		if (playing) {
 			if (latch.getCount() > 0) {
 				ac.stop();
 			}
 			onPlayingFinished();
+			playing = false;
 		}
 	}
 

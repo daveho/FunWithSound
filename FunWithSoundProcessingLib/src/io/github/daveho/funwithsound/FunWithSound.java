@@ -64,17 +64,24 @@ public class FunWithSound {
 		
 		parent.registerMethod("dispose", this);
 		parent.registerMethod("draw", this);
+		parent.registerMethod("post", this);
 		
 		System.out.println("Starting ##library.name## version ##library.prettyVersion##");
 	}
 
 	public void dispose() {
-		player.stopPlaying();
+		// Make sure player has stopped
+		player.forceStopPlaying();
 	}
 	
 	public void draw() {
 		// Draw piano keyboard
 		drawKeyboard();
+	}
+	
+	// Post-draw hook: see if playing has finished
+	public void post() {
+		player.checkForEndOfPlaying();
 	}
 
 	// Map of keys to offsets from current start note.
@@ -103,7 +110,7 @@ public class FunWithSound {
 			noteOn.set(note);
 			if (messageSource != null) {
 				ShortMessage msg = Midi.createShortMessage(ShortMessage.NOTE_ON, note, 127);
-				messageSource.send(msg, -1L);
+				messageSource.send(msg, player.getCurrentTimestamp());
 			}
 		}
 	}
@@ -114,7 +121,7 @@ public class FunWithSound {
 			noteOn.clear(note);
 			if (messageSource != null) {
 				ShortMessage msg = Midi.createShortMessage(ShortMessage.NOTE_OFF, note);
-				messageSource.send(msg, -1L);
+				messageSource.send(msg, player.getCurrentTimestamp());
 			}
 		}
 	}
