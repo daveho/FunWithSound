@@ -39,7 +39,7 @@ public class Instrument {
 	}
 	
 	Instrument(String soundFont) {
-		this(InstrumentType.MIDI_SOUNDFONT, -1, soundFont);
+		this(InstrumentType.MIDI, -1, soundFont);
 	}
 
 	public InstrumentType getType() {

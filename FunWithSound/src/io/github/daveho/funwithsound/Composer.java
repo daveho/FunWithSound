@@ -93,7 +93,7 @@ public class Composer {
 	 * @return the instrument
 	 */
 	public Instrument instr(String soundFont, int patch) {
-		return new Instrument(InstrumentType.MIDI_SOUNDFONT, patch, soundFont);
+		return new Instrument(InstrumentType.MIDI, patch, soundFont);
 	}
 	
 	/**

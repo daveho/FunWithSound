@@ -15,14 +15,89 @@
 
 package io.github.daveho.funwithsound;
 
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
 /**
  * Types of instruments.
+ * This is a class that behaves like an enumeration:
+ * all instances are unique.
  */
-public enum InstrumentType {
+public class InstrumentType implements Comparable<InstrumentType> {
+	/**
+	 * Kinds of InstrumentTypes.
+	 */
+	public enum Kind {
+		/** Standard MIDI instrument. */
+		MIDI,
+		
+		/** MIDI percussion instrument. */
+		MIDI_PERCUSSION,
+		
+		/** Sample bank instrument. */
+		SAMPLE_BANK,
+		
+		/** Custom instrument type. */
+		CUSTOM,
+	}
+	
+	private Kind kind;
+	private int code;
+	
 	/** Standard MIDI instrument. */
-	MIDI,
+	public static final InstrumentType MIDI = new InstrumentType(Kind.MIDI, 0);
+	
 	/** MIDI percussion instrument. */
-	MIDI_PERCUSSION,
-	/** MIDI instrument loaded from a soundfont. */
-	MIDI_SOUNDFONT,
+	public static final InstrumentType MIDI_PERCUSSION = new InstrumentType(Kind.MIDI_PERCUSSION, 0);
+	
+	private static final Map<Integer, InstrumentType> customInstrumentTypeMap =
+			new ConcurrentHashMap<Integer, InstrumentType>();
+	
+	private InstrumentType(Kind kind, int code) {
+		this.kind = kind;
+		this.code = code;
+	}
+
+	/**
+	 * Get the InstrumentType's kind.
+	 * 
+	 * @return
+	 */
+	public Kind getKind() {
+		return kind;
+	}
+
+	/**
+	 * Get integer code.  This is only meaningful for
+	 * {@link Kind#CUSTOM} InstrumentTypes.
+	 * 
+	 * @return the integer code
+	 */
+	public int getCode() {
+		return code;
+	}
+	
+	@Override
+	public int compareTo(InstrumentType o) {
+		int cmp;
+		cmp = this.kind.compareTo(o.kind);
+		if (cmp != 0) {
+			return cmp;
+		}
+		return code - o.code;
+	}
+	
+	/**
+	 * Get a {@link Kind#CUSTOM} InstrumentType with 
+	 * specified code.  Note that these are interned,
+	 * so for any given code, there is exactly one instance.
+	 * 
+	 * @param code the code
+	 * @return the custom InstrumentType with the specified code
+	 */
+	public InstrumentType custom(int code) {
+		InstrumentType type = new InstrumentType(Kind.CUSTOM, code);
+		InstrumentType prev = customInstrumentTypeMap.putIfAbsent(code, type);
+		return prev != null ? prev : type;
+	}
 }
