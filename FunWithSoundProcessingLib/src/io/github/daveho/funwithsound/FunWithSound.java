@@ -16,7 +16,6 @@
 package io.github.daveho.funwithsound;
 
 import io.github.daveho.gervill4beads.Midi;
-import io.github.daveho.gervill4beads.ReceivedMidiMessageSource;
 
 import java.io.IOException;
 import java.util.BitSet;
@@ -24,6 +23,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import javax.sound.midi.MidiUnavailableException;
+import javax.sound.midi.Receiver;
 import javax.sound.midi.ShortMessage;
 
 import processing.core.PApplet;
@@ -40,7 +40,7 @@ public class FunWithSound {
 	private static final int LOW_NOTE = 21;
 	PApplet parent;
 	Player player;
-	ReceivedMidiMessageSource messageSource;
+	Receiver receiver;
 	int startNote; // which note corresponds to the leftmost keyboard key
 	BitSet noteOn;
 	
@@ -110,9 +110,9 @@ public class FunWithSound {
 			int note = startNote+OFFSET_MAP.get(key);
 			if (note >= 0 && !noteOn.get(note)) {
 				noteOn.set(note);
-				if (messageSource != null) {
+				if (receiver != null) {
 					ShortMessage msg = Midi.createShortMessage(ShortMessage.NOTE_ON, note, 127);
-					messageSource.send(msg, player.getCurrentTimestamp());
+					receiver.send(msg, player.getCurrentTimestamp());
 				}
 			}
 		} else if (parent.key == PConstants.CODED && parent.keyCode == PConstants.UP) {
@@ -128,9 +128,9 @@ public class FunWithSound {
 			int note = startNote+OFFSET_MAP.get(key);
 			if (note >= 0 && noteOn.get(note)) {
 				noteOn.clear(note);
-				if (messageSource != null) {
+				if (receiver != null) {
 					ShortMessage msg = Midi.createShortMessage(ShortMessage.NOTE_OFF, note);
-					messageSource.send(msg, player.getCurrentTimestamp());
+					receiver.send(msg, player.getCurrentTimestamp());
 				}
 			}
 		}
@@ -229,7 +229,7 @@ public class FunWithSound {
 				return;
 			} else {
 				player = null;
-				messageSource = null;
+				receiver = null;
 			}
 		}
 		
@@ -244,10 +244,10 @@ public class FunWithSound {
 			protected void prepareToPlay() throws MidiUnavailableException, IOException {
 				super.prepareToPlay();
 				
-				// Get the MidiMessageSource so we can send MidiMessages
+				// Get the MIDI Receiver so we can send MidiMessages
 				// to the Gervill instance playing the live audition part
 				// (if there is one)
-				messageSource = getMessageSource();
+				receiver = getReceiver();
 			}
 		};
 	}
