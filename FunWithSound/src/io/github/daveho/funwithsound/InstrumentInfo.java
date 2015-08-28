@@ -20,6 +20,8 @@ import io.github.daveho.gervill4beads.GervillUGen;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.sound.midi.Receiver;
+
 import net.beadsproject.beads.core.UGen;
 import net.beadsproject.beads.ugens.Gain;
 
@@ -28,23 +30,35 @@ import net.beadsproject.beads.ugens.Gain;
  * a specific {@link Instrument}.
  */
 class InstrumentInfo {
-	/** GervillUGen, which sits in front of the effects chain. */
-	GervillUGen gervill;
+	/** MidiMessages to be played by this instrument should be sent here. */
+	Receiver source;
+	
+	/**
+	 * UGen at the head of the effects chain. MidiMessages sent to the
+	 * source Receiver should be delivered (somehow) to this UGen.
+	 */
+	UGen head;
 	
 	/** Reference to the UGen currently at the end of the effects chain. */ 
-	UGen endOfChain;
+	UGen tail;
 
 	/** Gain UGen (which is fed by the UGen at the end of the effects chain.) */
 	Gain gain;
 	
 	List<GainEvent> gainEvents;
 	
+	/**
+	 * Create an InstrumentInfo for a GervillUGen.
+	 * 
+	 * @param gervill the GervillUGen
+	 */
 	public InstrumentInfo(GervillUGen gervill) {
-		this.gervill = gervill;
+		this.source = gervill.getSynthRecv();
+		this.head = gervill;
 		this.gainEvents = new ArrayList<GainEvent>();
 		
 		// Initially, the GervillUGen is at the end of the effects
 		// chain (since there are no effects yet.)
-		this.endOfChain = gervill;
+		this.tail = gervill;
 	}
 }

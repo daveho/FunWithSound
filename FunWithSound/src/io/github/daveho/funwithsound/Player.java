@@ -34,6 +34,7 @@ import java.util.concurrent.CountDownLatch;
 import javax.sound.midi.MidiDevice;
 import javax.sound.midi.MidiMessage;
 import javax.sound.midi.MidiUnavailableException;
+import javax.sound.midi.Receiver;
 import javax.sound.midi.ShortMessage;
 
 import net.beadsproject.beads.core.AudioContext;
@@ -59,7 +60,7 @@ public class Player {
 	private Composition composition;
 	private AudioContext ac;
 	private HashMap<String, SF2Soundbank> soundBanks;
-	private Instrument liveInstr;
+	private InstrumentInfo liveSynth;
 	private Map<Instrument, InstrumentInfo> instrMap;
 	private String outputFile;
 	private long idleTimeUs;
@@ -68,9 +69,9 @@ public class Player {
 	private MidiDevice device;
 	private boolean playing;
 
-	// This delivers midi messages to the Gervill instance
-	// handling the live audition part.
-	private ReceivedMidiMessageSource messageSource;
+//	// This delivers midi messages to the Gervill instance
+//	// handling the live audition part.
+//	private ReceivedMidiMessageSource messageSource;
 	
 	public Player() {
 		soundBanks = new HashMap<String, SF2Soundbank>();
@@ -235,28 +236,35 @@ public class Player {
 	private void prepareForAudition() throws MidiUnavailableException,
 			IOException {
 		// Check the composition to see if there is an audition part
-		this.liveInstr = composition.getAudition();
+		Instrument liveInstr = composition.getAudition();
+		if (liveInstr == null) {
+			return;
+		}
 		
 		this.device = null;
 		this.capturedEvents = new ArrayList<MidiMessageAndTimeStamp>();
-		if (liveInstr != null) {
-			// Create a message source to feed MIDI events to the Gervill instance
-			createMessageSource();
-			
-			// Find a MIDI transmitter and feed its generated MIDI events to
-			// the message source
-			try {
-				device = CaptureMidiMessages.getMidiInput(messageSource);
-			} catch (MidiUnavailableException e) {
-				System.out.println("Warning: no MIDI input device found for live audition");
-			}
+		
+		// Create a message source to feed MIDI events to the Gervill instance
+		createMessageSource(liveInstr);
+		
+		// Find a MIDI transmitter and feed its generated MIDI events to
+		// the message source
+		try {
+			device = CaptureMidiMessages.getMidiInput(liveSynth.source);
+		} catch (MidiUnavailableException e) {
+			System.out.println("Warning: no MIDI input device found for live audition");
 		}
 	}
 
-	private void createMessageSource() throws MidiUnavailableException,
+	private void createMessageSource(final Instrument liveInstr) throws MidiUnavailableException,
 			IOException {
-		final InstrumentInfo liveSynth = getGervillUGen(liveInstr);
-		this.messageSource = new ReceivedMidiMessageSource(ac) {
+		this.liveSynth = getGervillUGen(liveInstr);
+
+		// Filter incoming MidiMessages to:
+		// - change to channel 10 (if this is a percussion instrument)
+		// - add them to capturedEvents list
+		final Receiver delegate = liveSynth.source;
+		liveSynth.source = new Receiver() {
 			@Override
 			public void send(MidiMessage message, long timeStamp) {
 				if (liveInstr.getType() == InstrumentType.MIDI_PERCUSSION) {
@@ -266,22 +274,27 @@ public class Player {
 						message = Midi.createShortMessage(smsg.getStatus()|9, smsg.getData1(), smsg.getData2());
 					}
 				}
-				
+
 				capturedEvents.add(new MidiMessageAndTimeStamp(message, timeStamp));
-				super.send(message, timeStamp);
+				
+				delegate.send(message, timeStamp);
+			}
+			
+			@Override
+			public void close() {
+				delegate.close();
 			}
 		};
-		messageSource.addMessageListener(liveSynth.gervill);
 	}
 	
 	/**
-	 * Get the MidiMessageSource that will deliver MIDI messages to
+	 * Get the Receiver that will deliver MIDI messages to
 	 * the Gervill instance being used to play the live audition part.
 	 * 
-	 * @return the MidiMessageSource, or null if there is no live audition part
+	 * @return the Receiver, or null if there is no live audition part
 	 */
-	public ReceivedMidiMessageSource getMessageSource() {
-		return messageSource;
+	public Receiver getMessageSource() {
+		return liveSynth != null ? liveSynth.source : null;
 	}
 
 	private void addGainEvents() throws MidiUnavailableException, IOException {
@@ -315,13 +328,13 @@ public class Player {
 			List<AddEffect> fx = composition.getEffectsMap().get(entry.getKey());
 			if (fx != null) {
 				for (AddEffect effect : fx) {
-					info.endOfChain = effect.apply(ac, info);
+					info.tail = effect.apply(ac, info);
 				}
 			}
 			
 			UGen gainEnvelope = new InstrumentGainEnvelope(ac, info.gainEvents);
 			info.gain = new Gain(ac, 2, gainEnvelope);
-			info.gain.addInput(info.endOfChain);
+			info.gain.addInput(info.tail);
 			ac.out.addInput(info.gain);
 		}
 	}
@@ -369,9 +382,11 @@ public class Player {
 //					System.out.printf("Note on at %d\n", onTime);
 					long offTime = onTime + s.getDurationUs();
 					ShortMessage noteOn = Midi.createShortMessage(ShortMessage.NOTE_ON|channel, note, s.getVelocity());
-					info.gervill.getSynthRecv().send(noteOn, onTime);
+					//info.gervill.getSynthRecv().send(noteOn, onTime);
+					info.source.send(noteOn, onTime);
 					ShortMessage noteOff = Midi.createShortMessage(ShortMessage.NOTE_OFF|channel, note, s.getVelocity());
-					info.gervill.getSynthRecv().send(noteOff, offTime);
+					//info.gervill.getSynthRecv().send(noteOff, offTime);
+					info.source.send(noteOff, offTime);
 					// Keep track of the time of the last note off event
 					if (offTime > lastNoteOffUs) {
 						lastNoteOffUs = offTime;
@@ -390,7 +405,7 @@ public class Player {
 		if (info == null) {
 			info = createGervill();
 			if (instrument.hasSoundFont()) {
-				SoftSynthesizer synth = info.gervill.getSynth();
+				SoftSynthesizer synth = ((GervillUGen)info.head).getSynth();
 				SF2Soundbank sb = getSoundBank(instrument);
 				if (sb != null) {
 					synth.loadAllInstruments(sb);
@@ -403,7 +418,7 @@ public class Player {
 				// The MIDI patches are numbered 1..128, but encoded as 0..127
 				patch--;
 				ShortMessage programChange = Midi.createShortMessage(ShortMessage.PROGRAM_CHANGE, patch);
-				info.gervill.getSynthRecv().send(programChange, -1L);
+				((GervillUGen)info.head).getSynthRecv().send(programChange, -1L);
 			}
 			instrMap.put(instrument, info);
 		}
@@ -423,16 +438,6 @@ public class Player {
 		sb = soundBanks.get(instrument.getSoundFont());
 		return sb;
 	}
-
-	/**
-	 * Use live input from a MIDI keyboard to play given {@link Instrument},
-	 * capturing the input MIDI messages.
-	 * 
-	 * @param liveInstr the live {@link Instrument}
-	 */
-	public void playLive(Instrument liveInstr) {
-		this.liveInstr = liveInstr;
-	}
 	
 	static class NoteStart {
 		final long ts;
@@ -444,11 +449,6 @@ public class Player {
 	}
 
 	private void analyzeCapturedEvents(List<MidiMessageAndTimeStamp> capturedEvents) {
-//		System.out.println("Captured timestamps:");
-//		for (MidiMessageAndTimeStamp mmts : capturedEvents) {
-//			System.out.println(mmts.timeStamp);
-//		}
-		
 		Map<Integer, NoteStart> starts = new HashMap<Integer, NoteStart>();
 		
 		Rhythm rhythm = new Rhythm();

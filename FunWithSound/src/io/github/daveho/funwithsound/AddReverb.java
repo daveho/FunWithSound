@@ -69,7 +69,7 @@ public class AddReverb implements AddEffect {
 	@Override
 	public UGen apply(AudioContext ac, InstrumentInfo info) {
 		Reverb reverb = new Reverb(ac, 2);
-		reverb.addInput(info.endOfChain);
+		reverb.addInput(info.tail);
 		
 		if (params != null) {
 			reverb.setDamping((float)params.damping);
@@ -81,7 +81,7 @@ public class AddReverb implements AddEffect {
 		// A Gain is used to mix the reverb output with the original signal
 		Gain mix = new Gain(ac, 2);
 		mix.addInput(reverb);
-		mix.addInput(info.endOfChain);
+		mix.addInput(info.tail);
 		
 		// The Gain is now at the end of the effects chain
 		return mix;

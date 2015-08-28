@@ -50,7 +50,7 @@ public class AddDelay implements AddEffect {
 		comb.setA((float)passThruGain);
 		comb.setG((float)delayGain);
 		
-		comb.addInput(info.endOfChain);
+		comb.addInput(info.tail);
 		
 		return comb;
 	}

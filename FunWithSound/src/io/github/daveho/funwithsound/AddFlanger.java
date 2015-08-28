@@ -114,7 +114,7 @@ public class AddFlanger implements AddEffect {
 		comb.setG((float)params.g);
 		comb.setH((float)params.h);
 		
-		comb.addInput(info.endOfChain);
+		comb.addInput(info.tail);
 		
 		return comb;
 	}

@@ -54,6 +54,8 @@ public class Demo4 extends DemoBase {
 		addfx(bass, new AddReverb());
 		v(bass, .5);
 		
+		//Instrument flute = instr(ARACHNO, 74);
+		
 		Rhythm pr = r(
 				s(0.000,1.984,118), s(2,0.646,118), s(2.826,0.248,118), s(3.281,2.587,118), s(6,0.892,118), s(6.830,0.250,127), s(7.270,2.773,106), s(10,0.742,118), s(11,0.253,118), s(11.382,0.710,99), s(13,0.657,118), s(14,0.492,118), s(14.387,0.808,118));
 		Melody pm = m(
@@ -143,7 +145,7 @@ public class Demo4 extends DemoBase {
 		
 		at(26, stringf);
 		
-		audition(str);
+		//audition(flute);
 	}
 
 	public static void main(String[] args) throws MidiUnavailableException, IOException {
