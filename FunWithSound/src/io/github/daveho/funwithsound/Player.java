@@ -18,7 +18,6 @@ import io.github.daveho.gervill4beads.CaptureMidiMessages;
 import io.github.daveho.gervill4beads.GervillUGen;
 import io.github.daveho.gervill4beads.Midi;
 import io.github.daveho.gervill4beads.MidiMessageAndTimeStamp;
-import io.github.daveho.gervill4beads.ReceivedMidiMessageSource;
 
 import java.io.File;
 import java.io.IOException;
@@ -68,10 +67,6 @@ public class Player {
 	private ArrayList<MidiMessageAndTimeStamp> capturedEvents;
 	private MidiDevice device;
 	private boolean playing;
-
-//	// This delivers midi messages to the Gervill instance
-//	// handling the live audition part.
-//	private ReceivedMidiMessageSource messageSource;
 	
 	public Player() {
 		soundBanks = new HashMap<String, SF2Soundbank>();
@@ -293,7 +288,7 @@ public class Player {
 	 * 
 	 * @return the Receiver, or null if there is no live audition part
 	 */
-	public Receiver getMessageSource() {
+	public Receiver getReceiver() {
 		return liveSynth != null ? liveSynth.source : null;
 	}
 
@@ -382,10 +377,8 @@ public class Player {
 //					System.out.printf("Note on at %d\n", onTime);
 					long offTime = onTime + s.getDurationUs();
 					ShortMessage noteOn = Midi.createShortMessage(ShortMessage.NOTE_ON|channel, note, s.getVelocity());
-					//info.gervill.getSynthRecv().send(noteOn, onTime);
 					info.source.send(noteOn, onTime);
 					ShortMessage noteOff = Midi.createShortMessage(ShortMessage.NOTE_OFF|channel, note, s.getVelocity());
-					//info.gervill.getSynthRecv().send(noteOff, offTime);
 					info.source.send(noteOff, offTime);
 					// Keep track of the time of the last note off event
 					if (offTime > lastNoteOffUs) {
