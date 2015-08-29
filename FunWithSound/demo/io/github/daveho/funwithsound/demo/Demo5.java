@@ -18,6 +18,7 @@ public class Demo5 extends DemoBase {
 		
 		Instrument sp = samplePlayer();
 		sp.addSample(0, SPDIR + "/torvalds/torvalds-says-linux.wav");
+		sp.addSample(1, SPDIR + "/torvalds/torvalds-says-linux.wav", 3162, 3700);
 		v(sp, 0.4);
 
 		Instrument drumkit = percussion(TR808);
@@ -30,10 +31,15 @@ public class Demo5 extends DemoBase {
 		Rhythm ltr = r(p(0));
 		Melody ltm = m(an(0));
 		Figure ltf = f(ltr, ltm, sp);
+
+		Rhythm llr = rr(p(0), .25, 9);
+		Melody llm = m(an(1),an(1),an(1),an(1),an(1),an(1),an(1),an(1),an(1));
+		Figure llf = f(llr, llm, sp);
 		
 		add1n(8, hihatf);
 		at(2, ltf);
 		at(4, ltf);
+		at(6, llf);
 	}
 	
 	public static void main(String[] args) throws MidiUnavailableException, IOException {

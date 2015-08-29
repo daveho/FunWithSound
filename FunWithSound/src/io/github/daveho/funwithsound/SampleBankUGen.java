@@ -44,6 +44,7 @@ public class SampleBankUGen extends UGenChain {
 	private AudioContext ac;
 	private Map<Integer, Sample> sampleBank;
 	private Map<Integer, SamplePlayer> samplePlayers;
+	private Map<Integer, SampleRange> sampleRanges;
 
 	/**
 	 * Constructor.
@@ -55,16 +56,31 @@ public class SampleBankUGen extends UGenChain {
 		this.ac = ac;
 		sampleBank = new HashMap<Integer, Sample>();
 		samplePlayers = new HashMap<Integer, SamplePlayer>();
+		sampleRanges = new HashMap<Integer, SampleRange>();
 	}
 	
 	/**
 	 * Add a Sample to be played for given MIDI note.
+	 * The entire sample will be played.
 	 * 
 	 * @param note the MIDI note
 	 * @param sample the Sample
 	 */
 	public void addSample(int note, Sample sample) {
 		sampleBank.put(note, sample);
+	}
+	
+	/**
+	 * Add a Sample to be played for given MIDI note.
+	 * Only the specified range of the sample will be played.
+	 * 
+	 * @param note     the MIDI note
+	 * @param sample   the Sample
+	 * @param range    the SampleRange (start and end time)
+	 */
+	public void addSample(int note, Sample sample, SampleRange range) {
+		sampleBank.put(note, sample);
+		sampleRanges.put(note, range);
 	}
 	
 	/**
@@ -84,7 +100,7 @@ public class SampleBankUGen extends UGenChain {
 			player.setLoopType(LoopType.NO_LOOP_FORWARDS);
 			player.pause(true);
 			samplePlayers.put(entry.getKey(), player);
-			System.out.printf("Added sample player for note %d\n", entry.getKey());
+			//System.out.printf("Added sample player for note %d\n", entry.getKey());
 		}
 		
 		// All of the SamplePlayers feed into a Gain,
@@ -112,8 +128,14 @@ public class SampleBankUGen extends UGenChain {
 					SamplePlayer player = samplePlayers.get(note);
 					if (player != null) {
 						double time = ac.getTime();
-						//System.out.printf("Play sample %d at %f ms\n", note, time);
+						System.out.printf("Play sample %d at %f ms\n", note, time);
+						
 						player.reset();
+						if (sampleRanges.containsKey(note)) {
+							SampleRange range = sampleRanges.get(note);
+							player.setPosition(range.startMs);
+						}
+						
 						player.start();
 					}
 				}

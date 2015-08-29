@@ -435,7 +435,13 @@ public class Player {
 			SampleBankUGen sb = new SampleBankUGen(ac);
 			for (Map.Entry<Integer, String> entry : instr.getSampleMap().entrySet()) {
 				Sample sample = SampleManager.sample(entry.getValue());
-				sb.addSample(entry.getKey(), sample);
+				
+				SampleRange sampleRange = instr.getSampleRanges().get(entry.getKey());
+				if (sampleRange != null) {
+					sb.addSample(entry.getKey(), sample, sampleRange);
+				} else {
+					sb.addSample(entry.getKey(), sample);
+				}
 			}
 			info = new InstrumentInfo(sb, ac);
 			instrMap.put(instr, info);

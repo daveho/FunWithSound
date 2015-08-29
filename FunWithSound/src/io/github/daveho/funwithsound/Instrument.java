@@ -27,6 +27,7 @@ public class Instrument {
 	private final int patch;
 	private final String soundFont;
 	private final Map<Integer, String> sampleMap;
+	private final Map<Integer, SampleRange> sampleRanges;
 	
 	Instrument(int patch) {
 		this(InstrumentType.MIDI, patch, null);
@@ -37,6 +38,7 @@ public class Instrument {
 		this.patch = patch;
 		this.soundFont = soundFont;
 		this.sampleMap = new HashMap<Integer, String>();
+		this.sampleRanges = new HashMap<Integer, SampleRange>();
 	}
 	
 	Instrument(InstrumentType type) {
@@ -69,9 +71,18 @@ public class Instrument {
 		}
 		sampleMap.put(note, fileName);
 	}
+
+	public void addSample(int note, String fileName, double startMs, double endMs) {
+		addSample(note, fileName);
+		sampleRanges.put(note, new SampleRange(startMs, endMs));
+	}
 	
 	public Map<Integer, String> getSampleMap() {
 		return sampleMap;
+	}
+	
+	public Map<Integer, SampleRange> getSampleRanges() {
+		return sampleRanges;
 	}
 
 	public boolean isMidi() {
