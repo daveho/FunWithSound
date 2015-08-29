@@ -71,12 +71,20 @@ public class SampleBankUGen extends UGenChain {
 	 * Prepare to play. This must be called before the AudioContext is started.
 	 */
 	public void prepareToPlay() {
+		if (!samplePlayers.isEmpty()) {
+			// We will assume that this method has already been called, and so
+			// doesn't need to be called again.
+			return;
+		}
+		
 		// Create a SamplePlayer for each sample
 		for (Map.Entry<Integer, Sample> entry : sampleBank.entrySet()) {
 			SamplePlayer player = new SamplePlayer(ac, 2);
 			player.setSample(entry.getValue());
 			player.setLoopType(LoopType.NO_LOOP_FORWARDS);
+			player.pause(true);
 			samplePlayers.put(entry.getKey(), player);
+			System.out.printf("Added sample player for note %d\n", entry.getKey());
 		}
 		
 		// All of the SamplePlayers feed into a Gain,
@@ -98,9 +106,13 @@ public class SampleBankUGen extends UGenChain {
 				// Note that NOTE_OFF messages are ignored.
 				// NOTE_ON messages trigger the appropriate sample to be played.
 				if (msg.getStatus() == ShortMessage.NOTE_ON) {
+					//System.out.println("Sample note on?");
 					// Find the appropriate SamplePlayer
-					SamplePlayer player = samplePlayers.get(((ShortMessage)msg).getData1());
+					int note = ((ShortMessage)msg).getData1();
+					SamplePlayer player = samplePlayers.get(note);
 					if (player != null) {
+						double time = ac.getTime();
+						//System.out.printf("Play sample %d at %f ms\n", note, time);
 						player.reset();
 						player.start();
 					}

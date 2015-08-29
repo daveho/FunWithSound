@@ -18,6 +18,7 @@ public class Demo5 extends DemoBase {
 		
 		Instrument sp = samplePlayer();
 		sp.addSample(0, SPDIR + "/torvalds/torvalds-says-linux.wav");
+		v(sp, 0.4);
 
 		Instrument drumkit = percussion(TR808);
 		
@@ -32,6 +33,7 @@ public class Demo5 extends DemoBase {
 		
 		add1n(8, hihatf);
 		at(2, ltf);
+		at(4, ltf);
 	}
 	
 	public static void main(String[] args) throws MidiUnavailableException, IOException {

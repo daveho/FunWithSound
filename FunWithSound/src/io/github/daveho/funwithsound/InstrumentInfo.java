@@ -49,6 +49,8 @@ class InstrumentInfo {
 	
 	List<GainEvent> gainEvents;
 	
+	private Runnable prepare;
+	
 	/**
 	 * Create an InstrumentInfo for a GervillUGen.
 	 * 
@@ -78,5 +80,24 @@ class InstrumentInfo {
 		
 		// Deliver MidiMessages to the SampleBankUGen
 		((ReceivedMidiMessageSource)source).addMessageListener(head);
+		
+		// The SampleBankUGen's prepareToPlay method must be called before
+		// playing can commence.
+		prepare = new Runnable() {
+			@Override
+			public void run() {
+				((SampleBankUGen)head).prepareToPlay();
+			}
+		};
+	}
+
+	/**
+	 * Prepare to play: does any final initialization of the
+	 * instrument so that playback can commence.
+	 */
+	public void prepareToPlay() {
+		if (prepare != null) {
+			prepare.run();
+		}
 	}
 }

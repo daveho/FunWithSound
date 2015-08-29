@@ -339,6 +339,8 @@ public class Player {
 		for (Map.Entry<Instrument, InstrumentInfo> entry : instrMap.entrySet()) {
 			InstrumentInfo info = entry.getValue();
 			
+			info.prepareToPlay();
+			
 			List<AddEffect> fx = composition.getEffectsMap().get(entry.getKey());
 			if (fx != null) {
 				for (AddEffect effect : fx) {
