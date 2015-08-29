@@ -39,6 +39,8 @@ import javax.sound.midi.ShortMessage;
 import net.beadsproject.beads.core.AudioContext;
 import net.beadsproject.beads.core.Bead;
 import net.beadsproject.beads.core.UGen;
+import net.beadsproject.beads.data.Sample;
+import net.beadsproject.beads.data.SampleManager;
 import net.beadsproject.beads.ugens.Gain;
 import net.beadsproject.beads.ugens.RecordToFile;
 
@@ -101,11 +103,28 @@ public class Player {
 		this.outputFile = outputFile;
 	}
 	
-	private InstrumentInfo createGervill() throws MidiUnavailableException {
+	private InstrumentInfo createGervill(Instrument instrument) throws MidiUnavailableException, IOException {
 		// Note that the GervillUGen isn't connected to an effects chain,
 		// or the AudioContext output, at this point.
 		GervillUGen gervill = new GervillUGen(ac, Collections.<String, Object>emptyMap());
-		return new InstrumentInfo(gervill);
+		InstrumentInfo info = new InstrumentInfo(gervill);
+		if (instrument.hasSoundFont()) {
+			SoftSynthesizer synth = ((GervillUGen)info.head).getSynth();
+			SF2Soundbank sb = getSoundBank(instrument);
+			if (sb != null) {
+				synth.loadAllInstruments(sb);
+			} else {
+				System.err.println("Warning: couldn't load soundfont " + instrument.getSoundFont());
+			}
+		}
+		int patch = instrument.getPatch();
+		if (patch >= 1) {
+			// The MIDI patches are numbered 1..128, but encoded as 0..127
+			patch--;
+			ShortMessage programChange = Midi.createShortMessage(ShortMessage.PROGRAM_CHANGE, patch);
+			((GervillUGen)info.head).getSynthRecv().send(programChange, -1L);
+		}
+		return info;
 	}
 
 	/**
@@ -167,7 +186,7 @@ public class Player {
 		
 		// If MIDI messages were captured, translate them to
 		// Rhythm and Melody
-		if (!capturedEvents.isEmpty()) {
+		if (capturedEvents != null && !capturedEvents.isEmpty()) {
 			analyzeCapturedEvents(capturedEvents);
 		}
 	}
@@ -253,7 +272,7 @@ public class Player {
 
 	private void createMessageSource(final Instrument liveInstr) throws MidiUnavailableException,
 			IOException {
-		this.liveSynth = getGervillUGen(liveInstr);
+		this.liveSynth = getInstrumentInfo(liveInstr);
 
 		// Filter incoming MidiMessages to:
 		// - change to channel 10 (if this is a percussion instrument)
@@ -295,7 +314,7 @@ public class Player {
 	private void addGainEvents() throws MidiUnavailableException, IOException {
 		// Distribute GainEvents by instrument
 		for (GainEvent e : composition.getGainEvents()) {
-			InstrumentInfo info = getGervillUGen(e.instr);
+			InstrumentInfo info = getInstrumentInfo(e.instr);
 			info.gainEvents.add(e);
 		}
 		
@@ -359,7 +378,7 @@ public class Player {
 //			System.out.printf("PlayFigureEvent start time=%d\n", e.getStartUs());
 			SimpleFigure f = e.getFigure();
 			Instrument instrument = f.getInstrument();
-			InstrumentInfo info = getGervillUGen(instrument);
+			InstrumentInfo info = getInstrumentInfo(instrument);
 			Rhythm rhythm = f.getRhythm();
 			Melody melody = f.getMelody();
 			int n = Math.min(rhythm.size(), melody.size());
@@ -392,28 +411,32 @@ public class Player {
 		return idleTimeUs;
 	}
 
-	private InstrumentInfo getGervillUGen(Instrument instrument)
+	private InstrumentInfo getInstrumentInfo(Instrument instrument)
 			throws MidiUnavailableException, IOException {
 		InstrumentInfo info = instrMap.get(instrument);
 		if (info == null) {
-			info = createGervill();
-			if (instrument.hasSoundFont()) {
-				SoftSynthesizer synth = ((GervillUGen)info.head).getSynth();
-				SF2Soundbank sb = getSoundBank(instrument);
-				if (sb != null) {
-					synth.loadAllInstruments(sb);
-				} else {
-					System.err.println("Warning: couldn't load soundfont " + instrument.getSoundFont());
-				}
-			}
-			int patch = instrument.getPatch();
-			if (patch >= 1) {
-				// The MIDI patches are numbered 1..128, but encoded as 0..127
-				patch--;
-				ShortMessage programChange = Midi.createShortMessage(ShortMessage.PROGRAM_CHANGE, patch);
-				((GervillUGen)info.head).getSynthRecv().send(programChange, -1L);
+			if (instrument.isMidi()) {
+				info = createGervill(instrument);
+			} else if (instrument.getType() == InstrumentType.SAMPLE_BANK) {
+				info = createSampleBank(instrument);
+			} else {
+				throw new RuntimeException("Don't know how to create a " + instrument.getType() + " instrument");
 			}
 			instrMap.put(instrument, info);
+		}
+		return info;
+	}
+	
+	private InstrumentInfo createSampleBank(Instrument instr) {
+		InstrumentInfo info = instrMap.get(instr);
+		if (info == null) {
+			SampleBankUGen sb = new SampleBankUGen(ac);
+			for (Map.Entry<Integer, String> entry : instr.getSampleMap().entrySet()) {
+				Sample sample = SampleManager.sample(entry.getValue());
+				sb.addSample(entry.getKey(), sample);
+			}
+			info = new InstrumentInfo(sb, ac);
+			instrMap.put(instr, info);
 		}
 		return info;
 	}

@@ -16,12 +16,14 @@
 package io.github.daveho.funwithsound;
 
 import io.github.daveho.gervill4beads.GervillUGen;
+import io.github.daveho.gervill4beads.ReceivedMidiMessageSource;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.sound.midi.Receiver;
 
+import net.beadsproject.beads.core.AudioContext;
 import net.beadsproject.beads.core.UGen;
 import net.beadsproject.beads.ugens.Gain;
 
@@ -60,5 +62,21 @@ class InstrumentInfo {
 		// Initially, the GervillUGen is at the end of the effects
 		// chain (since there are no effects yet.)
 		this.tail = gervill;
+	}
+
+	/**
+	 * Create an InstrumentInfo for a @{link SampleBankUGen}.
+	 * 
+	 * @param sb the SampleBankUGen
+	 * @param ac the AudioContext
+	 */
+	public InstrumentInfo(SampleBankUGen sb, AudioContext ac) {
+		this.source = new ReceivedMidiMessageSource(ac);
+		this.head = sb;
+		this.gainEvents = new ArrayList<GainEvent>();
+		this.tail = sb;
+		
+		// Deliver MidiMessages to the SampleBankUGen
+		((ReceivedMidiMessageSource)source).addMessageListener(head);
 	}
 }

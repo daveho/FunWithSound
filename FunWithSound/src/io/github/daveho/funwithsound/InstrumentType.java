@@ -38,7 +38,11 @@ public class InstrumentType implements Comparable<InstrumentType> {
 		SAMPLE_BANK,
 		
 		/** Custom instrument type. */
-		CUSTOM,
+		CUSTOM,;
+
+		public boolean isMidi() {
+			return this == MIDI || this == MIDI_PERCUSSION;
+		}
 	}
 	
 	private Kind kind;
@@ -49,6 +53,11 @@ public class InstrumentType implements Comparable<InstrumentType> {
 	
 	/** MIDI percussion instrument. */
 	public static final InstrumentType MIDI_PERCUSSION = new InstrumentType(Kind.MIDI_PERCUSSION, 0);
+	
+	/**
+	 * Sample bank instrument.
+	 */
+	public static final InstrumentType SAMPLE_BANK = new InstrumentType(Kind.SAMPLE_BANK, 0);
 	
 	private static final Map<Integer, InstrumentType> customInstrumentTypeMap =
 			new ConcurrentHashMap<Integer, InstrumentType>();
@@ -99,5 +108,21 @@ public class InstrumentType implements Comparable<InstrumentType> {
 		InstrumentType type = new InstrumentType(Kind.CUSTOM, code);
 		InstrumentType prev = customInstrumentTypeMap.putIfAbsent(code, type);
 		return prev != null ? prev : type;
+	}
+	
+	@Override
+	public String toString() {
+		StringBuilder buf = new StringBuilder();
+		buf.append(kind);
+		if (kind == Kind.CUSTOM) {
+			buf.append("(");
+			buf.append(code);
+			buf.append(")");
+		}
+		return buf.toString();
+	}
+
+	public boolean isMidi() {
+		return kind.isMidi();
 	}
 }

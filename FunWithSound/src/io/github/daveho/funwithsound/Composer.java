@@ -117,6 +117,15 @@ public class Composer {
 	}
 	
 	/**
+	 * Create a sample player instrument.
+	 * 
+	 * @return a sample player instrument
+	 */
+	public Instrument samplePlayer() {
+		return new Instrument(InstrumentType.SAMPLE_BANK);
+	}
+	
+	/**
 	 * Get the composition.
 	 * 
 	 * @return the composition
