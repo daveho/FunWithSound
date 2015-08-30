@@ -53,6 +53,9 @@ public abstract class DemoBase extends Composer {
 	// http://www.hammersound.com/cgi-bin/soundlink.pl?action=view_download_page;ID=566;SoundFont_Location_Selected=Download%20USA;SoundFont_Filename_Selected=analog_age_set.rar
 	public static final String ANALOG_AGE = SOUNDFONT_DIR+"/analogage/Analog Age_set.sf2";
 	
+	// http://www.hammersound.com/cgi-bin/soundlink_download2.pl/Download%20Norway;hs_synt1.zip;21
+	public static final String TB303 = SOUNDFONT_DIR+"/tb303/HS TB-303.SF2";
+	
 	private String outputFile;
 	
 	public abstract void create();

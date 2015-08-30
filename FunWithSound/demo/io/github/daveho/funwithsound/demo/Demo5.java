@@ -1,5 +1,21 @@
+// FunWithSound - A Java/Processing library for music composition
+// Copyright 2015, David Hovemeyer <david.hovemeyer@gmail.com>
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 package io.github.daveho.funwithsound.demo;
 
+import io.github.daveho.funwithsound.AddAutoPan;
 import io.github.daveho.funwithsound.AddDelay;
 import io.github.daveho.funwithsound.AddReverb;
 import io.github.daveho.funwithsound.Figure;
@@ -21,36 +37,26 @@ public class Demo5 extends DemoBase {
 		Instrument sp = samplePlayer();
 		sp.addSample(0, SPDIR + "/torvalds/torvalds-says-linux.wav");
 		sp.addSample(1, SPDIR + "/torvalds/torvalds-says-linux.wav", 3162, 3600);
-		v(sp, 0.4);
+		v(sp, 0.35);
 
 		//Instrument drumkit = percussion(TR808);
 		
 		Instrument tr909 = percussion(TR909);
 		
-		Instrument tr909echo = percussion(ARACHNO);
-		addfx(tr909echo, new AddDelay(200, 1, 0.8));
-		addfx(tr909echo, new AddDelay(400, 1, 0.75));
-		addfx(tr909echo, new AddDelay(600, 1, 0.7));
+		Instrument conga = percussion(ARACHNO);
+		addfx(conga, new AddDelay(200, 1, 0.8));
+		addfx(conga, new AddDelay(400, 1, 0.75));
+		addfx(conga, new AddDelay(600, 1, 0.7));
+		addfx(conga, new AddDelay(800, 1, 0.65));
 		
 		Instrument bassint = instr(ANALOG_AGE, 10);
-		Instrument bass = instr(ANALOG_AGE, 15);
+		addfx(bassint, new AddAutoPan(0.125, -.8, .8));
+		addfx(bassint, new AddReverb());
+		v(bassint, .8);
+		
+		Instrument bass = instr(TB303, 9); // best: 5,9 good: 2,4,7,8  ok: 3 weird: 11,12,16(fun for break)
 		v(bass, 0.8);
 
-		/*
-		Rhythm chihatr = rr(p(0, 101), .5, 4);
-		Rhythm hihatr = gr(chihatr, r(s(2, 1.2, 101)), sr(4, chihatr), r(s(6, 1.2, 101)));
-		Melody hihatm = m(an(42),an(42),an(42),an(42),an(46),an(42),an(42),an(42),an(42),an(46));
-		Figure hihatf = f(hihatr, hihatm, drumkit);
-		
-		Rhythm kicksr = r(p(0, 101), p(3.5, 88), p(4, 101));
-		Melody kicksm = m(an(36), an(63), an(36));
-		Figure kicksf = f(kicksr, kicksm, drumkit);
-		*/
-//		Rhythm hihatr = rr(p(0, 101), 1, 8);
-//		Figure hihatf = pf(hihatr, 42, drumkit);
-//		Rhythm kicksr = rr(p(0, 101), 4, 2);
-//		Figure kicksf = pf(kicksr, 36, drumkit);
-		
 		Rhythm percr = r(
 				s(0.000,.8,110), s(1,.8,118), s(2,1.2,118), s(4,.4,118), s(4.5,.8,110), s(6,0.477,118));
 		Melody percm = m(
@@ -76,12 +82,12 @@ public class Demo5 extends DemoBase {
 		Melody llm = m(an(1),an(1),an(1),an(1),an(1));
 		Figure llf = f(llr, llm, sp);
 		
-		Rhythm decayr = r(p(0, 127), p(2, 127), p(4, 110), p(6, 110));
-		Melody decaym = m(an(61),an(61),an(60),an(60));
-		Figure decayf = f(decayr, decaym, tr909echo);
+		Rhythm decayr = r(p(0, 127), p(2, 127), p(4, 110), p(6, 110), p(8, 100), p(10, 90), p(12, 80));
+		Melody decaym = m(an(61),an(61),an(60),an(60),an(60),an(60),an(60));
+		Figure decayf = f(decayr, decaym, conga);
 
 		int where = m();
-		
+		// /*
 		add1n(10, percf);
 		at(where+2, bassintf);
 		at(where+2, ltf);
@@ -92,11 +98,22 @@ public class Demo5 extends DemoBase {
 		at(where+9, llf);
 		
 		at(where+10, decayf);
-
-		for (int i = 0; i < 4; i++) {
-			at(where+11+i, gf(percf,bass1f));
+		// */
+		int off = 12/*0*/;
+		for (int i = 0; i < 16; i++) {
+			at(where+off+i, gf(percf,bass1f));
 		}
-		
+		// /*
+		at(where+off+2, llf);
+		at(where+off+3, llf);
+		at(where+off+4, bassintf);
+		at(where+off+5, llf);
+		at(where+off+6, llf);
+		at(where+off+7, llf);
+		at(where+off+8, llf);
+		at(where+off+9, llf);
+		at(where+off+10, llf);
+		// */
 		audition(bass);
 	}
 	
