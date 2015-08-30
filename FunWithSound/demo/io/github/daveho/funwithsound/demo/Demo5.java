@@ -49,6 +49,7 @@ public class Demo5 extends DemoBase {
 		addfx(conga, new AddDelay(400, 1, 0.75));
 		addfx(conga, new AddDelay(600, 1, 0.7));
 		addfx(conga, new AddDelay(800, 1, 0.65));
+		addfx(conga, new AddAutoPan(.75, -.8, .8));
 		
 		Instrument bassint = instr(ANALOG_AGE, 10);
 		addfx(bassint, new AddAutoPan(0.125, -.8, .8));
