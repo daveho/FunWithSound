@@ -18,6 +18,7 @@ package io.github.daveho.funwithsound.demo;
 import io.github.daveho.funwithsound.AddAutoPan;
 import io.github.daveho.funwithsound.AddDelay;
 import io.github.daveho.funwithsound.AddReverb;
+import io.github.daveho.funwithsound.AddStaticPan;
 import io.github.daveho.funwithsound.Figure;
 import io.github.daveho.funwithsound.Instrument;
 import io.github.daveho.funwithsound.Melody;
@@ -36,7 +37,7 @@ public class Demo5 extends DemoBase {
 		
 		Instrument sp = samplePlayer();
 		sp.addSample(0, SPDIR + "/torvalds/torvalds-says-linux.wav");
-		sp.addSample(1, SPDIR + "/torvalds/torvalds-says-linux.wav", 3162, 3600);
+		sp.addSample(1, SPDIR + "/torvalds/torvalds-says-linux.wav", 3162, 3600); // Just "Linux"
 		v(sp, 0.35);
 
 		//Instrument drumkit = percussion(TR808);
@@ -59,6 +60,11 @@ public class Demo5 extends DemoBase {
 		
 		Instrument bleep = instr(TB303, 16);
 		v(bleep, 0.7);
+		addfx(bleep, new AddStaticPan(-.8));
+		
+		Instrument bleep2 = instr(TB303, 11);
+		v(bleep2, 0.8);
+		addfx(bleep2, new AddStaticPan(.8));
 
 		Rhythm percr = r(
 				s(0.000,.8,110), s(1,.8,118), s(2,1.2,118), s(4,.4,118), s(4.5,.8,110), s(6,0.477,118));
@@ -96,6 +102,15 @@ public class Demo5 extends DemoBase {
 				an(62), an(67),
 				an(67), an(71), an(69), an(72), an(71));
 		Figure bleep1f = f(bleep1r, bleep1m, bleep);
+		
+		// I'm not sure about this...
+		Rhythm bleep2r = r(
+				s(0.000,0.870,106), s(0.925,3.978,99), s(4.950,3.821,99), s(8.975,4.008,96), s(8.987,3.992,106),
+				s(15.864,1.023,110), s(16.953,4.064,110), s(20.977,4.151,106), s(25.111,3.962,96), s(25.128,3.932,106));
+		Melody bleep2m = m(
+				an(62), an(72), an(71), an(64), an(69),
+				an(62), an(71), an(69), an(60), an(67));
+		Figure bleep2f = f(sr(-1,bleep2r), bleep2m, bleep2);
 
 		int where = m();
 		// /*
@@ -110,13 +125,7 @@ public class Demo5 extends DemoBase {
 		
 		at(where+10, decayf);
 		// */
-		int off = 12;
-		for (int i = 0; i < 16; i++) {
-			at(where+off+i, gf(percf,bass1f));
-		}
-//		for (int i = 2; i <= 4; i+=2 ){
-//			at(where+off+i, bleep1f);
-//		}
+		int off = 12/*0*/;
 		// /*
 		at(where+off+2, llf);
 		at(where+off+3, llf);
@@ -129,10 +138,22 @@ public class Demo5 extends DemoBase {
 		//at(where+off+10, llf);
 		at(where+off+10, llf);
 		at(where+off+11, llf);
-		at(where+off+12, bleep1f);
-		at(where+off+14, bleep1f);
 		// */
-		audition(bleep);
+		for (int i = 0; i < 32; i++) {
+			at(where+off+i, gf(percf,bass1f));
+		}
+		
+		off += 12;
+		for (int i = 0; i <= 9; i++ ){
+			if (i%2==0) {
+				at(where+off+i, bleep1f);
+			}
+			if (i%4 == 1) {
+				at(where+off+i, bleep2f);
+			}
+		}
+
+		audition(bleep2);
 	}
 	
 	public static void main(String[] args) throws MidiUnavailableException, IOException {
