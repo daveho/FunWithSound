@@ -32,8 +32,8 @@ public class Demo5 extends DemoBase {
 		Melody ltm = m(an(0));
 		Figure ltf = f(ltr, ltm, sp);
 
-		Rhythm llr = rr(p(0), .25, 9);
-		Melody llm = m(an(1),an(1),an(1),an(1),an(1),an(1),an(1),an(1),an(1));
+		Rhythm llr = rr(p(0), .5, 5);
+		Melody llm = m(an(1),an(1),an(1),an(1),an(1));
 		Figure llf = f(llr, llm, sp);
 		
 		add1n(8, hihatf);

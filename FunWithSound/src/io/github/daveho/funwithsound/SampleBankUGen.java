@@ -28,6 +28,7 @@ import net.beadsproject.beads.core.Bead;
 import net.beadsproject.beads.core.UGen;
 import net.beadsproject.beads.core.UGenChain;
 import net.beadsproject.beads.data.Sample;
+import net.beadsproject.beads.ugens.Envelope;
 import net.beadsproject.beads.ugens.Gain;
 import net.beadsproject.beads.ugens.SamplePlayer;
 import net.beadsproject.beads.ugens.SamplePlayer.LoopType;
@@ -41,9 +42,16 @@ import net.beadsproject.beads.ugens.SamplePlayer.LoopType;
  * should deliver them at the correct playback times.
  */
 public class SampleBankUGen extends UGenChain {
+	
+	private static class PlayerInfo {
+		SamplePlayer player;
+		Envelope env;
+		Gain gain;
+	}
+	
 	private AudioContext ac;
 	private Map<Integer, Sample> sampleBank;
-	private Map<Integer, SamplePlayer> samplePlayers;
+	private Map<Integer, PlayerInfo> samplePlayers;
 	private Map<Integer, SampleRange> sampleRanges;
 
 	/**
@@ -55,7 +63,7 @@ public class SampleBankUGen extends UGenChain {
 		super(ac, 0, 2);
 		this.ac = ac;
 		sampleBank = new HashMap<Integer, Sample>();
-		samplePlayers = new HashMap<Integer, SamplePlayer>();
+		samplePlayers = new HashMap<Integer, PlayerInfo>();
 		sampleRanges = new HashMap<Integer, SampleRange>();
 	}
 	
@@ -99,15 +107,21 @@ public class SampleBankUGen extends UGenChain {
 			player.setSample(entry.getValue());
 			player.setLoopType(LoopType.NO_LOOP_FORWARDS);
 			player.pause(true);
-			samplePlayers.put(entry.getKey(), player);
+			PlayerInfo sp = new PlayerInfo();
+			sp.player = player;
+			sp.env = new Envelope(ac, 1.0f); // Controls gain
+			sp.gain = new Gain(ac, 2);
+			sp.gain.setGain(sp.env);
+			sp.gain.addInput(sp.player);
+			samplePlayers.put(entry.getKey(), sp);
 			//System.out.printf("Added sample player for note %d\n", entry.getKey());
 		}
 		
-		// All of the SamplePlayers feed into a Gain,
+		// All of the SamplePlayers' Gains feed into a mixer Gain,
 		// which mixes the input
 		UGen mixer = new Gain(ac, 2);
-		for (SamplePlayer player : samplePlayers.values()) {
-			mixer.addInput(player);
+		for (PlayerInfo sp : samplePlayers.values()) {
+			mixer.addInput(sp.gain);
 		}
 		
 		// The Gain is the output of the UGen
@@ -125,18 +139,18 @@ public class SampleBankUGen extends UGenChain {
 					//System.out.println("Sample note on?");
 					// Find the appropriate SamplePlayer
 					int note = ((ShortMessage)msg).getData1();
-					SamplePlayer player = samplePlayers.get(note);
-					if (player != null) {
+					PlayerInfo sp = samplePlayers.get(note);
+					if (sp != null) {
 						double time = ac.getTime();
 						System.out.printf("Play sample %d at %f ms\n", note, time);
 						
-						player.reset();
+						sp.player.reset();
 						if (sampleRanges.containsKey(note)) {
 							SampleRange range = sampleRanges.get(note);
-							player.setPosition(range.startMs);
+							sp.player.setPosition(range.startMs);
 						}
 						
-						player.start();
+						sp.player.start();
 					}
 				}
 			}
