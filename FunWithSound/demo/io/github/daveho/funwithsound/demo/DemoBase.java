@@ -47,6 +47,12 @@ public abstract class DemoBase extends Composer {
 	// From: http://www.suonoelettronico.com/soundfont_scaricare_sf2.asp?nome=Minimoog%2053%20suoni
 	public static final String MINIMOOG = SOUNDFONT_DIR+"/minimoog/minimoog_leads.sf2";
 	
+	// http://www.hammersound.com/cgi-bin/soundlink.pl?action=view_download_page;ID=673;SoundFont_Location_Selected=Download%20USA;SoundFont_Filename_Selected=PerKristianRisvik_Bandpass.zip
+	public static final String BANDPASS = SOUNDFONT_DIR+"/bandpass/Bandpass.sf2";
+	
+	// http://www.hammersound.com/cgi-bin/soundlink.pl?action=view_download_page;ID=566;SoundFont_Location_Selected=Download%20USA;SoundFont_Filename_Selected=analog_age_set.rar
+	public static final String ANALOG_AGE = SOUNDFONT_DIR+"/analogage/Analog Age_set.sf2";
+	
 	private String outputFile;
 	
 	public abstract void create();
