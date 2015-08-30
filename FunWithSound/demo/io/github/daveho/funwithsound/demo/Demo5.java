@@ -14,11 +14,11 @@ public class Demo5 extends DemoBase {
 
 	@Override
 	public void create() {
-		tempo(220, 8);
+		tempo(210, 8);
 		
 		Instrument sp = samplePlayer();
 		sp.addSample(0, SPDIR + "/torvalds/torvalds-says-linux.wav");
-		sp.addSample(1, SPDIR + "/torvalds/torvalds-says-linux.wav", 3162, 3700);
+		sp.addSample(1, SPDIR + "/torvalds/torvalds-says-linux.wav", 3162, 3600);
 		v(sp, 0.4);
 
 		Instrument drumkit = percussion(TR808);
@@ -28,6 +28,10 @@ public class Demo5 extends DemoBase {
 		Melody hihatm = m(an(42),an(42),an(42),an(42),an(46),an(42),an(42),an(42),an(42),an(46));
 		Figure hihatf = f(hihatr, hihatm, drumkit);
 		
+		Rhythm kicksr = r(p(0, 101), p(3.5, 88), p(4, 101));
+		Melody kicksm = m(an(36), an(63), an(36));
+		Figure kicksf = f(kicksr, kicksm, drumkit);
+		
 		Rhythm ltr = r(p(0));
 		Melody ltm = m(an(0));
 		Figure ltf = f(ltr, ltm, sp);
@@ -35,11 +39,14 @@ public class Demo5 extends DemoBase {
 		Rhythm llr = rr(p(0), .5, 5);
 		Melody llm = m(an(1),an(1),an(1),an(1),an(1));
 		Figure llf = f(llr, llm, sp);
+
+		int where = m();
 		
-		add1n(8, hihatf);
-		at(2, ltf);
-		at(4, ltf);
-		at(6, llf);
+		add1n(8, gf(hihatf, kicksf));
+		at(where+2, ltf);
+		at(where+4, llf);
+		at(where+5, llf);
+		at(where+6, ltf);
 	}
 	
 	public static void main(String[] args) throws MidiUnavailableException, IOException {

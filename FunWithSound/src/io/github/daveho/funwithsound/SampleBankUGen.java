@@ -42,6 +42,7 @@ import net.beadsproject.beads.ugens.SamplePlayer.LoopType;
  * should deliver them at the correct playback times.
  */
 public class SampleBankUGen extends UGenChain {
+	private static final float RAMP_TIME_MS = 5.0f;
 	
 	private static class PlayerInfo {
 		SamplePlayer player;
@@ -75,7 +76,7 @@ public class SampleBankUGen extends UGenChain {
 	 * @param sample the Sample
 	 */
 	public void addSample(int note, Sample sample) {
-		sampleBank.put(note, sample);
+		addSample(note, sample, new SampleRange(0, sample.getLength()));
 	}
 	
 	/**
@@ -106,10 +107,11 @@ public class SampleBankUGen extends UGenChain {
 			SamplePlayer player = new SamplePlayer(ac, 2);
 			player.setSample(entry.getValue());
 			player.setLoopType(LoopType.NO_LOOP_FORWARDS);
+			player.setKillOnEnd(false);
 			player.pause(true);
 			PlayerInfo sp = new PlayerInfo();
 			sp.player = player;
-			sp.env = new Envelope(ac, 1.0f); // Controls gain
+			sp.env = new Envelope(ac, 0.0f); // Controls gain
 			sp.gain = new Gain(ac, 2);
 			sp.gain.setGain(sp.env);
 			sp.gain.addInput(sp.player);
@@ -139,16 +141,21 @@ public class SampleBankUGen extends UGenChain {
 					//System.out.println("Sample note on?");
 					// Find the appropriate SamplePlayer
 					int note = ((ShortMessage)msg).getData1();
-					PlayerInfo sp = samplePlayers.get(note);
+					final PlayerInfo sp = samplePlayers.get(note);
 					if (sp != null) {
-						double time = ac.getTime();
-						System.out.printf("Play sample %d at %f ms\n", note, time);
+//						double time = ac.getTime();
+//						System.out.printf("Play sample %d at %f ms\n", note, time);
 						
 						sp.player.reset();
-						if (sampleRanges.containsKey(note)) {
-							SampleRange range = sampleRanges.get(note);
-							sp.player.setPosition(range.startMs);
-						}
+						SampleRange range = sampleRanges.get(note);
+						sp.player.setPosition(range.startMs);
+						float durationMs = (float)(range.endMs - range.startMs);
+						
+						sp.env.clear();
+						float middleTimeMs = durationMs - 2*RAMP_TIME_MS;
+						sp.env.addSegment(1.0f, RAMP_TIME_MS);
+						sp.env.addSegment(1.0f, middleTimeMs);
+						sp.env.addSegment(0.0f, RAMP_TIME_MS);
 						
 						sp.player.start();
 					}
