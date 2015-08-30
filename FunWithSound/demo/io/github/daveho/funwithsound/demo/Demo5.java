@@ -56,6 +56,9 @@ public class Demo5 extends DemoBase {
 		
 		Instrument bass = instr(TB303, 9); // best: 5,9 good: 2,4,7,8  ok: 3 weird: 11,12,16(fun for break)
 		v(bass, 0.8);
+		
+		Instrument bleep = instr(TB303, 16);
+		v(bleep, 0.7);
 
 		Rhythm percr = r(
 				s(0.000,.8,110), s(1,.8,118), s(2,1.2,118), s(4,.4,118), s(4.5,.8,110), s(6,0.477,118));
@@ -85,6 +88,14 @@ public class Demo5 extends DemoBase {
 		Rhythm decayr = r(p(0, 127), p(2, 127), p(4, 110), p(6, 110), p(8, 100), p(10, 90), p(12, 80));
 		Melody decaym = m(an(61),an(61),an(60),an(60),an(60),an(60),an(60));
 		Figure decayf = f(decayr, decaym, conga);
+		
+		Rhythm bleep1r = r(
+				s(0.000,1.795,118), s(2,0.9,110),
+				s(3,0.416,110), s(3.400,1.523,102), s(5,0.940,118), s(6,1.205,106), s(7,0.879,110));
+		Melody bleep1m = m(
+				an(62), an(67),
+				an(67), an(71), an(69), an(72), an(71));
+		Figure bleep1f = f(bleep1r, bleep1m, bleep);
 
 		int where = m();
 		// /*
@@ -99,22 +110,29 @@ public class Demo5 extends DemoBase {
 		
 		at(where+10, decayf);
 		// */
-		int off = 12/*0*/;
+		int off = 12;
 		for (int i = 0; i < 16; i++) {
 			at(where+off+i, gf(percf,bass1f));
 		}
+//		for (int i = 2; i <= 4; i+=2 ){
+//			at(where+off+i, bleep1f);
+//		}
 		// /*
 		at(where+off+2, llf);
 		at(where+off+3, llf);
 		at(where+off+4, bassintf);
-		at(where+off+5, llf);
+		//at(where+off+5, llf);
+		//at(where+off+6, llf);
 		at(where+off+6, llf);
 		at(where+off+7, llf);
-		at(where+off+8, llf);
-		at(where+off+9, llf);
+		//at(where+off+9, llf);
+		//at(where+off+10, llf);
 		at(where+off+10, llf);
+		at(where+off+11, llf);
+		at(where+off+12, bleep1f);
+		at(where+off+14, bleep1f);
 		// */
-		audition(bass);
+		audition(bleep);
 	}
 	
 	public static void main(String[] args) throws MidiUnavailableException, IOException {
