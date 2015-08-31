@@ -38,11 +38,13 @@ public class LinuxTechno extends DemoBase {
 		Instrument sp = samplePlayer();
 		sp.addSample(0, SPDIR + "/torvalds/torvalds-says-linux.wav");
 		sp.addSample(1, SPDIR + "/torvalds/torvalds-says-linux.wav", 3162, 3600); // Just "Linux"
+		sp.addSample(2, SPDIR+"/freesound/201571__julien-matthey__jm-fx-boom-01a.wav"); // Boom!
 		v(sp, 0.35);
 
 		//Instrument drumkit = percussion(TR808);
 		
 		Instrument tr909 = percussion(TR909);
+		Instrument tr808 = percussion(TR808);
 		
 		Instrument conga = percussion(ARACHNO);
 		addfx(conga, new AddDelay(200, 1, 0.8));
@@ -51,31 +53,63 @@ public class LinuxTechno extends DemoBase {
 		addfx(conga, new AddDelay(800, 1, 0.65));
 		addfx(conga, new AddAutoPan(.75, -.8, .8));
 		
-		Instrument bassint = instr(ANALOG_AGE, 10);
+		//Instrument bassint = instr(ANALOG_AGE, 10);
+		Instrument bassint = instr(ARACHNO, 88);
+		//Instrument bassint = instr(ARACHNO, 91);
 		addfx(bassint, new AddAutoPan(0.125, -.8, .8));
 		addfx(bassint, new AddReverb());
-		v(bassint, .8);
+		v(bassint, 0.9);
 		
 		//Instrument bass = instr(TB303, 9); // best: 5,9 good: 2,4,7,8  ok: 3 weird: 11,12,16(fun for break)
 		Instrument bass = instr(ARACHNO, 39);
-		v(bass, 0.5);
+		v(bass, 0.6);
 		
-		Instrument bass2 = instr(ARACHNO, 39);
-		//v(bass2, 0.6);
+//		Instrument bass2 = instr(ARACHNO, 39);
+//		//v(bass2, 0.6);
 		
 		Instrument bleep = instr(TB303, 16);
-		v(bleep, 0.7);
+		v(bleep, 1.0);
 		addfx(bleep, new AddStaticPan(-.8));
 		
 		Instrument bleep2 = instr(TB303, 11);
-		v(bleep2, 0.8);
+		v(bleep2, 1.0);
 		addfx(bleep2, new AddStaticPan(.8));
 
-		Rhythm percr = r(
+		Rhythm drumr = r(
 				s(0.000,.8,110), s(1,.8,118), s(2,1.2,118), s(4,.4,118), s(4.5,.8,110), s(6,0.477,118));
-		Melody percm = m(
+		Melody drumm = m(
 				an(36), an(36), an(40), an(36), an(36), an(40));
-		Figure percf = f(percr, percm, tr909);
+		Figure drumf = f(drumr, drumm, tr909);
+		
+//		Rhythm hihatr = r(
+//				s(0.000,1.182,66), s(1,0.372,66));
+//		Melody hihatm = m(
+//				an(51), an(46), an(51), an(46));
+//		Figure hihatf = f(gr(sr(1.5,hihatr), sr(5.5,hihatr)), hihatm, tr909);
+		
+		// A complicated hihat pattern,
+		// sort of like Selected Ambient Works, Vol. 1 era Aphex Twin
+		int n = 4;
+		double dur = .5/n;
+		int vel = 60;
+		Rhythm drillr = rr(s(0, dur, vel), dur, n);
+		Rhythm fillr = rr(s(1, .5, vel), .5, 4);
+		Rhythm drill2r = rr(s(0, dur*2, vel), dur*2, n);
+		Rhythm hihatr = gr(drillr,
+				fillr,
+				r(s(3, 2.0, vel)), // first open hihat
+				r(s(4, .5, vel),s(4.5, .5, vel), s(5, 1.0, vel)),
+				sr(7,drill2r));
+		Melody hihatm = m(
+				an(42),an(42),an(42),an(42), // drill4r
+				an(42),an(42),an(42),an(42), // fillr
+				an(46), // first open hihat
+				an(42),an(42),an(46), // tap, tap, open hihat
+				an(42),an(42),an(42),an(42) // drill2r
+				);
+		Figure hihatf = f(hihatr, hihatm, tr808);
+		
+		Figure percf = gf(drumf, hihatf);
 		
 		Rhythm bassintr = r(s(0.000,31.453,118), s(32,32.231,118));
 		Melody bassintm = m(an(26), an(26));
@@ -104,8 +138,11 @@ public class LinuxTechno extends DemoBase {
 		Figure llf = f(llr, llm, sp);
 		
 		Rhythm decayr = r(p(0, 127), p(2, 127), p(4, 110), p(6, 110), p(8, 100), p(10, 90), p(12, 80));
-		Melody decaym = m(an(61),an(61),an(75),an(60),an(74),an(60),an(75));
+		Melody decaym = m(an(61),an(61),an(75),an(60),an(61),an(60),an(61));
 		Figure decayf = f(decayr, decaym, conga);
+		Rhythm boomr = r(p(0));
+		Melody boomm = m(an(2));
+		//Figure boomf = f(boomr, boomm, sp);
 		
 		Rhythm bleep1r = r(
 				s(0.000,1.795,118), s(2,0.9,110),
@@ -127,23 +164,23 @@ public class LinuxTechno extends DemoBase {
 		Figure bleep2f = f(sr(-1,bleep2r), bleep2m, bleep2);
 		Figure bleep3f = f(sr(-1,bleep2r), bleep3m, bleep2);
 		
-/* 0*/	add1(gf(percf));
-/* 1*/	add1(gf(percf));
-/* 2*/	add1(gf(percf,bassintf,ltf));
-/* 3*/	add1(gf(percf));
-/* 4*/	add1(gf(percf, llf));
-/* 5*/	add1(gf(percf, llf));
-/* 6*/	add1(gf(percf,ltf));
-/* 7*/	add1(gf(percf));
-/* 8*/	add1(gf(percf,llf));
-/* 9*/	add1(gf(percf,llf));
-/*10*/	add1(gf(decayf));
+/* 0*/	add1(gf(drumf));
+/* 1*/	add1(gf(drumf));
+/* 2*/	add1(gf(drumf,bassintf,ltf));
+/* 3*/	add1(gf(drumf));
+/* 4*/	add1(gf(drumf, llf));
+/* 5*/	add1(gf(drumf, llf));
+/* 6*/	add1(gf(drumf,ltf));
+/* 7*/	add1(gf(drumf));
+/* 8*/	add1(gf(drumf,llf));
+/* 9*/	add1(gf(drumf,llf));
+/*10*/	add1(gf(decayf,f(sr(14,boomr),boomm,sp)));
 /*11*/	add1(gf());
 /*12*/	add1(gf(percf,bass1f));
 /*13*/	add1(gf(percf,bass1f));
 /*14*/	add1(gf(percf,bass1f,llf));
 /*15*/	add1(gf(percf,bass2f,llf));
-/*16*/	add1(gf(percf,bass1f,bassintf));
+/*16*/	add1(gf(percf,bass1f,bassintf,f(sr(0,boomr),boomm,sp)));
 /*17*/	add1(gf(percf,bass1f));
 /*18*/	add1(gf(percf,bass1f,llf));
 /*19*/	add1(gf(percf,bass2f,llf));
@@ -151,13 +188,13 @@ public class LinuxTechno extends DemoBase {
 /*21*/	add1(gf(percf,bass1f));
 /*22*/	add1(gf(percf,bass1f,llf));
 /*23*/	add1(gf(percf,bass2f,llf));
-/*24*/	add1(gf(percf,bass1f,bleep1f));
-/*25*/	add1(gf(percf,bass1f,bleep2f));
-/*26*/	add1(gf(percf,bass1f,bleep1f));
-/*27*/	add1(gf(percf,bass2f));
-/*28*/	add1(gf(percf,bass1f,bleep1f));
-/*29*/	add1(gf(percf,bass1f,bleep3f));
-/*30*/	add1(gf(percf,bass1f,bleep1f));
+/*24*/	add1(gf(drumf,bass1f,bleep1f));
+/*25*/	add1(gf(drumf,bass1f,bleep2f));
+/*26*/	add1(gf(drumf,bass1f,bleep1f));
+/*27*/	add1(gf(drumf,bass2f));
+/*28*/	add1(gf(drumf,bass1f,bleep1f));
+/*29*/	add1(gf(drumf,bass1f,bleep3f));
+/*30*/	add1(gf(drumf,bass1f,bleep1f));
 /*31*/	add1(gf(percf,bass2f));
 /*32*/	add1(gf(percf,bass1f,llf));
 /*33*/	add1(gf(percf,bass1f,llf));
@@ -167,8 +204,9 @@ public class LinuxTechno extends DemoBase {
 /*37*/	add1(gf(percf,bass1f,llf));
 /*38*/	add1(gf(percf,bass1f,llf));
 /*39*/	add1(gf(percf,bass2f));
+/*40*/	add1(gf(f(boomr, boomm,sp)));
 
-		audition(bass2);
+		audition(tr909);
 	}
 	
 	public static void main(String[] args) throws MidiUnavailableException, IOException {
