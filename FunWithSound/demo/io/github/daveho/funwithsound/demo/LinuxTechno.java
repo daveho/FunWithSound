@@ -28,7 +28,7 @@ import java.io.IOException;
 
 import javax.sound.midi.MidiUnavailableException;
 
-public class Demo5 extends DemoBase {
+public class LinuxTechno extends DemoBase {
 	private static final String SPDIR = "/home/dhovemey/Samples";
 
 	@Override
@@ -104,7 +104,6 @@ public class Demo5 extends DemoBase {
 				an(67), an(71), an(69)/*, an(72), an(71)*/);
 		Figure bleep1f = f(bleep1r, bleep1m, bleep);
 		
-		// I'm not sure about this...
 		Rhythm bleep2r = r(
 				s(0.000,0.870,106), s(0.925,3.978,99), s(4.950,3.821,99), s(8.975,4.008,96), s(8.987,3.992,106),
 				s(15.864,1.023,110), s(16.953,4.064,110), s(20.977,4.151,106), s(25.111,3.962,96), s(25.128,3.932,106));
@@ -165,7 +164,7 @@ public class Demo5 extends DemoBase {
 	}
 	
 	public static void main(String[] args) throws MidiUnavailableException, IOException {
-		Demo5 demo = new Demo5();
+		LinuxTechno demo = new LinuxTechno();
 		demo.create();
 		demo.play();
 	}
