@@ -56,8 +56,9 @@ public class LinuxTechno extends DemoBase {
 		addfx(bassint, new AddReverb());
 		v(bassint, .8);
 		
-		Instrument bass = instr(TB303, 9); // best: 5,9 good: 2,4,7,8  ok: 3 weird: 11,12,16(fun for break)
-		v(bass, 0.8);
+		//Instrument bass = instr(TB303, 9); // best: 5,9 good: 2,4,7,8  ok: 3 weird: 11,12,16(fun for break)
+		Instrument bass = instr(ARACHNO, 36);
+		v(bass, 0.5);
 		
 		Instrument bleep = instr(TB303, 16);
 		v(bleep, 0.7);
@@ -78,7 +79,7 @@ public class LinuxTechno extends DemoBase {
 		Figure bassintf = f(bassintr, bassintm, bassint);
 		
 		Rhythm bass1r = r(
-				s(0.000,0.8,110), s(1,0.8,106), s(2,1.6,118), s(3,0.3,75), s(3.5,1.6,102),
+				s(0.000,0.8,110), s(1,0.8,106), s(2,1.6,118), s(3,0.3,75), s(3.5,2,102),
 				s(5,1,118), s(5.95,2,106));
 		Melody bass1m = m(
 				an(38), an(38), an(38), an(41), an(43), an(38), an(50));
@@ -166,6 +167,7 @@ public class LinuxTechno extends DemoBase {
 	public static void main(String[] args) throws MidiUnavailableException, IOException {
 		LinuxTechno demo = new LinuxTechno();
 		demo.create();
+//		demo.setOutputFile("linuxtechno.wav");
 		demo.play();
 	}
 
