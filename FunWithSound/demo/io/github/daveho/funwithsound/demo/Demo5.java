@@ -93,15 +93,15 @@ public class Demo5 extends DemoBase {
 		Figure llf = f(llr, llm, sp);
 		
 		Rhythm decayr = r(p(0, 127), p(2, 127), p(4, 110), p(6, 110), p(8, 100), p(10, 90), p(12, 80));
-		Melody decaym = m(an(61),an(61),an(60),an(60),an(60),an(60),an(60));
+		Melody decaym = m(an(61),an(61),an(78),an(60),an(74),an(75),an(75));
 		Figure decayf = f(decayr, decaym, conga);
 		
 		Rhythm bleep1r = r(
 				s(0.000,1.795,118), s(2,0.9,110),
-				s(3,0.416,110), s(3.400,1.523,102), s(5,0.940,118), s(6,1.205,106), s(7,0.879,110));
+				s(3,0.416,110), s(3.400,1.523,102), s(5,0.940,118)/*, s(6,1.205,106), s(7,0.879,110)*/);
 		Melody bleep1m = m(
 				an(62), an(67),
-				an(67), an(71), an(69), an(72), an(71));
+				an(67), an(71), an(69)/*, an(72), an(71)*/);
 		Figure bleep1f = f(bleep1r, bleep1m, bleep);
 		
 		// I'm not sure about this...
@@ -153,6 +153,13 @@ public class Demo5 extends DemoBase {
 				at(where+off+i, bleep2f);
 			}
 		}
+		
+		off += 12;
+		at(where+off+0, llf);
+		at(where+off+1, llf);
+		at(where+off+2, llf);
+		at(where+off+3, llf);
+		at(where+off+4, bassintf);
 
 		audition(bleep2);
 	}
