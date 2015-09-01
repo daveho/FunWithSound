@@ -29,16 +29,15 @@ import java.io.IOException;
 import javax.sound.midi.MidiUnavailableException;
 
 public class LinuxTechno extends DemoBase {
-	private static final String SPDIR = "/home/dhovemey/Samples";
-
 	@Override
 	public void create() {
 		tempo(210, 8);
 		
 		Instrument sp = samplePlayer();
-		sp.addSample(0, SPDIR + "/torvalds/torvalds-says-linux.wav");
-		sp.addSample(1, SPDIR + "/torvalds/torvalds-says-linux.wav", 3162, 3600); // Just "Linux"
-		sp.addSample(2, SPDIR+"/freesound/201571__julien-matthey__jm-fx-boom-01a.wav"); // Boom!
+		// These samples are local to the project - sorry, Github
+		sp.addSample(0, "samples/torvalds-says-linux-noclip.wav");
+		sp.addSample(1, "samples/torvalds-says-linux-noclip.wav", 3162, 3600); // Just "Linux"
+		sp.addSample(2, "samples/201571__julien-matthey__jm-fx-boom-01a.wav"); // Boom!
 		v(sp, 0.35);
 
 		//Instrument drumkit = percussion(TR808);
@@ -58,7 +57,7 @@ public class LinuxTechno extends DemoBase {
 		//Instrument bassint = instr(ARACHNO, 91);
 		addfx(bassint, new AddAutoPan(0.125, -.8, .8));
 		addfx(bassint, new AddReverb());
-		v(bassint, 0.9);
+		v(bassint, 0.8);
 		
 		//Instrument bass = instr(TB303, 9); // best: 5,9 good: 2,4,7,8  ok: 3 weird: 11,12,16(fun for break)
 		Instrument bass = instr(ARACHNO, 39);
@@ -212,7 +211,7 @@ public class LinuxTechno extends DemoBase {
 	public static void main(String[] args) throws MidiUnavailableException, IOException {
 		LinuxTechno demo = new LinuxTechno();
 		demo.create();
-//		demo.setOutputFile("linuxtechno.wav");
+		//demo.setOutputFile("linuxtechno.wav");
 		demo.play();
 	}
 
