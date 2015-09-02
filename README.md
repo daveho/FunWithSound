@@ -24,6 +24,7 @@ Java demo programs:
 * [Demo2](https://github.com/daveho/FunWithSound/blob/master/FunWithSound/demo/io/github/daveho/funwithsound/demo/Demo2.java)
 * [Demo3](https://github.com/daveho/FunWithSound/blob/master/FunWithSound/demo/io/github/daveho/funwithsound/demo/Demo3.java)
 * [Demo4](https://github.com/daveho/FunWithSound/blob/master/FunWithSound/demo/io/github/daveho/funwithsound/demo/Demo4.java)
+* [LinuxTechno](https://github.com/daveho/FunWithSound/blob/master/FunWithSound/demo/io/github/daveho/funwithsound/demo/LinuxTechno.java)
 
 Processing demo programs:
 
