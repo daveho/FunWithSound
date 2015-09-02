@@ -28,7 +28,7 @@ import net.beadsproject.beads.core.UGen;
 import net.beadsproject.beads.ugens.Gain;
 
 /**
- * The GervillUGen and effects chain Beads for
+ * The synthesizer UGen and effects chain UGens for
  * a specific {@link Instrument}.
  */
 class InstrumentInfo {
