@@ -39,80 +39,72 @@ public class LinuxTechno extends DemoBase {
 		sp.addSample(1, "samples/torvalds-says-linux-noclip.wav", 3162, 3600); // Just "Linux"
 		sp.addSample(2, "samples/201571__julien-matthey__jm-fx-boom-01a.wav"); // Boom!
 		v(sp, 0.35);
-
-		//Instrument drumkit = percussion(TR808);
 		
 		Instrument tr909 = percussion(TR909);
 		Instrument tr808 = percussion(TR808);
 		
-		Instrument conga = percussion(ARACHNO);
-		addfx(conga, new AddDelay(200, 1, 0.8));
-		addfx(conga, new AddDelay(400, 1, 0.75));
-		addfx(conga, new AddDelay(600, 1, 0.7));
-		addfx(conga, new AddDelay(800, 1, 0.65));
-		addfx(conga, new AddAutoPan(.75, -.8, .8));
+		// Instrument for the percussion break following the intro:
+		// add lots of delays and an autopan.
+		Instrument percbrk = percussion(ARACHNO);
+		addfx(percbrk, new AddDelay(200, 1, 0.8));
+		addfx(percbrk, new AddDelay(400, 1, 0.75));
+		addfx(percbrk, new AddDelay(600, 1, 0.7));
+		addfx(percbrk, new AddDelay(800, 1, 0.65));
+		addfx(percbrk, new AddAutoPan(.75, -.8, .8));
 		
-		//Instrument bassint = instr(ANALOG_AGE, 10);
-		Instrument bassint = instr(ARACHNO, 88);
-		//Instrument bassint = instr(ARACHNO, 91);
-		addfx(bassint, new AddAutoPan(0.125, -.8, .8));
-		addfx(bassint, new AddReverb());
-		v(bassint, 0.8);
+		// This instrument makes the low droning sound
+		Instrument drone = instr(ARACHNO, 88);
+		addfx(drone, new AddAutoPan(0.125, -.8, .8));
+		addfx(drone, new AddReverb());
+		v(drone, 0.8);
 		
-		//Instrument bass = instr(TB303, 9); // best: 5,9 good: 2,4,7,8  ok: 3 weird: 11,12,16(fun for break)
+		// Bass instrument: Arachno has a very nice synth bass patch
 		Instrument bass = instr(ARACHNO, 39);
 		v(bass, 0.6);
-		
-//		Instrument bass2 = instr(ARACHNO, 39);
-//		//v(bass2, 0.6);
-		
+
+		// Bleep parts using TB303 sounds: two instruments panned
+		// to left and right.
 		Instrument bleep = instr(TB303, 16);
 		v(bleep, 1.0);
 		addfx(bleep, new AddStaticPan(-.8));
-		
 		Instrument bleep2 = instr(TB303, 11);
 		v(bleep2, 1.0);
 		addfx(bleep2, new AddStaticPan(.8));
 
+		// Basic bass/snare drum rhythm. 
 		Rhythm drumr = r(
-				s(0.000,.8,110), s(1,.8,118), s(2,1.2,118), s(4,.4,118), s(4.5,.8,110), s(6,0.477,118));
+				s(0.000,1,110), s(1,1,118), s(2,1,118), s(4,.5,118), s(4.5,1,110), s(6,1,118));
 		Melody drumm = m(
 				an(36), an(36), an(40), an(36), an(36), an(40));
 		Figure drumf = f(drumr, drumm, tr909);
 		
-//		Rhythm hihatr = r(
-//				s(0.000,1.182,66), s(1,0.372,66));
-//		Melody hihatm = m(
-//				an(51), an(46), an(51), an(46));
-//		Figure hihatf = f(gr(sr(1.5,hihatr), sr(5.5,hihatr)), hihatm, tr909);
-		
-		// A complicated hihat pattern,
-		// sort of like Selected Ambient Works, Vol. 1 era Aphex Twin
+		// A complicated TR-808 hihat pattern, sort of like early Aphex Twin
 		int n = 4;
 		double dur = .5/n;
 		int vel = 60;
-		Rhythm drillr = rr(s(0, dur, vel), dur, n);
-		Rhythm fillr = rr(s(1, .5, vel), .5, 4);
-		Rhythm drill2r = rr(s(0, dur*2, vel), dur*2, n);
-		Rhythm hihatr = gr(drillr,
-				fillr,
-				r(s(3, 2.0, vel)), // first open hihat
-				r(s(4, .5, vel),s(4.5, .5, vel), s(5, 1.0, vel)),
-				sr(7,drill2r));
+		Rhythm fill1r = rr(s(0, dur, vel), dur, n); // very fast half-beat fill
+		Rhythm fill2r = rr(s(1, .5, vel), .5, 4); // slower fill for two beats
+		Rhythm fill3r = rr(s(0, dur*2, vel), dur*2, n); // medium-fast one beat fill
+		Rhythm hihatr = gr(fill1r,
+				fill2r,
+				r(s(3, 2.0, vel)), // long-ish open hihat
+				r(s(4, .5, vel),s(4.5, .5, vel), s(5, 1.0, vel)), // tap, tap, open hihat 
+				sr(7,fill3r)
+				);
 		Melody hihatm = m(
-				an(42),an(42),an(42),an(42), // drill4r
-				an(42),an(42),an(42),an(42), // fillr
+				an(42),an(42),an(42),an(42), // hihats for fill1r
+				an(42),an(42),an(42),an(42), // hihats for fill2r
 				an(46), // first open hihat
 				an(42),an(42),an(46), // tap, tap, open hihat
-				an(42),an(42),an(42),an(42) // drill2r
+				an(42),an(42),an(42),an(42) // hihats for fill3r
 				);
 		Figure hihatf = f(hihatr, hihatm, tr808);
 		
 		Figure percf = gf(drumf, hihatf);
 		
-		Rhythm bassintr = r(s(0.000,31.453,118), s(32,32.231,118));
-		Melody bassintm = m(an(26), an(26));
-		Figure bassintf = f(bassintr, bassintm, bassint);
+		Rhythm droner = r(s(0.000,31.453,118), s(32,32.231,118));
+		Melody dronem = m(an(26), an(26));
+		Figure dronef = f(droner, dronem, drone);
 		
 		Rhythm bass1r = r(
 				s(0.000,0.8,110), s(1,0.8,106), s(2,1.6,118), s(3,0.3,75), s(3.5,2,102),
@@ -128,21 +120,30 @@ public class LinuxTechno extends DemoBase {
 				an(38), an(38), an(38), an(40), an(36), an(36), an(33));
 		Figure bass2f = f(bass2r, bass2m, bass);
 		
+		// Full "I pronounce Linux..." sample
 		Rhythm ltr = r(p(0));
 		Melody ltm = m(an(0));
 		Figure ltf = f(ltr, ltm, sp);
 
+		// Stutter "Linux" pattern
 		Rhythm llr = rr(p(0), .5, 5);
 		Melody llm = m(an(1),an(1),an(1),an(1),an(1));
 		Figure llf = f(llr, llm, sp);
 		
+		// Percussion break
 		Rhythm decayr = r(p(0, 127), p(2, 127), p(4, 110), p(6, 110), p(8, 100), p(10, 90), p(12, 80));
 		Melody decaym = m(an(61),an(61),an(75),an(60),an(61),an(60),an(61));
-		Figure decayf = f(decayr, decaym, conga);
+		Figure decayf = f(decayr, decaym, percbrk);
+		
+		// Boom!
 		Rhythm boomr = r(p(0));
 		Melody boomm = m(an(2));
-		//Figure boomf = f(boomr, boomm, sp);
-		
+		// Figure to play the boom sound at beat 14 of the percussion break
+		Figure boomf14 = f(sr(14, boomr), boomm, sp);
+		// Figure to play the boom sound on beat 0
+		Figure boomf = f(boomr, boomm, sp);
+
+		// Left-channel bleep figure
 		Rhythm bleep1r = r(
 				s(0.000,1.795,118), s(2,0.9,110),
 				s(3,0.416,110), s(3.400,1.523,102), s(5,0.940,118));
@@ -151,6 +152,7 @@ public class LinuxTechno extends DemoBase {
 				an(67), an(71), an(69));
 		Figure bleep1f = f(bleep1r, bleep1m, bleep);
 		
+		// Right-channel bleep figure
 		Rhythm bleep2r = r(
 				s(0.000,0.870,106), s(0.925,3.978,99), s(4.950,3.821,99), s(8.987,3.992,106),
 				s(15.864,1.023,110), s(16.953,4.064,110), s(20.977,4.151,106), s(25.128,3.932,106));
@@ -165,7 +167,7 @@ public class LinuxTechno extends DemoBase {
 		
 /* 0*/	add1(gf(drumf));
 /* 1*/	add1(gf(drumf));
-/* 2*/	add1(gf(drumf,bassintf,ltf));
+/* 2*/	add1(gf(drumf,dronef,ltf));
 /* 3*/	add1(gf(drumf));
 /* 4*/	add1(gf(drumf, llf));
 /* 5*/	add1(gf(drumf, llf));
@@ -173,13 +175,13 @@ public class LinuxTechno extends DemoBase {
 /* 7*/	add1(gf(drumf));
 /* 8*/	add1(gf(drumf,llf));
 /* 9*/	add1(gf(drumf,llf));
-/*10*/	add1(gf(decayf,f(sr(14,boomr),boomm,sp)));
+/*10*/	add1(gf(decayf,boomf14));
 /*11*/	add1(gf());
 /*12*/	add1(gf(percf,bass1f));
 /*13*/	add1(gf(percf,bass1f));
 /*14*/	add1(gf(percf,bass1f,llf));
 /*15*/	add1(gf(percf,bass2f,llf));
-/*16*/	add1(gf(percf,bass1f,bassintf,f(sr(0,boomr),boomm,sp)));
+/*16*/	add1(gf(percf,bass1f,dronef,boomf));
 /*17*/	add1(gf(percf,bass1f));
 /*18*/	add1(gf(percf,bass1f,llf));
 /*19*/	add1(gf(percf,bass2f,llf));
@@ -199,13 +201,11 @@ public class LinuxTechno extends DemoBase {
 /*33*/	add1(gf(percf,bass1f,llf));
 /*34*/	add1(gf(percf,bass1f,llf));
 /*35*/	add1(gf(percf,bass2f));
-/*36*/	add1(gf(percf,bass1f,llf,bassintf));
+/*36*/	add1(gf(percf,bass1f,llf,dronef));
 /*37*/	add1(gf(percf,bass1f,llf));
 /*38*/	add1(gf(percf,bass1f,llf));
 /*39*/	add1(gf(percf,bass2f));
-/*40*/	add1(gf(f(boomr, boomm,sp)));
-
-		audition(tr909);
+/*40*/	add1(gf(boomf));
 	}
 	
 	public static void main(String[] args) throws MidiUnavailableException, IOException {
