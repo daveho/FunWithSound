@@ -35,10 +35,9 @@ public class LinuxTechno extends DemoBase {
 		
 		Instrument sp = samplePlayer();
 		// These samples are local to the project - sorry, Github
-		sp.addSample(0, "samples/torvalds-says-linux-noclip.wav");
-		sp.addSample(1, "samples/torvalds-says-linux-noclip.wav", 3162, 3600); // Just "Linux"
-		sp.addSample(2, "samples/201571__julien-matthey__jm-fx-boom-01a.wav"); // Boom!
-		v(sp, 0.35);
+		sp.addSample(0, "samples/torvalds-says-linux-noclip.wav", 0.35);
+		sp.addSample(1, "samples/torvalds-says-linux-noclip.wav", 3162, 3600, 0.7); // Just "Linux"
+		sp.addSample(2, "samples/201571__julien-matthey__jm-fx-boom-01a.wav", 0.4); // Boom!
 		
 		Instrument tr909 = percussion(TR909);
 		Instrument tr808 = percussion(TR808);
@@ -56,11 +55,11 @@ public class LinuxTechno extends DemoBase {
 		Instrument drone = instr(ARACHNO, 88);
 		addfx(drone, new AddAutoPan(0.125, -.8, .8));
 		addfx(drone, new AddReverb());
-		v(drone, 0.8);
+		v(drone, 0.7);
 		
 		// Bass instrument: Arachno has a very nice synth bass patch
 		Instrument bass = instr(ARACHNO, 39);
-		v(bass, 0.6);
+		v(bass, 0.7);
 
 		// Bleep parts using TB303 sounds: two instruments panned
 		// to left and right.
@@ -84,12 +83,12 @@ public class LinuxTechno extends DemoBase {
 		int vel = 60;
 		Rhythm fill1r = rr(s(0, dur, vel), dur, n); // very fast half-beat fill
 		Rhythm fill2r = rr(s(1, .5, vel), .5, 4); // slower fill for two beats
-		Rhythm fill3r = rr(s(0, dur*2, vel), dur*2, n); // medium-fast one beat fill
+		Rhythm fill3r = rr(s(7, dur*2, vel), dur*2, n); // medium-fast one beat fill
 		Rhythm hihatr = gr(fill1r,
 				fill2r,
 				r(s(3, 2.0, vel)), // long-ish open hihat
 				r(s(4, .5, vel),s(4.5, .5, vel), s(5, 1.0, vel)), // tap, tap, open hihat 
-				sr(7,fill3r)
+				fill3r
 				);
 		Melody hihatm = m(
 				an(42),an(42),an(42),an(42), // hihats for fill1r

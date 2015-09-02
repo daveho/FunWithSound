@@ -25,7 +25,6 @@ import javax.sound.midi.ShortMessage;
 
 import net.beadsproject.beads.core.AudioContext;
 import net.beadsproject.beads.core.Bead;
-import net.beadsproject.beads.core.UGen;
 import net.beadsproject.beads.core.UGenChain;
 import net.beadsproject.beads.data.Sample;
 import net.beadsproject.beads.ugens.Envelope;
@@ -47,13 +46,13 @@ public class SampleBankUGen extends UGenChain {
 	private static class PlayerInfo {
 		SamplePlayer player;
 		Envelope env;
-		Gain gain;
+		Gain out;
+		SampleRange range;
 	}
 	
 	private AudioContext ac;
-	private Map<Integer, Sample> sampleBank;
 	private Map<Integer, PlayerInfo> samplePlayers;
-	private Map<Integer, SampleRange> sampleRanges;
+	private Gain mixer;
 
 	/**
 	 * Constructor.
@@ -63,9 +62,12 @@ public class SampleBankUGen extends UGenChain {
 	public SampleBankUGen(AudioContext ac) {
 		super(ac, 0, 2);
 		this.ac = ac;
-		sampleBank = new HashMap<Integer, Sample>();
 		samplePlayers = new HashMap<Integer, PlayerInfo>();
-		sampleRanges = new HashMap<Integer, SampleRange>();
+
+		// All of the SamplePlayers' Gains feed into a mixer Gain,
+		// which mixes the input
+		this.mixer = new Gain(ac, 2);
+		addToChainOutput(mixer);
 	}
 	
 	/**
@@ -74,9 +76,10 @@ public class SampleBankUGen extends UGenChain {
 	 * 
 	 * @param note the MIDI note
 	 * @param sample the Sample
+	 * @param gain the gain
 	 */
-	public void addSample(int note, Sample sample) {
-		addSample(note, sample, new SampleRange(0, sample.getLength()));
+	public void addSample(int note, Sample sample, double gain) {
+		addSample(note, sample, gain, new SampleRange(0, sample.getLength()));
 	}
 	
 	/**
@@ -85,49 +88,41 @@ public class SampleBankUGen extends UGenChain {
 	 * 
 	 * @param note     the MIDI note
 	 * @param sample   the Sample
+	 * @param gain     the gain
 	 * @param range    the SampleRange (start and end time)
 	 */
-	public void addSample(int note, Sample sample, SampleRange range) {
-		sampleBank.put(note, sample);
-		sampleRanges.put(note, range);
-	}
-	
-	/**
-	 * Prepare to play. This must be called before the AudioContext is started.
-	 */
-	public void prepareToPlay() {
-		if (!samplePlayers.isEmpty()) {
-			// We will assume that this method has already been called, and so
-			// doesn't need to be called again.
-			return;
-		}
+	public void addSample(int note, Sample sample, double gain, SampleRange range) {
+		PlayerInfo sp = new PlayerInfo();
+
+		SamplePlayer player = new SamplePlayer(ac, 2);
+		player.setSample(sample);
+		player.setLoopType(LoopType.NO_LOOP_FORWARDS);
+		player.setKillOnEnd(false);
+		player.pause(true);
 		
-		// Create a SamplePlayer for each sample
-		for (Map.Entry<Integer, Sample> entry : sampleBank.entrySet()) {
-			SamplePlayer player = new SamplePlayer(ac, 2);
-			player.setSample(entry.getValue());
-			player.setLoopType(LoopType.NO_LOOP_FORWARDS);
-			player.setKillOnEnd(false);
-			player.pause(true);
-			PlayerInfo sp = new PlayerInfo();
-			sp.player = player;
-			sp.env = new Envelope(ac, 0.0f); // Controls gain
-			sp.gain = new Gain(ac, 2);
-			sp.gain.setGain(sp.env);
-			sp.gain.addInput(sp.player);
-			samplePlayers.put(entry.getKey(), sp);
-			//System.out.printf("Added sample player for note %d\n", entry.getKey());
-		}
+		sp.player = player;
+		sp.env = new Envelope(ac, 0.0f); // Controls the sample gain envelope
 		
-		// All of the SamplePlayers' Gains feed into a mixer Gain,
-		// which mixes the input
-		UGen mixer = new Gain(ac, 2);
-		for (PlayerInfo sp : samplePlayers.values()) {
-			mixer.addInput(sp.gain);
-		}
+		// Sample envelope gain
+		Gain senvGain = new Gain(ac, 2);
+		senvGain.setGain(sp.env);
+		senvGain.addInput(sp.player);
 		
-		// The Gain is the output of the UGen
-		addToChainOutput(mixer);
+		// Create a single static Gain to control the volume of
+		// the sample
+		sp.out = new Gain(ac, 2);
+		System.out.printf("Setting static gain for sample %d to %f\n", note, gain);
+		sp.out.setGain((float)gain);
+		sp.out.addInput(senvGain);
+		
+		// Range of the sample to be played
+		sp.range = range;
+
+		samplePlayers.put(note, sp);
+		//System.out.printf("Added sample player for note %d\n", entry.getKey());
+		
+		// Feed the sample player's output into the mixer UGen
+		mixer.addInput(sp.out);
 	}
 
 	@Override
@@ -144,12 +139,10 @@ public class SampleBankUGen extends UGenChain {
 					final PlayerInfo sp = samplePlayers.get(note);
 					if (sp != null) {
 //						double time = ac.getTime();
-//						System.out.printf("Play sample %d at %f ms\n", note, time);
-						
+//						System.out.printf("Play sample %d at %f from %f..%f ms\n", note, time, sp.range.startMs, sp.range.endMs);
 						sp.player.reset();
-						SampleRange range = sampleRanges.get(note);
-						sp.player.setPosition(range.startMs);
-						float durationMs = (float)(range.endMs - range.startMs);
+						sp.player.setPosition(sp.range.startMs);
+						float durationMs = (float)(sp.range.endMs - sp.range.startMs);
 						
 						sp.env.clear();
 						float middleTimeMs = durationMs - 2*RAMP_TIME_MS;

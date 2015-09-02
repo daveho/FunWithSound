@@ -26,8 +26,7 @@ public class Instrument {
 	private final InstrumentType type;
 	private final int patch;
 	private final String soundFont;
-	private final Map<Integer, String> sampleMap;
-	private final Map<Integer, SampleRange> sampleRanges;
+	private final Map<Integer, SampleInfo> sampleMap;
 	
 	Instrument(int patch) {
 		this(InstrumentType.MIDI, patch, null);
@@ -37,8 +36,7 @@ public class Instrument {
 		this.type = type;
 		this.patch = patch;
 		this.soundFont = soundFont;
-		this.sampleMap = new HashMap<Integer, String>();
-		this.sampleRanges = new HashMap<Integer, SampleRange>();
+		this.sampleMap = new HashMap<Integer, SampleInfo>();
 	}
 	
 	Instrument(InstrumentType type) {
@@ -65,24 +63,61 @@ public class Instrument {
 		return soundFont != null;
 	}
 	
+	/**
+	 * Add a sample to be played for given note.
+	 * The entire sample will be played at full volume.
+	 * 
+	 * @param note the note
+	 * @param fileName the filename of the sample
+	 */
 	public void addSample(int note, String fileName) {
+		addSample(note, fileName, -1, -1, 1.0);
+	}
+
+	/**
+	 * Add a sample to be played for given note.
+	 * The specified range of the sample will be played at full volume.
+	 * 
+	 * @param note the note
+	 * @param fileName the filename of the sample
+	 * @param startMs the start time in milliseconds
+	 * @param endMs the end time in milliseconds
+	 */
+	public void addSample(int note, String fileName, double startMs, double endMs) {
+		addSample(note, fileName, startMs, endMs, 1.0);
+	}
+
+	/**
+	 * Add sample to be played for given note.
+	 * The entire sample will be played using the specified gain.
+	 * 
+	 * @param note the note
+	 * @param fileName the sample filename
+	 * @param gain the gain
+	 */
+	public void addSample(int note, String fileName, double gain) {
+		addSample(note, fileName, -1, -1, gain);
+	}
+
+	/**
+	 * Add sample to be played for given note.
+	 * The specified range of the sample will be played with specified gain.
+	 * 
+	 * @param note the note
+	 * @param fileName the sample filename
+	 * @param startMs the start time
+	 * @param endMs the end time
+	 * @param gain the gain
+	 */
+	public void addSample(int note, String fileName, double startMs, double endMs, double gain) {
 		if (type != InstrumentType.SAMPLE_BANK) {
 			throw new RuntimeException("Can't add samples to " + type + " instrument");
 		}
-		sampleMap.put(note, fileName);
-	}
-
-	public void addSample(int note, String fileName, double startMs, double endMs) {
-		addSample(note, fileName);
-		sampleRanges.put(note, new SampleRange(startMs, endMs));
+		sampleMap.put(note, new SampleInfo(note, fileName, startMs, endMs, gain));
 	}
 	
-	public Map<Integer, String> getSampleMap() {
+	public Map<Integer, SampleInfo> getSampleMap() {
 		return sampleMap;
-	}
-	
-	public Map<Integer, SampleRange> getSampleRanges() {
-		return sampleRanges;
 	}
 
 	public boolean isMidi() {

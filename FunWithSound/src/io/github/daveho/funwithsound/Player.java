@@ -339,8 +339,6 @@ public class Player {
 		for (Map.Entry<Instrument, InstrumentInfo> entry : instrMap.entrySet()) {
 			InstrumentInfo info = entry.getValue();
 			
-			info.prepareToPlay();
-			
 			List<AddEffect> fx = composition.getEffectsMap().get(entry.getKey());
 			if (fx != null) {
 				for (AddEffect effect : fx) {
@@ -433,15 +431,28 @@ public class Player {
 		InstrumentInfo info = instrMap.get(instr);
 		if (info == null) {
 			SampleBankUGen sb = new SampleBankUGen(ac);
-			for (Map.Entry<Integer, String> entry : instr.getSampleMap().entrySet()) {
-				Sample sample = SampleManager.sample(entry.getValue());
+			for (Map.Entry<Integer, SampleInfo> entry : instr.getSampleMap().entrySet()) {
+				SampleInfo sampleInfo = entry.getValue();
+
+				Sample sample = SampleManager.sample(sampleInfo.fileName);
 				
+				if (sampleInfo.startMs >= 0.0) {
+					// Range is specified
+					SampleRange sr = new SampleRange(sampleInfo.startMs, sampleInfo.endMs);
+					sb.addSample(sampleInfo.note, sample, sampleInfo.gain, sr);
+				} else {
+					// Play entire sample
+					sb.addSample(sampleInfo.note, sample, sampleInfo.gain);
+				}
+				
+				/*
 				SampleRange sampleRange = instr.getSampleRanges().get(entry.getKey());
 				if (sampleRange != null) {
 					sb.addSample(entry.getKey(), sample, sampleRange);
 				} else {
 					sb.addSample(entry.getKey(), sample);
 				}
+				*/
 			}
 			info = new InstrumentInfo(sb, ac);
 			instrMap.put(instr, info);
