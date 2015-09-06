@@ -21,6 +21,8 @@ import javax.sound.midi.MidiUnavailableException;
 
 import io.github.daveho.funwithsound.Composer;
 import io.github.daveho.funwithsound.Player;
+import io.github.daveho.funwithsound.Rhythm;
+import io.github.daveho.funwithsound.Strike;
 
 public abstract class DemoBase extends Composer {
 	private static final String SOUNDFONT_DIR = "/home/dhovemey/SoundFonts";
@@ -56,9 +58,44 @@ public abstract class DemoBase extends Composer {
 	// http://www.hammersound.com/cgi-bin/soundlink_download2.pl/Download%20Norway;hs_tb303.zip;20
 	public static final String TB303 = SOUNDFONT_DIR+"/tb303/HS TB-303.SF2";
 	
+	// http://www.hammersound.com/cgi-bin/soundlink_download2.pl/Download%20Norway;hs_pt1.zip;22
+	public static final String HS_PT1 = SOUNDFONT_DIR + "/hammersound/HS Pads and Textures I.sf2";
+	
+	// http://www.hammersound.com/cgi-bin/soundlink_download2.pl/Download%20Norway;hs_pt2.zip;30
+	public static final String HS_PT2 = SOUNDFONT_DIR + "/hammersound/HS Pads and Textures II.sf2";
+	
+	// http://www.hammersound.com/cgi-bin/soundlink_download2.pl/Download%20Norway;tr808.zip;17
+	public static final String HS_TR808 = SOUNDFONT_DIR + "/hammersound/TR-808 Drums.SF2";
+	
+	// http://www.hammersound.com/cgi-bin/soundlink_download2.pl/Download%20Norway;hs_synt1.zip;21
+	public static final String HS_SYNTH1 = SOUNDFONT_DIR + "/hammersound/HS Synth Collection I.sf2";
+	
+	// http://www.hammersound.com/cgi-bin/soundlink_download2.pl/Download%20Norway;hs_se.zip;63
+	public static final String HS_SE = SOUNDFONT_DIR + "/hammersound/HS Synthetic Electronic.sf2";
+	
+	// http://www.hammersound.com/cgi-bin/soundlink_download2.pl/Download%20Norway;iw_vint.zip;8
+	public static final String HS_VDW = SOUNDFONT_DIR + "/hammersound/Vintage Dreams Waves v2.sf2";
+	
+	public static final String GORT = SOUNDFONT_DIR + "/hammersound/Gort's-DoubleDecker.SF2";
+	
+	public static final String RTANBAS = SOUNDFONT_DIR + "/hammersound/rtanbas1.SF2";
+	
+	public static final String BAZZ = SOUNDFONT_DIR + "/hammersound/Bazz.SF2";
+	
 	private String outputFile;
 	
 	public abstract void create();
+	
+	public Rhythm dilate(double c, Rhythm r) {
+		Rhythm result = new Rhythm();
+		
+		for (Strike s : r) {
+			Strike ds = new Strike((long)(s.getStartUs()*c), (long)(s.getDurationUs()*c), s.getVelocity());
+			result.add(ds);
+		}
+		
+		return result;
+	}
 	
 	public void setOutputFile(String outputFile) {
 		this.outputFile = outputFile;
