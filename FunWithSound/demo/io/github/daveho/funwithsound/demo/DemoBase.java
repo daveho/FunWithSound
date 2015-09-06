@@ -86,7 +86,7 @@ public abstract class DemoBase extends Composer {
 	
 	public abstract void create();
 	
-	public Rhythm dilate(double c, Rhythm r) {
+	public Rhythm dr(double c, Rhythm r) {
 		Rhythm result = new Rhythm();
 		
 		for (Strike s : r) {
