@@ -63,7 +63,7 @@ public class InstrumentInfo {
 	/**
 	 * "Generic" constructor for instruments that wish to have MIDI
 	 * messages sequenced/delivered automatically by a
-	 * ReceivedMidiMessageSource.  Most custom instruments will
+	 * {@link ReceivedMidiMessageSource}.  Most custom instruments will
 	 * want to use this constructor.  The head UGen should
 	 * override the <code>messageReceived</code> method
 	 * and use the {@link Midi#hasMidiMessage(net.beadsproject.beads.core.Bead)}
