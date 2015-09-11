@@ -1,6 +1,5 @@
 package io.github.daveho.funwithsound.demo;
 
-import io.github.daveho.funwithsound.AddDelay;
 import io.github.daveho.funwithsound.AddFlanger;
 import io.github.daveho.funwithsound.AddReverb;
 import io.github.daveho.funwithsound.CustomInstrumentFactory;
@@ -31,8 +30,8 @@ public class Demo6 extends DemoBase {
 		Instrument monosynth = custom(0);
 		v(monosynth, 0.1);
 		//addfx(monosynth, new AddDelay(200, 1.0, 0.6));
-		AddFlanger.Params params = AddFlanger.defaultParams();
-		addfx(monosynth, new AddFlanger(params));
+		//AddFlanger.Params params = AddFlanger.defaultParams();
+		//addfx(monosynth, new AddFlanger(params));
 		addfx(monosynth, new AddReverb());
 		
 		add1(clickf);
@@ -46,7 +45,9 @@ public class Demo6 extends DemoBase {
 			@Override
 			public InstrumentInfo create(int code, AudioContext ac) {
 				if (code == 0) {
-					MonoSynthUGen synth = new MonoSynthUGen(ac, Buffer.SAW);
+					MonoSynthUGen.Params params = MonoSynthUGen.defaultParams();
+					params.glideTimeMs = 40;
+					MonoSynthUGen synth = new MonoSynthUGen(ac, Buffer.SAW, params);
 					return new InstrumentInfo(synth, ac);
 				}
 				throw new IllegalArgumentException("Don't know how to create custom instrument " + code);

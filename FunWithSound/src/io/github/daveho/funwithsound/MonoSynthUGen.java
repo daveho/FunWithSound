@@ -34,15 +34,37 @@ import net.beadsproject.beads.ugens.WavePlayer;
  * MIDI mono synth using Beads, and use it to render
  * parts of a composition (as the runtime implementation of
  * a custom {@link Instrument}.)  It actually sounds pretty
- * decent!  Need to make attack/decay envelope and
- * portamento controllable. 
+ * decent!
  */
 public class MonoSynthUGen extends UGenChain {
-	private static final float GLIDE_TIME_MS = 100;
-	private static final float ATTACK_TIME_MS = 20;
-	private static final float DECAY_TIME_MS = 200;
-	private static final float MIN_GAIN = .3f;
+	/**
+	 * Parameters.
+	 */
+	public static class Params {
+		/** Glide time between notes (for portamento). */
+		public double glideTimeMs;
+		/** Time to ramp up to full gain when note starts. */
+		public double attackTimeMs;
+		/** Time to decay to silence when note ends. */
+		public double decayTimeMs;
+		/** Minimum gain (for notes with velocity 0.) */
+		public double minGain;
+	}
 	
+	/**
+	 * Get default parameters.  These are abitrary, but sound pretty good.
+	 * @return
+	 */
+	public static Params defaultParams() {
+		Params params = new Params();
+		params.glideTimeMs = 200;
+		params.attackTimeMs = 20;
+		params.decayTimeMs = 200;
+		params.minGain = .1f;
+		return params;
+	}
+	
+	private Params params;
 	private Glide freq;
 	private WavePlayer player;
 	private Envelope gainEnv;
@@ -54,17 +76,19 @@ public class MonoSynthUGen extends UGenChain {
 	 * 
 	 * @param ac      the AudioContext
 	 * @param buffer  the buffer type (sine, square, triangle, etc.)
+	 * @param params  parameters to control attack/decay, glide time, etc.
 	 */
-	public MonoSynthUGen(AudioContext ac, Buffer buffer) {
+	public MonoSynthUGen(AudioContext ac, Buffer buffer, Params params) {
 		super(ac, 0, 2);
 		
+		this.params = params;
 		freq = new Glide(ac);
 		player = new WavePlayer(ac, freq, buffer);
 		gainEnv = new Envelope(ac);
 		gain = new Gain(ac, 2, gainEnv);
 		gain.addInput(player);
 		
-		freq.setGlideTime(GLIDE_TIME_MS);
+		freq.setGlideTime((float)params.glideTimeMs);
 
 		addToChainOutput(gain);
 	}
@@ -82,14 +106,14 @@ public class MonoSynthUGen extends UGenChain {
 					gainEnv.clear();
 					
 					int velocity = smsg.getData2();
-					float gain = MIN_GAIN + ((1.0f - MIN_GAIN) * velocity/127.0f);
-					gainEnv.addSegment(gain, ATTACK_TIME_MS);
+					float gain = (float)params.minGain + ((1.0f - (float)params.minGain) * velocity/127.0f);
+					gainEnv.addSegment(gain, (float)params.attackTimeMs);
 					freq.setValue(Pitch.mtof(note));
 					this.note = note;
 				} else if (smsg.getCommand() == ShortMessage.NOTE_OFF) {
 					// Only requests to stop playing the current note will be honored
 					if (note == this.note) {
-						gainEnv.addSegment(0.0f, DECAY_TIME_MS);
+						gainEnv.addSegment(0.0f, (float)params.decayTimeMs);
 					}
 				}
 			}

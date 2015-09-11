@@ -76,7 +76,7 @@ public abstract class DemoBase extends Composer {
 	// http://www.hammersound.com/cgi-bin/soundlink_download2.pl/Download%20Norway;iw_vint.zip;8
 	public static final String HS_VDW = SOUNDFONT_DIR + "/hammersound/Vintage Dreams Waves v2.sf2";
 	
-	public static final String GORT = SOUNDFONT_DIR + "/hammersound/Gort's-DoubleDecker.SF2";
+	public static final String GORT = SOUNDFONT_DIR + "/hammersound/Gort's-DoubleDecker_J1.SF2";
 	
 	public static final String RTANBAS = SOUNDFONT_DIR + "/hammersound/rtanbas1.SF2";
 	
