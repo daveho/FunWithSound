@@ -28,7 +28,7 @@ public class Demo6 extends DemoBase {
 		Figure clickf = pf(clickr, 42, tr808);
 		
 		Instrument monosynth = custom(0);
-		v(monosynth, 0.1);
+		v(monosynth, 0.3);
 		//addfx(monosynth, new AddDelay(200, 1.0, 0.6));
 		//AddFlanger.Params params = AddFlanger.defaultParams();
 		//addfx(monosynth, new AddFlanger(params));
@@ -47,7 +47,11 @@ public class Demo6 extends DemoBase {
 				if (code == 0) {
 					MonoSynthUGen.Params params = MonoSynthUGen.defaultParams();
 					params.glideTimeMs = 40;
-					MonoSynthUGen synth = new MonoSynthUGen(ac, Buffer.SAW, params);
+					MonoSynthUGen synth = new MonoSynthUGen(
+							ac,
+							Buffer.SAW,
+							params,
+							1.0, Math.pow(2.0, 7.0/12.0));
 					return new InstrumentInfo(synth, ac);
 				}
 				throw new IllegalArgumentException("Don't know how to create custom instrument " + code);

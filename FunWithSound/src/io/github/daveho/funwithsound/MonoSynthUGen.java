@@ -25,6 +25,7 @@ import net.beadsproject.beads.core.UGenChain;
 import net.beadsproject.beads.data.Buffer;
 import net.beadsproject.beads.data.Pitch;
 import net.beadsproject.beads.ugens.Envelope;
+import net.beadsproject.beads.ugens.Function;
 import net.beadsproject.beads.ugens.Gain;
 import net.beadsproject.beads.ugens.Glide;
 import net.beadsproject.beads.ugens.WavePlayer;
@@ -65,28 +66,58 @@ public class MonoSynthUGen extends UGenChain {
 	}
 	
 	private Params params;
+	private double[] freqMult; // what frequencies are played (multiples of the note frequency)
 	private Glide freq;
-	private WavePlayer player;
+	private WavePlayer[] player;
 	private Envelope gainEnv;
 	private Gain gain;
 	private int note;
 
 	/**
 	 * Constructor.
+	 * The synth will play a single frequency when a note is played.
 	 * 
 	 * @param ac      the AudioContext
 	 * @param buffer  the buffer type (sine, square, triangle, etc.)
 	 * @param params  parameters to control attack/decay, glide time, etc.
 	 */
 	public MonoSynthUGen(AudioContext ac, Buffer buffer, Params params) {
+		this(ac, buffer, params, new double[]{ 1.0 });
+	}
+	
+	/**
+	 * Constructor.
+	 * The synth will play multiple frequencies when a note is played.
+	 * 
+	 * @param ac      the AudioContext
+	 * @param buffer  the buffer type (sine, square, triangle, etc.)
+	 * @param params  parameters to control attack/decay, glide time, etc.
+	 * @param freqMult create oscillators to play these multiples of the note frequency 
+	 */
+	public MonoSynthUGen(AudioContext ac, Buffer buffer, Params params, double... freqMult) {
 		super(ac, 0, 2);
 		
 		this.params = params;
+		this.freqMult = freqMult;
+		
 		freq = new Glide(ac);
-		player = new WavePlayer(ac, freq, buffer);
 		gainEnv = new Envelope(ac);
 		gain = new Gain(ac, 2, gainEnv);
-		gain.addInput(player);
+
+		// Create WavePlayers to play frequencies that are multiples of
+		// the note frequency
+		this.player = new WavePlayer[freqMult.length];
+		for (int i = 0; i < freqMult.length; i++) {
+			final int index = i;
+			Function multFreq = new Function(freq) {
+				@Override
+				public float calculate() {
+					return (float)MonoSynthUGen.this.freqMult[index] * x[0];
+				}
+			};
+			player[i] = new WavePlayer(ac, multFreq, buffer);
+			gain.addInput(player[i]);
+		}
 		
 		freq.setGlideTime((float)params.glideTimeMs);
 
