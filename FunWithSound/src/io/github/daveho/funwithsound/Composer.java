@@ -117,6 +117,16 @@ public class Composer {
 	}
 	
 	/**
+	 * Create a new custom instrument.
+	 * 
+	 * @param code the code identifying the type of custom instrument
+	 * @return the instrument
+	 */
+	public Instrument custom(int code) {
+		return new Instrument(InstrumentType.custom(code));
+	}
+	
+	/**
 	 * Create a sample player instrument.
 	 * 
 	 * @return a sample player instrument

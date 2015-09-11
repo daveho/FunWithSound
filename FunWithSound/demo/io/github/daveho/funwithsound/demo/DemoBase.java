@@ -108,10 +108,14 @@ public abstract class DemoBase extends Composer {
 
 	public void play() throws MidiUnavailableException, IOException {
 		Player player = new Player();
+		onCreatePlayer(player);
 		player.setComposition(getComposition());
 		if (outputFile != null) {
 			player.setOutputFile(outputFile);
 		}
 		player.play();
+	}
+
+	protected void onCreatePlayer(Player player) {
 	}
 }

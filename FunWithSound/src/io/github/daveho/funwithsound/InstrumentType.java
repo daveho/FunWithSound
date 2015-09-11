@@ -104,7 +104,7 @@ public class InstrumentType implements Comparable<InstrumentType> {
 	 * @param code the code
 	 * @return the custom InstrumentType with the specified code
 	 */
-	public InstrumentType custom(int code) {
+	public static InstrumentType custom(int code) {
 		InstrumentType type = new InstrumentType(Kind.CUSTOM, code);
 		InstrumentType prev = customInstrumentTypeMap.putIfAbsent(code, type);
 		return prev != null ? prev : type;
@@ -124,5 +124,9 @@ public class InstrumentType implements Comparable<InstrumentType> {
 
 	public boolean isMidi() {
 		return kind.isMidi();
+	}
+
+	public boolean isCustom() {
+		return kind == Kind.CUSTOM;
 	}
 }

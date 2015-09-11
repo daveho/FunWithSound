@@ -69,10 +69,27 @@ public class Player {
 	private ArrayList<MidiMessageAndTimeStamp> capturedEvents;
 	private MidiDevice device;
 	private boolean playing;
+	private CustomInstrumentFactory customInstrumentFactory;
 	
 	public Player() {
 		soundBanks = new HashMap<String, SF2Soundbank>();
 		instrMap = new IdentityHashMap<Instrument, InstrumentInfo>();
+		customInstrumentFactory = new CustomInstrumentFactory() {
+			@Override
+			public InstrumentInfo create(int code, AudioContext ac) {
+				throw new RuntimeException("No custom instrument factory is registered!");
+			}
+		};
+	}
+	
+	/**
+	 * Set the {@link CustomInstrumentFactory} to use for creating the
+	 * runtime support for custom instruments.
+	 * 
+	 * @param customInstrumentFactory the {@link CustomInstrumentFactory} to set
+	 */
+	public void setCustomInstrumentFactory(CustomInstrumentFactory customInstrumentFactory) {
+		this.customInstrumentFactory = customInstrumentFactory;
 	}
 
 	/**
@@ -419,6 +436,8 @@ public class Player {
 				info = createGervill(instrument);
 			} else if (instrument.getType() == InstrumentType.SAMPLE_BANK) {
 				info = createSampleBank(instrument);
+			} else if (instrument.getType().isCustom()) {
+				info = customInstrumentFactory.create(instrument.getType().getCode(), ac);
 			} else {
 				throw new RuntimeException("Don't know how to create a " + instrument.getType() + " instrument");
 			}
