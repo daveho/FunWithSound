@@ -71,6 +71,7 @@ public class MonoSynthUGen extends UGenChain {
 	private WavePlayer[] player;
 	private Envelope gainEnv;
 	private Gain gain;
+	private Gain[] outGains;
 	private int note;
 
 	/**
@@ -94,7 +95,11 @@ public class MonoSynthUGen extends UGenChain {
 	 * @param params  parameters to control attack/decay, glide time, etc.
 	 * @param freqMult create oscillators to play these multiples of the note frequency 
 	 */
-	public MonoSynthUGen(AudioContext ac, Buffer buffer, Params params, double... freqMult) {
+	public MonoSynthUGen(AudioContext ac, Buffer buffer, Params params, double[] freqMult) {
+		this(ac, buffer, params, freqMult, Util.filledDoubleArray(freqMult.length, 1.0));
+	}
+	
+	public MonoSynthUGen(AudioContext ac, Buffer buffer, Params params, double[] freqMult, double[] oscGains) {
 		super(ac, 0, 2);
 		
 		this.params = params;
@@ -107,6 +112,7 @@ public class MonoSynthUGen extends UGenChain {
 		// Create WavePlayers to play frequencies that are multiples of
 		// the note frequency
 		this.player = new WavePlayer[freqMult.length];
+		this.outGains = new Gain[freqMult.length];
 		for (int i = 0; i < freqMult.length; i++) {
 			final int index = i;
 			Function multFreq = new Function(freq) {
@@ -116,7 +122,13 @@ public class MonoSynthUGen extends UGenChain {
 				}
 			};
 			player[i] = new WavePlayer(ac, multFreq, buffer);
-			gain.addInput(player[i]);
+			
+			outGains[i] = new Gain(ac, 2);
+			outGains[i].setGain((float)oscGains[i]);
+
+			outGains[i].addInput(player[i]);
+			
+			gain.addInput(outGains[i]);
 		}
 		
 		freq.setGlideTime((float)params.glideTimeMs);

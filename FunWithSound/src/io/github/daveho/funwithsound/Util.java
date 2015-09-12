@@ -15,6 +15,8 @@
 
 package io.github.daveho.funwithsound;
 
+import java.util.Arrays;
+
 public class Util {
 	public static int compareLongs(Long left, Long right) {
 		return left.compareTo(right);
@@ -22,5 +24,11 @@ public class Util {
 
 	public static int compareInts(Integer left, Integer right) {
 		return left.compareTo(right);
+	}
+
+	public static double[] filledDoubleArray(int length, double val) {
+		double[] a = new double[length];
+		Arrays.fill(a, val);
+		return a;
 	}
 }
