@@ -17,10 +17,7 @@ package io.github.daveho.funwithsound;
 
 import net.beadsproject.beads.core.AudioContext;
 import net.beadsproject.beads.core.UGen;
-import net.beadsproject.beads.data.Buffer;
 import net.beadsproject.beads.ugens.CombFilter;
-import net.beadsproject.beads.ugens.Function;
-import net.beadsproject.beads.ugens.WavePlayer;
 
 /**
  * Add a flanger effect.
@@ -86,29 +83,12 @@ public class AddFlanger implements AddEffect {
 	public UGen apply(AudioContext ac, InstrumentInfo info) {
 		final int mindel = (int) ac.msToSamples(params.minDelayMs);
 		final int maxdel = (int) Math.ceil(ac.msToSamples(params.maxDelayMs));
-		final int spread = maxdel - mindel;
 		
 		CombFilter comb = new CombFilter(ac, maxdel);
 		
 		// Modulate the comb filter's delay with a sine function
-		UGen sine = new WavePlayer(ac, (float)params.freqHz, Buffer.SINE);
-		Function delay = new Function(sine) {
-			@Override
-			public float calculate() {
-				// Convert the sine output to the range 0..1.0
-				float f = (x[0] + 1.0f) / 2.0f;
-				
-				// Interpolate between mindel and maxdel
-				float result = mindel + f*spread;
-				if (result < mindel) {
-					result = mindel;
-				} else if (result > maxdel) {
-					result = maxdel;
-				}
-				return result;
-			}
-		};
-		
+		UGen delay = Util.getRangedSineFunction(ac, mindel, maxdel, params.freqHz);
+	
 		comb.setDelay(delay);
 		comb.setA((float)params.a);
 		comb.setG((float)params.g);

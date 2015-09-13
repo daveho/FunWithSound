@@ -17,10 +17,7 @@ package io.github.daveho.funwithsound;
 
 import net.beadsproject.beads.core.AudioContext;
 import net.beadsproject.beads.core.UGen;
-import net.beadsproject.beads.data.Buffer;
-import net.beadsproject.beads.ugens.Function;
 import net.beadsproject.beads.ugens.Panner;
-import net.beadsproject.beads.ugens.WavePlayer;
 
 /**
  * Add an auto-pan effect, where a panner is fed by a sine
@@ -47,17 +44,8 @@ public class AddAutoPan implements AddEffect {
 
 	@Override
 	public UGen apply(AudioContext ac, InstrumentInfo info) {
-		final float range = (float)(max-min);
-		
-		WavePlayer sine = new WavePlayer(ac, (float)freqHz, Buffer.SINE);
 		// Constrain the sine wave to be between min and max
-		Function limitedSine = new Function(sine) {
-			@Override
-			public float calculate() {
-				float coeff = (x[0] + 1.0f) / 2.0f;
-				return (float)min + coeff*range;
-			}
-		};
+		UGen limitedSine = Util.getRangedSineFunction(ac, min, max, freqHz);
 		
 		Panner panner = new Panner(ac);
 		panner.setPos(limitedSine);
