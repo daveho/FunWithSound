@@ -1,3 +1,18 @@
+// FunWithSound - A Java/Processing library for music composition
+// Copyright 2015, David Hovemeyer <david.hovemeyer@gmail.com>
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 package io.github.daveho.funwithsound;
 
 import javax.sound.midi.ShortMessage;
@@ -12,18 +27,28 @@ import net.beadsproject.beads.ugens.Envelope;
 /**
  * Variant of {@link MonoSynthUGen} that processes played
  * notes with a bandpass filter.  The bandpass filter's center frequency
- * rises from a minimum to a maximum, and then decays
- * from the maximum to the minimum.
+ * glides from a start frequency to a "rise" frequency, and then glides
+ * from the rise frequency back to the start frequency.
  */
 public class BandpassFilterMonoSynthUGen extends MonoSynthUGen {
 	public static class Params extends MonoSynthUGen.Params {
+		/** Start frequency (expressed as a multiple of the note frequency). */
 		public double startEndFreqFactor;
+		/** Rise frequency (expressed as a multiple of the note frequency). */
 		public double riseFreqFactor;
+		/** Time to rise from the start frequency to the rise frequency. */
 		public double riseTimeMs;
+		/** Time to decay from the rise frequency back to the start frequency. */
 		public double decayTimeMs;
+		/** Curvature of the glides from start to rise and back. */
 		public double curvature;
 	}
 	
+	/**
+	 * Get the default parameters.
+	 * 
+	 * @return the default parameters
+	 */
 	public static Params defaultParams() {
 		Params params = new Params();
 		MonoSynthUGen.setToDefault(params);
@@ -59,7 +84,7 @@ public class BandpassFilterMonoSynthUGen extends MonoSynthUGen {
 	@Override
 	protected UGen createOutputUGen(AudioContext ac, UGen tail) {
 		centerFreqEnv = new Envelope(ac);
-		filter = new BiquadFilter(ac, 2, BiquadFilter.Type.BP_PEAK);
+		filter = new BiquadFilter(ac, 2, BiquadFilter.Type.BP_SKIRT);
 		filter.setFrequency(centerFreqEnv);
 		
 		filter.addInput(tail);

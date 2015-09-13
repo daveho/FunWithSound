@@ -22,11 +22,11 @@ import net.beadsproject.beads.data.Buffer;
 public class Demo6 extends DemoBase {
 	@Override
 	public void create() {
-		tempo(120, 8);
+		tempo(150, 8);
 		
 		Instrument tr808 = percussion(TR909);
 		
-		Rhythm clickr = rr(s(0,.5,101), 1, 256);
+		Rhythm clickr = rr(s(0,.5,101), 1, 4096);
 		Figure clickf = pf(clickr, 42, tr808);
 		
 		Instrument monosynth = custom(0);
@@ -66,10 +66,10 @@ public class Demo6 extends DemoBase {
 					params.curvature = .25;
 					BandpassFilterMonoSynthUGen synth = new BandpassFilterMonoSynthUGen(
 							ac,
-							Buffer.SINE,
+							Buffer.TRIANGLE,
 							params,
 							new double[]{1.0, Math.pow(2.0, 7.0/12.0), 2.0, 2.0*Math.pow(2.0, 7.0/12.0), 4.0},
-							new double[]{1.0, 0.2, 0.6, 0.1, 0.4});
+							new double[]{1.0, 0.2, 0.3, 0.1, 0.2});
 					return new InstrumentInfo(synth, ac);
 				}
 			});
