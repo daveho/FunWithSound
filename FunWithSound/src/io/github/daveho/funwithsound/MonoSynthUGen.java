@@ -21,6 +21,7 @@ import javax.sound.midi.ShortMessage;
 import io.github.daveho.gervill4beads.Midi;
 import net.beadsproject.beads.core.AudioContext;
 import net.beadsproject.beads.core.Bead;
+import net.beadsproject.beads.core.UGen;
 import net.beadsproject.beads.core.UGenChain;
 import net.beadsproject.beads.data.Buffer;
 import net.beadsproject.beads.data.Pitch;
@@ -58,11 +59,15 @@ public class MonoSynthUGen extends UGenChain {
 	 */
 	public static Params defaultParams() {
 		Params params = new Params();
+		setToDefault(params);
+		return params;
+	}
+
+	public static void setToDefault(Params params) {
 		params.glideTimeMs = 200;
 		params.attackTimeMs = 20;
 		params.decayTimeMs = 200;
 		params.minGain = .1f;
-		return params;
 	}
 	
 	private Params params;
@@ -99,6 +104,17 @@ public class MonoSynthUGen extends UGenChain {
 		this(ac, buffer, params, freqMult, Util.filledDoubleArray(freqMult.length, 1.0));
 	}
 	
+	/**
+	 * Constructor.
+	 * The synth will play multiple frequencies when a note is played.
+	 * Each frequency has a specified static gain.
+	 * 
+	 * @param ac      the AudioContext
+	 * @param buffer  the buffer type (sine, square, triangle, etc.)
+	 * @param params  parameters to control attack/decay, glide time, etc.
+	 * @param freqMult create oscillators to play these multiples of the note frequency 
+	 * @param oscGains the gains for each oscillator
+	 */
 	public MonoSynthUGen(AudioContext ac, Buffer buffer, Params params, double[] freqMult, double[] oscGains) {
 		super(ac, 0, 2);
 		
@@ -132,8 +148,42 @@ public class MonoSynthUGen extends UGenChain {
 		}
 		
 		freq.setGlideTime((float)params.glideTimeMs);
+		
+		UGen output = gain;
+		output = createOutputUGen(ac, output);
 
-		addToChainOutput(gain);
+		addToChainOutput(output);
+	}
+	
+	/**
+	 * Get parameters.
+	 * 
+	 * @return the parameters
+	 */
+	public Params getParams() {
+		return params;
+	}
+	
+	/**
+	 * Downcall method to create an output UGen for playing one
+	 * of the synth's frequencies.  Subclasses may override to add
+	 * effects.
+	 * 
+	 * @param ac the AudioContext
+	 * @param tail the output of the oscillator and gain envelope
+	 * @return the output UGen: by default, returns the parameter
+	 */
+	protected UGen createOutputUGen(AudioContext ac, UGen tail) {
+		return tail;
+	}
+
+	/**
+	 * Get the MIDI note that the synthesizer is currently playing.
+	 * 
+	 * @return the current note
+	 */
+	public int getCurrentNote() {
+		return note;
 	}
 	
 	@Override
@@ -146,20 +196,45 @@ public class MonoSynthUGen extends UGenChain {
 				int note = smsg.getData1();
 				
 				if (smsg.getCommand() == ShortMessage.NOTE_ON) {
-					gainEnv.clear();
-					
-					int velocity = smsg.getData2();
-					float gain = (float)params.minGain + ((1.0f - (float)params.minGain) * velocity/127.0f);
-					gainEnv.addSegment(gain, (float)params.attackTimeMs);
-					freq.setValue(Pitch.mtof(note));
-					this.note = note;
+					onNoteOn(smsg, note);
 				} else if (smsg.getCommand() == ShortMessage.NOTE_OFF) {
 					// Only requests to stop playing the current note will be honored
 					if (note == this.note) {
-						gainEnv.addSegment(0.0f, (float)params.decayTimeMs);
+						onNoteOff(note);
 					}
 				}
 			}
 		}
+	}
+
+	/**
+	 * Called when a NOTE_ON message is received, and playing the
+	 * specified note should start.
+	 * Subclasses may override (but should call this method
+	 * as part of their implementation.)
+	 * 
+	 * @param smsg the ShortMessage specifying the NOTE_ON message
+	 * @param note the MIDI note number
+	 */
+	protected void onNoteOn(ShortMessage smsg, int note) {
+		gainEnv.clear();
+		
+		int velocity = smsg.getData2();
+		float gain = (float)params.minGain + ((1.0f - (float)params.minGain) * velocity/127.0f);
+		gainEnv.addSegment(gain, (float)params.attackTimeMs);
+		freq.setValue(Pitch.mtof(note));
+		this.note = note;
+	}
+
+	/**
+	 * Called when a NOTE_OFF message turning off the current note is received,
+	 * and playing the current note should end.
+	 * Subclasses may override (but should call this method
+	 * as part of their implementation.)
+	 * 
+	 * @param note the MIDI note number
+	 */
+	protected void onNoteOff(int note) {
+		gainEnv.addSegment(0.0f, (float)params.decayTimeMs);
 	}
 }

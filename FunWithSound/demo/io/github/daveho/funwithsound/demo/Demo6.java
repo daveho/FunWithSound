@@ -1,13 +1,14 @@
 package io.github.daveho.funwithsound.demo;
 
 import io.github.daveho.funwithsound.AbstractCustomInstrumentFactory;
-import io.github.daveho.funwithsound.AddOscillatingBandPassFilter;
+import io.github.daveho.funwithsound.AddDelay;
+import io.github.daveho.funwithsound.AddFlanger;
 import io.github.daveho.funwithsound.AddReverb;
+import io.github.daveho.funwithsound.BandpassFilterMonoSynthUGen;
 import io.github.daveho.funwithsound.CustomInstrumentFactory;
 import io.github.daveho.funwithsound.Figure;
 import io.github.daveho.funwithsound.Instrument;
 import io.github.daveho.funwithsound.InstrumentInfo;
-import io.github.daveho.funwithsound.MonoSynthUGen;
 import io.github.daveho.funwithsound.Player;
 import io.github.daveho.funwithsound.Rhythm;
 
@@ -31,19 +32,19 @@ public class Demo6 extends DemoBase {
 		Instrument monosynth = custom(0);
 		v(monosynth, 0.6);
 		//addfx(monosynth, new AddDelay(200, 1.0, 0.6));
-//		AddFlanger.Params params = AddFlanger.defaultParams();
-//		params.minDelayMs = 0;
-//		params.maxDelayMs = 5;
-//		params.freqHz = 1.0;
+		AddFlanger.Params params = AddFlanger.defaultParams();
+		params.minDelayMs = 0;
+		params.maxDelayMs = 5;
+		params.freqHz = 1.0;
 //		addfx(monosynth, new AddFlanger(params));
-//		for (int i = 0; i < 6; i++) {
+//		for (int i = 0; i < 8; i++) {
 //			addfx(monosynth, new AddDelay(i*100, 1.0, 0.3));
 //		}
 //		addfx(monosynth, new AddDelay(100, 1.0, 0.6));
 //		addfx(monosynth, new AddDelay(200, 1.0, 0.5));
 //		addfx(monosynth, new AddDelay(300, 1.0, 0.4));
 //		addfx(monosynth, new AddDelay(400, 1.0, 0.3));
-		addfx(monosynth, new AddOscillatingBandPassFilter(400, 2000, .1));
+//		addfx(monosynth, new AddOscillatingBandPassFilter(400, 2000, .1));
 		addfx(monosynth, new AddReverb());
 		
 		add1(clickf);
@@ -57,12 +58,15 @@ public class Demo6 extends DemoBase {
 			addCreator(0, new CreateCustomInstrument() {
 				@Override
 				public InstrumentInfo create(AudioContext ac) {
-					MonoSynthUGen.Params params = MonoSynthUGen.defaultParams();
+					BandpassFilterMonoSynthUGen.Params params = BandpassFilterMonoSynthUGen.defaultParams();
 					params.attackTimeMs = 10;
 					params.glideTimeMs = 40;
-					MonoSynthUGen synth = new MonoSynthUGen(
+					params.startEndFreqFactor = .5;
+					params.riseFreqFactor = 4;
+					params.curvature = .25;
+					BandpassFilterMonoSynthUGen synth = new BandpassFilterMonoSynthUGen(
 							ac,
-							Buffer.TRIANGLE,
+							Buffer.SINE,
 							params,
 							new double[]{1.0, Math.pow(2.0, 7.0/12.0), 2.0, 2.0*Math.pow(2.0, 7.0/12.0), 4.0},
 							new double[]{1.0, 0.2, 0.6, 0.1, 0.4});
