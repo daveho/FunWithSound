@@ -1,7 +1,7 @@
 package io.github.daveho.funwithsound.demo;
 
 import io.github.daveho.funwithsound.AbstractCustomInstrumentFactory;
-import io.github.daveho.funwithsound.AddFlanger;
+import io.github.daveho.funwithsound.AddOscillatingBandPassFilter;
 import io.github.daveho.funwithsound.AddReverb;
 import io.github.daveho.funwithsound.CustomInstrumentFactory;
 import io.github.daveho.funwithsound.Figure;
@@ -29,13 +29,13 @@ public class Demo6 extends DemoBase {
 		Figure clickf = pf(clickr, 42, tr808);
 		
 		Instrument monosynth = custom(0);
-		v(monosynth, 0.4);
+		v(monosynth, 0.6);
 		//addfx(monosynth, new AddDelay(200, 1.0, 0.6));
-		AddFlanger.Params params = AddFlanger.defaultParams();
-		params.minDelayMs = 0;
-		params.maxDelayMs = 5;
-		params.freqHz = 1.0;
-		addfx(monosynth, new AddFlanger(params));
+//		AddFlanger.Params params = AddFlanger.defaultParams();
+//		params.minDelayMs = 0;
+//		params.maxDelayMs = 5;
+//		params.freqHz = 1.0;
+//		addfx(monosynth, new AddFlanger(params));
 //		for (int i = 0; i < 6; i++) {
 //			addfx(monosynth, new AddDelay(i*100, 1.0, 0.3));
 //		}
@@ -43,6 +43,7 @@ public class Demo6 extends DemoBase {
 //		addfx(monosynth, new AddDelay(200, 1.0, 0.5));
 //		addfx(monosynth, new AddDelay(300, 1.0, 0.4));
 //		addfx(monosynth, new AddDelay(400, 1.0, 0.3));
+		addfx(monosynth, new AddOscillatingBandPassFilter(400, 2000, .1));
 		addfx(monosynth, new AddReverb());
 		
 		add1(clickf);
@@ -61,7 +62,7 @@ public class Demo6 extends DemoBase {
 					params.glideTimeMs = 40;
 					MonoSynthUGen synth = new MonoSynthUGen(
 							ac,
-							Buffer.SINE,
+							Buffer.TRIANGLE,
 							params,
 							new double[]{1.0, Math.pow(2.0, 7.0/12.0), 2.0, 2.0*Math.pow(2.0, 7.0/12.0), 4.0},
 							new double[]{1.0, 0.2, 0.6, 0.1, 0.4});
