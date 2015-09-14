@@ -11,6 +11,7 @@ import io.github.daveho.funwithsound.Instrument;
 import io.github.daveho.funwithsound.InstrumentInfo;
 import io.github.daveho.funwithsound.Player;
 import io.github.daveho.funwithsound.Rhythm;
+import io.github.daveho.funwithsound.Util;
 
 import java.io.IOException;
 
@@ -68,8 +69,8 @@ public class Demo6 extends DemoBase {
 							ac,
 							Buffer.TRIANGLE,
 							params,
-							new double[]{1.0, Math.pow(2.0, 7.0/12.0), 2.0, 2.0*Math.pow(2.0, 7.0/12.0), 4.0},
-							new double[]{1.0, 0.2, 0.3, 0.1, 0.2});
+							new double[]{1.0, Util.freqShift(7), 2.0, 2.0*Util.freqShift(7), 4.0},
+							new double[]{1.0, 0.2, 0.5, 0.1, 0.4});
 					return new InstrumentInfo(synth, ac);
 				}
 			});

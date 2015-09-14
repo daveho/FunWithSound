@@ -83,4 +83,15 @@ public class Util {
 			}
 		};
 	}
+	
+	/**
+	 * Compute the multiplier needed to shift a frequency up
+	 * or down by specified number of half steps. 
+	 * 
+	 * @param numHalfSteps number of half steps (negative to shift down)
+	 * @return the multiplier
+	 */
+	public static double freqShift(double numHalfSteps) {
+		return Math.pow(2, numHalfSteps/12);
+	}
 }
