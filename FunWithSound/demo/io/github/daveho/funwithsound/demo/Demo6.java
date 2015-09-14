@@ -37,16 +37,16 @@ public class Demo6 extends DemoBase {
 		params.minDelayMs = 0;
 		params.maxDelayMs = 5;
 		params.freqHz = 1.0;
-//		addfx(monosynth, new AddFlanger(params));
-//		for (int i = 0; i < 8; i++) {
-//			addfx(monosynth, new AddDelay(i*100, 1.0, 0.3));
-//		}
+		addfx(monosynth, new AddFlanger(params));
+		for (int i = 0; i < 8; i++) {
+			addfx(monosynth, new AddDelay(i*100, 1.0, 0.3));
+		}
 //		addfx(monosynth, new AddDelay(100, 1.0, 0.6));
 //		addfx(monosynth, new AddDelay(200, 1.0, 0.5));
 //		addfx(monosynth, new AddDelay(300, 1.0, 0.4));
 //		addfx(monosynth, new AddDelay(400, 1.0, 0.3));
 //		addfx(monosynth, new AddOscillatingBandPassFilter(400, 2000, .1));
-		addfx(monosynth, new AddReverb());
+//		addfx(monosynth, new AddReverb());
 		
 		add1(clickf);
 		
@@ -67,10 +67,10 @@ public class Demo6 extends DemoBase {
 					params.curvature = .25;
 					BandpassFilterMonoSynthUGen synth = new BandpassFilterMonoSynthUGen(
 							ac,
-							Buffer.TRIANGLE,
+							Buffer.SINE,
 							params,
-							new double[]{1.0, Util.freqShift(7), 2.0, 2.0*Util.freqShift(7), 4.0},
-							new double[]{1.0, 0.2, 0.5, 0.1, 0.4});
+							new double[]{1.0, /*Util.freqShift(7), 2.0, 2.0*Util.freqShift(7), 4.0,*/ 3.0},
+							new double[]{1.0, /*0.2, 0.5, 0.1, 0.4,*/ 0.7});
 					return new InstrumentInfo(synth, ac);
 				}
 			});
