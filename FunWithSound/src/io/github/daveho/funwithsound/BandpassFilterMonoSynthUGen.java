@@ -62,6 +62,29 @@ public class BandpassFilterMonoSynthUGen extends MonoSynthUGen {
 	
 	private Envelope centerFreqEnv;
 	private BiquadFilter filter;
+
+	/**
+	 * Constructor.
+	 * 
+	 * @param ac      the AudioContext
+	 * @param buffer  the buffer type (sine, square, triangle, etc.)
+	 * @param params  parameters to control attack/decay, glide time, etc.
+	 */
+	public BandpassFilterMonoSynthUGen(AudioContext ac, Buffer buffer, Params params) {
+		super(ac, buffer, params);
+	}
+	
+	/**
+	 * Constructor.
+	 * 
+	 * @param ac      the AudioContext
+	 * @param buffer  the buffer type (sine, square, triangle, etc.)
+	 * @param params  parameters to control attack/decay, glide time, etc.
+	 * @param freqMult create oscillators to play these multiples of the note frequency 
+	 */
+	public BandpassFilterMonoSynthUGen(AudioContext ac, Buffer buffer, Params params, double[] freqMult) {
+		super(ac, buffer, params, freqMult);
+	}
 	
 	/**
 	 * Constructor.
