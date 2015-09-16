@@ -52,8 +52,8 @@ public class Demo6 extends DemoBase {
 		params.put(AddPingPongStereoDelays.FIRST_DELAY_GAIN, 0.6);
 		params.put(AddPingPongStereoDelays.SPREAD, 0.9);
 		addfx(monosynth2, new AddPingPongStereoDelays(params));
-		addfx(monosynth2, new AddReverb());
 		addfx(monosynth2, new AddOscillatingBandPassFilter(200, 1200, 0.125));
+		addfx(monosynth2, new AddReverb());
 		
 //		Rhythm clickr = rr(s(0,.5,101), 1, 8);
 //		Figure clickf = pf(clickr, 42, tr909);
@@ -171,7 +171,7 @@ public class Demo6 extends DemoBase {
 					params.put(MonoSynthUGen.GLIDE_TIME_MS, 40);
 					MonoSynthUGen synth = new MonoSynthUGen(
 							ac,
-							Buffer.SQUARE,
+							Buffer.SAW,
 							params,
 							new double[]{1.0, Util.freqShift(7), 2.0, 2.0*Util.freqShift(7)},
 							new double[]{0.6, 0.3, 0.5, 0.2});
