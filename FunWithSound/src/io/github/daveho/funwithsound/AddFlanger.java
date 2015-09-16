@@ -17,82 +17,88 @@ package io.github.daveho.funwithsound;
 
 import net.beadsproject.beads.core.AudioContext;
 import net.beadsproject.beads.core.UGen;
+import net.beadsproject.beads.data.DataBead;
 import net.beadsproject.beads.ugens.CombFilter;
 
 /**
  * Add a flanger effect.
+ * Accepts parameter configuration via a DataBead.
+ * Note that parameters can only be set at effect creation time,
+ * not during runtime.
  */
 public class AddFlanger implements AddEffect {
+	// default parameter values as constants
 	public static final double DEFAULT_H = .3;
 	public static final double DEFAULT_G = .8;
 	public static final double DEFAULT_A = .8;
 	public static final double DEFAULT_MAX_DELAY_MS = 10.0;
 	public static final double DEFAULT_MIN_DELAY_MS = 5.0;
 	public static final double DEFAULT_FREQ_HZ = 1.0;
-
-	/**
-	 * Flanger parameters.
-	 */
-	public static class Params {
-		/** Frequency (rate at which the flanger's delay changes). */
-		public double freqHz;
-		/** Minimum delay in milliseconds. */
-		public double minDelayMs;
-		/** Maximum delay in milliseconds. */
-		public double maxDelayMs;
-		/** Gain for original signal through the flanger's comb filter. */
-		public double a;
-		/** Gain for the delayed signal through the flanger's comb filter. */
-		public double g;
-		/** Gain for the feed-forward component of the flanger's comb filter. */
-		public double h;
-		
-		public Params(double freqHz, double minDelayMs, double maxDelayMs, double a, double g, double h) {
-			this.freqHz = freqHz;
-			this.minDelayMs = minDelayMs;
-			this.maxDelayMs = maxDelayMs;
-			this.a = a;
-			this.g = g;
-			this.h = h;
-		}
-	}
+	
+	// Property names
+	
+	/** DataBead property name: Frequency (rate at which the flanger's delay changes). */
+	public static final String FREQ_HZ = "freqHz";
+	/** DataBead property name: Minimum delay in milliseconds. */
+	public static final String MIN_DELAY_MS = "minDelayMs";
+	/** DataBead property name: Maximum delay in milliseconds. */
+	public static final String MAX_DELAY_MS = "maxDelayMs";
+	/** DataBead property name: Gain for original signal through the flanger's comb filter. */
+	public static final String A = "a";
+	/** DataBead property name: Gain for the delayed signal through the flanger's comb filter. */
+	public static final String G = "g";
+	/** DataBead property name: Gain for the feed-forward component of the flanger's comb filter. */
+	public static final String H = "h";
 	
 	/**
 	 * Create default parameters.
 	 * They are completely arbitrary, but
 	 * can serve as a useful starting point.
 	 */
-	public static final Params defaultParams() {
-		return new Params(
-			DEFAULT_FREQ_HZ,
-			DEFAULT_MIN_DELAY_MS,
-			DEFAULT_MAX_DELAY_MS,
-			DEFAULT_A,
-			DEFAULT_G,
-			DEFAULT_H
-		);
+	public static final DataBead defaultParams() {
+		return new DataBead(
+				FREQ_HZ, DEFAULT_FREQ_HZ,
+				MIN_DELAY_MS, DEFAULT_MIN_DELAY_MS,
+				MAX_DELAY_MS, DEFAULT_MAX_DELAY_MS,
+				A, DEFAULT_A,
+				G, DEFAULT_G,
+				H, DEFAULT_H
+				);
+	}
+
+	private DataBead params;
+	
+	/**
+	 * Constructor.
+	 * The default parameters will be used.
+	 */
+	public AddFlanger() {
+		this.params = defaultParams();
 	}
 	
-	private Params params;
-	
-	public AddFlanger(Params params) {
+	/**
+	 * Constructor.
+	 * 
+	 * @param params a DataBead containing the parameters
+	 */
+	public AddFlanger(DataBead params) {
 		this.params = params;
 	}
 
 	@Override
 	public UGen apply(AudioContext ac, InstrumentInfo info) {
-		final int mindel = (int) ac.msToSamples(params.minDelayMs);
-		final int maxdel = (int) Math.ceil(ac.msToSamples(params.maxDelayMs));
+		final int mindel = (int) ac.msToSamples(Util.getDouble(params, MIN_DELAY_MS));
+		final int maxdel = (int) Math.ceil(ac.msToSamples(Util.getDouble(params, MAX_DELAY_MS)));
 		
 		CombFilter comb = new CombFilter(ac, maxdel);
 		
 		// Modulate the comb filter's delay with a sine function
-		UGen delay = Util.getRangedSineFunction(ac, mindel, maxdel, params.freqHz);
+		UGen delay = Util.getRangedSineFunction(ac, mindel, maxdel, Util.getDouble(params, FREQ_HZ));
 	
 		comb.setDelay(delay);
-		comb.setA((float)params.a);
-		comb.setG((float)params.g);
-		comb.setH((float)params.h);
+		comb.setA(Util.getFloat(params, A));
+		comb.setG(Util.getFloat(params, G));
+		comb.setH(Util.getFloat(params, H));
 		
 		comb.addInput(info.tail);
 		

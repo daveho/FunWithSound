@@ -20,6 +20,7 @@ import java.util.Arrays;
 import net.beadsproject.beads.core.AudioContext;
 import net.beadsproject.beads.core.UGen;
 import net.beadsproject.beads.data.Buffer;
+import net.beadsproject.beads.data.DataBead;
 import net.beadsproject.beads.ugens.Function;
 import net.beadsproject.beads.ugens.WavePlayer;
 
@@ -93,5 +94,33 @@ public class Util {
 	 */
 	public static double freqShift(double numHalfSteps) {
 		return Math.pow(2, numHalfSteps/12);
+	}
+
+	/**
+	 * Get a double parameter from a DataBead.
+	 * Throws an exception if the stored parameter value can't
+	 * be converted to a double.
+	 * 
+	 * @param params      the DataBead
+	 * @param propName    the parameter name
+	 * @return the double value
+	 */
+	public static double getDouble(DataBead params, String propName) {
+		Number val = (Number) params.get(propName);
+		return val.doubleValue();
+	}
+
+	/**
+	 * Get a float parameter from a DataBead.
+	 * Throws an exception if the stored parameter value can't
+	 * be converted to a float.
+	 * 
+	 * @param params      the DataBead
+	 * @param propName    the parameter name
+	 * @return the float value
+	 */
+	public static float getFloat(DataBead params, String propName) {
+		Number val = (Number) params.get(propName);
+		return val.floatValue();
 	}
 }

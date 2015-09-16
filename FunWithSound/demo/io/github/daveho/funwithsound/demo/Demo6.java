@@ -22,6 +22,7 @@ import javax.sound.midi.MidiUnavailableException;
 
 import net.beadsproject.beads.core.AudioContext;
 import net.beadsproject.beads.data.Buffer;
+import net.beadsproject.beads.data.DataBead;
 
 public class Demo6 extends DemoBase {
 	@Override
@@ -32,24 +33,17 @@ public class Demo6 extends DemoBase {
 		
 		Instrument monosynth = custom(0);
 		v(monosynth, 0.4);
-		//addfx(monosynth, new AddDelay(200, 1.0, 0.6));
-		AddFlanger.Params params = AddFlanger.defaultParams();
-		params.minDelayMs = 0;
-		params.maxDelayMs = 5;
-		params.freqHz = 1.0;
-		addfx(monosynth, new AddFlanger(params));
+		addfx(monosynth, new AddFlanger());
 		for (int i = 0; i < 8; i++) {
 			addfx(monosynth, new AddDelay(i*100, 1.0, 0.3));
 		}
-//		addfx(monosynth, new AddOscillatingBandPassFilter(400, 2000, .1));
-//		addfx(monosynth, new AddReverb());
 		
 		Instrument monosynth2 = custom(1);
 		v(monosynth2, 0.6);
-		AddFlanger.Params params2 = AddFlanger.defaultParams();
-		params.minDelayMs = 0;
-		params.maxDelayMs = 5;
-		params.freqHz = 1.0;
+		DataBead params2 = AddFlanger.defaultParams();
+		params2.put(AddFlanger.MIN_DELAY_MS, 0);
+		params2.put(AddFlanger.MAX_DELAY_MS, 5);
+		params2.put(AddFlanger.FREQ_HZ, 1.0);
 		addfx(monosynth2, new AddFlanger(params2));
 		addfx(monosynth2, new AddOscillatingBandPassFilter(20, 4000, 0.125));
 		addfx(monosynth2, new AddReverb());
