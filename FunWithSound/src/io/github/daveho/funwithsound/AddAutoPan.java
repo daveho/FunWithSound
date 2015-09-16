@@ -43,7 +43,7 @@ public class AddAutoPan implements AddEffect {
 	}
 
 	@Override
-	public UGen apply(AudioContext ac, InstrumentInfo info) {
+	public UGen apply(AudioContext ac, RealizedInstrument info) {
 		// Constrain the sine wave to be between min and max
 		UGen limitedSine = Util.getRangedSineFunction(ac, min, max, freqHz);
 		

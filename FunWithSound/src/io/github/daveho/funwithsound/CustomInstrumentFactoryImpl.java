@@ -26,16 +26,16 @@ import net.beadsproject.beads.core.AudioContext;
  */
 public class CustomInstrumentFactoryImpl implements CustomInstrumentFactory {
 	/**
-	 * Callback to create an {@link InstrumentInfo} for a custom instrument.
+	 * Callback to create an {@link RealizedInstrument} for a custom instrument.
 	 */
 	public interface CreateCustomInstrument {
 		/**
-		 * Create an {@link InstrumentInfo} for a custom instrument.
+		 * Create an {@link RealizedInstrument} for a custom instrument.
 		 * 
 		 * @param ac the AudioContext
-		 * @return the custom instrument {@link InstrumentInfo}
+		 * @return the custom instrument {@link RealizedInstrument}
 		 */
-		public InstrumentInfo create(AudioContext ac);
+		public RealizedInstrument create(AudioContext ac);
 	}
 	
 	private Map<Integer, CreateCustomInstrument> creatorMap;
@@ -71,7 +71,7 @@ public class CustomInstrumentFactoryImpl implements CustomInstrumentFactory {
 	}
 
 	@Override
-	public InstrumentInfo create(int code, AudioContext ac) {
+	public RealizedInstrument create(int code, AudioContext ac) {
 		CreateCustomInstrument creator = creatorMap.get(code);
 		if (creator == null) {
 			throw new IllegalArgumentException("Don't know how to create custom instrument " + code);

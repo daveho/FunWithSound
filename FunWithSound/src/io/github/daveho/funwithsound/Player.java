@@ -61,8 +61,8 @@ public class Player {
 	private Composition composition;
 	private AudioContext ac;
 	private HashMap<String, SF2Soundbank> soundBanks;
-	private InstrumentInfo liveSynth;
-	private Map<Instrument, InstrumentInfo> instrMap;
+	private RealizedInstrument liveSynth;
+	private Map<Instrument, RealizedInstrument> instrMap;
 	private String outputFile;
 	private long idleTimeUs;
 	private CountDownLatch latch;
@@ -73,10 +73,10 @@ public class Player {
 	
 	public Player() {
 		soundBanks = new HashMap<String, SF2Soundbank>();
-		instrMap = new IdentityHashMap<Instrument, InstrumentInfo>();
+		instrMap = new IdentityHashMap<Instrument, RealizedInstrument>();
 		customInstrumentFactory = new CustomInstrumentFactory() {
 			@Override
-			public InstrumentInfo create(int code, AudioContext ac) {
+			public RealizedInstrument create(int code, AudioContext ac) {
 				throw new RuntimeException("No custom instrument factory is registered!");
 			}
 		};
@@ -120,11 +120,11 @@ public class Player {
 		this.outputFile = outputFile;
 	}
 	
-	private InstrumentInfo createGervill(Instrument instrument) throws MidiUnavailableException, IOException {
+	private RealizedInstrument createGervill(Instrument instrument) throws MidiUnavailableException, IOException {
 		// Note that the GervillUGen isn't connected to an effects chain,
 		// or the AudioContext output, at this point.
 		GervillUGen gervill = new GervillUGen(ac, Collections.<String, Object>emptyMap());
-		InstrumentInfo info = new InstrumentInfo(gervill);
+		RealizedInstrument info = new RealizedInstrument(gervill);
 		if (instrument.hasSoundFont()) {
 			SoftSynthesizer synth = ((GervillUGen)info.head).getSynth();
 			SF2Soundbank sb = getSoundBank(instrument);
@@ -331,12 +331,12 @@ public class Player {
 	private void addGainEvents() throws MidiUnavailableException, IOException {
 		// Distribute GainEvents by instrument
 		for (GainEvent e : composition.getGainEvents()) {
-			InstrumentInfo info = getInstrumentInfo(e.instr);
+			RealizedInstrument info = getInstrumentInfo(e.instr);
 			info.gainEvents.add(e);
 		}
 		
 		// Sort the GainEvents by timestamp for each instrument
-		for (Map.Entry<Instrument, InstrumentInfo> entry : instrMap.entrySet()) {
+		for (Map.Entry<Instrument, RealizedInstrument> entry : instrMap.entrySet()) {
 			Collections.sort(entry.getValue().gainEvents, new Comparator<GainEvent>() {
 				@Override
 				public int compare(GainEvent o1, GainEvent o2) {
@@ -353,8 +353,8 @@ public class Player {
 	}
 	
 	private void configureInstrumentEffects() {
-		for (Map.Entry<Instrument, InstrumentInfo> entry : instrMap.entrySet()) {
-			InstrumentInfo info = entry.getValue();
+		for (Map.Entry<Instrument, RealizedInstrument> entry : instrMap.entrySet()) {
+			RealizedInstrument info = entry.getValue();
 			
 			List<AddEffect> fx = composition.getEffectsMap().get(entry.getKey());
 			if (fx != null) {
@@ -395,7 +395,7 @@ public class Player {
 //			System.out.printf("PlayFigureEvent start time=%d\n", e.getStartUs());
 			SimpleFigure f = e.getFigure();
 			Instrument instrument = f.getInstrument();
-			InstrumentInfo info = getInstrumentInfo(instrument);
+			RealizedInstrument info = getInstrumentInfo(instrument);
 			Rhythm rhythm = f.getRhythm();
 			Melody melody = f.getMelody();
 			int n = Math.min(rhythm.size(), melody.size());
@@ -428,9 +428,9 @@ public class Player {
 		return idleTimeUs;
 	}
 
-	private InstrumentInfo getInstrumentInfo(Instrument instrument)
+	private RealizedInstrument getInstrumentInfo(Instrument instrument)
 			throws MidiUnavailableException, IOException {
-		InstrumentInfo info = instrMap.get(instrument);
+		RealizedInstrument info = instrMap.get(instrument);
 		if (info == null) {
 			if (instrument.isMidi()) {
 				info = createGervill(instrument);
@@ -446,8 +446,8 @@ public class Player {
 		return info;
 	}
 	
-	private InstrumentInfo createSampleBank(Instrument instr) {
-		InstrumentInfo info = instrMap.get(instr);
+	private RealizedInstrument createSampleBank(Instrument instr) {
+		RealizedInstrument info = instrMap.get(instr);
 		if (info == null) {
 			SampleBankUGen sb = new SampleBankUGen(ac);
 			for (Map.Entry<Integer, SampleInfo> entry : instr.getSampleMap().entrySet()) {
@@ -473,7 +473,7 @@ public class Player {
 				}
 				*/
 			}
-			info = new InstrumentInfo(sb, ac);
+			info = new RealizedInstrument(sb, ac);
 			instrMap.put(instr, info);
 		}
 		return info;

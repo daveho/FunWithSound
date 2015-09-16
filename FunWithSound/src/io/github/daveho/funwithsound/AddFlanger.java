@@ -86,7 +86,7 @@ public class AddFlanger implements AddEffect {
 	}
 
 	@Override
-	public UGen apply(AudioContext ac, InstrumentInfo info) {
+	public UGen apply(AudioContext ac, RealizedInstrument info) {
 		final int mindel = (int) ac.msToSamples(Util.getDouble(params, MIN_DELAY_MS));
 		final int maxdel = (int) Math.ceil(ac.msToSamples(Util.getDouble(params, MAX_DELAY_MS)));
 		

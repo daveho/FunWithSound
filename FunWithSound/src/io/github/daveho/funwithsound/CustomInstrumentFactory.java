@@ -18,17 +18,17 @@ package io.github.daveho.funwithsound;
 import net.beadsproject.beads.core.AudioContext;
 
 /**
- * Factory interface for creating {@link InstrumentInfo} objects
+ * Factory interface for creating {@link RealizedInstrument} objects
  * for custom instrument types.
  */
 public interface CustomInstrumentFactory {
 	/**
-	 * Create an {@link InstrumentInfo} for the custom instrument type
+	 * Create an {@link RealizedInstrument} for the custom instrument type
 	 * with given code.
 	 * 
 	 * @param code  the code
 	 * @param ac    the AudioContext
 	 * @return the InstrumentInfo for the custom instrument
 	 */
-	public InstrumentInfo create(int code, AudioContext ac);
+	public RealizedInstrument create(int code, AudioContext ac);
 }

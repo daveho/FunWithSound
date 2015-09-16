@@ -9,7 +9,7 @@ import io.github.daveho.funwithsound.BandpassFilterMonoSynthUGen;
 import io.github.daveho.funwithsound.CustomInstrumentFactory;
 import io.github.daveho.funwithsound.Figure;
 import io.github.daveho.funwithsound.Instrument;
-import io.github.daveho.funwithsound.InstrumentInfo;
+import io.github.daveho.funwithsound.RealizedInstrument;
 import io.github.daveho.funwithsound.Melody;
 import io.github.daveho.funwithsound.MonoSynthUGen;
 import io.github.daveho.funwithsound.Player;
@@ -107,7 +107,7 @@ public class Demo6 extends DemoBase {
 		CustomInstrumentFactory fac = new CustomInstrumentFactoryImpl(
 			0, new CustomInstrumentFactoryImpl.CreateCustomInstrument() {
 				@Override
-				public InstrumentInfo create(AudioContext ac) {
+				public RealizedInstrument create(AudioContext ac) {
 					DataBead params = BandpassFilterMonoSynthUGen.defaultParams();
 					params.put(MonoSynthUGen.ATTACK_TIME_MS, 10);
 					params.put(MonoSynthUGen.GLIDE_TIME_MS, 40);
@@ -120,12 +120,12 @@ public class Demo6 extends DemoBase {
 							params,
 							new double[]{1.0, /*Util.freqShift(7), 2.0, 2.0*Util.freqShift(7), 4.0,*/ 3.0},
 							new double[]{1.0, /*0.2, 0.5, 0.1, 0.4,*/ 0.7});
-					return new InstrumentInfo(synth, ac);
+					return new RealizedInstrument(synth, ac);
 				}
 			},
 			1, new CustomInstrumentFactoryImpl.CreateCustomInstrument() {
 				@Override
-				public InstrumentInfo create(AudioContext ac) {
+				public RealizedInstrument create(AudioContext ac) {
 					DataBead params = MonoSynthUGen.defaultParams();
 					params.put(MonoSynthUGen.GLIDE_TIME_MS, 40);
 					MonoSynthUGen synth = new MonoSynthUGen(
@@ -134,7 +134,7 @@ public class Demo6 extends DemoBase {
 							params,
 							new double[]{1.0, Util.freqShift(7), 2.0, 2.0*Util.freqShift(7)},
 							new double[]{0.6, 0.3, 0.5, 0.2});
-					return new InstrumentInfo(synth, ac);
+					return new RealizedInstrument(synth, ac);
 				}
 			});
 		

@@ -30,10 +30,22 @@ import net.beadsproject.beads.core.UGen;
 import net.beadsproject.beads.ugens.Gain;
 
 /**
- * The synthesizer UGen and effects chain UGens for
- * a specific {@link Instrument}.
+ * This class is the runtime instantiation of an {@link Instrument}.
+ * It consists of:
+ * <ul>
+ * <li><code>source</code>: A MIDI Receiver interface, to which MIDI messages are sent</li>
+ * <li><code>head</code>: A "head" UGen, which is the synthesizer (and which processes the
+ *     MIDI messages sent to the Receiver)</li>
+ * <li><code>tail</code>: A "tail" UGen, the tail of the effects chain (initially set
+ *     to the head UGen, because the realized instrument starts out with
+ *     no effects)</li>
+ * </ul>
+ * 
+ * The {@link Player} class also stores {@link GainEvent}s here, and there
+ * is a <code>gain</code> UGen which controls the overall gain of the
+ * realized instrument.
  */
-public class InstrumentInfo {
+public class RealizedInstrument {
 	/** MidiMessages to be played by this instrument should be sent here. */
 	public Receiver source;
 	
@@ -56,7 +68,7 @@ public class InstrumentInfo {
 	 * 
 	 * @param gervill the GervillUGen
 	 */
-	public InstrumentInfo(GervillUGen gervill) {
+	public RealizedInstrument(GervillUGen gervill) {
 		this(gervill.getSynthRecv(), gervill);
 	}
 	
@@ -74,7 +86,7 @@ public class InstrumentInfo {
 	 *             (i.e., the synthesizer)
 	 * @param ac   the AudioContext
 	 */
-	public InstrumentInfo(UGen head, AudioContext ac) {
+	public RealizedInstrument(UGen head, AudioContext ac) {
 		this(new ReceivedMidiMessageSource(ac), head);
 		
 		// Deliver MidiMessages to the head UGen
@@ -89,7 +101,7 @@ public class InstrumentInfo {
 	 * @param head   the UGen at the head of the effects chain
 	 *               (i.e., the synthesizer or audio source)
 	 */
-	public InstrumentInfo(Receiver source, UGen head) {
+	public RealizedInstrument(Receiver source, UGen head) {
 		this.source = source;
 		this.head = head;
 		this.tail = head;

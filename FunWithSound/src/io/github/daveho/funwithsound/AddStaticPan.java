@@ -35,7 +35,7 @@ public class AddStaticPan implements AddEffect {
 	}
 
 	@Override
-	public UGen apply(AudioContext ac, InstrumentInfo info) {
+	public UGen apply(AudioContext ac, RealizedInstrument info) {
 		Panner panner = new Panner(ac, (float)pos);
 		
 		panner.addInput(info.tail);

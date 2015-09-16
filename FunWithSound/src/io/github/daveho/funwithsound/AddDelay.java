@@ -41,7 +41,7 @@ public class AddDelay implements AddEffect {
 	}
 
 	@Override
-	public UGen apply(AudioContext ac, InstrumentInfo info) {
+	public UGen apply(AudioContext ac, RealizedInstrument info) {
 		int delaySamples = (int) Math.ceil(ac.msToSamples(delayMs));
 		
 		CombFilter comb = new CombFilter(ac, delaySamples);

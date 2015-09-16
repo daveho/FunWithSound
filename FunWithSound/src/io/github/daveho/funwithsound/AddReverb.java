@@ -75,7 +75,7 @@ public class AddReverb implements AddEffect {
 	}
 	
 	@Override
-	public UGen apply(AudioContext ac, InstrumentInfo info) {
+	public UGen apply(AudioContext ac, RealizedInstrument info) {
 		Reverb reverb = new Reverb(ac, 2);
 		reverb.addInput(info.tail);
 
