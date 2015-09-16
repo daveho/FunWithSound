@@ -1,5 +1,6 @@
 package io.github.daveho.funwithsound.demo;
 
+import io.github.daveho.funwithsound.AddPingPongStereoDelays;
 import io.github.daveho.funwithsound.CustomInstrumentFactoryImpl;
 import io.github.daveho.funwithsound.AddDelay;
 import io.github.daveho.funwithsound.AddFlanger;
@@ -39,14 +40,20 @@ public class Demo6 extends DemoBase {
 		}
 		
 		Instrument monosynth2 = custom(1);
-		v(monosynth2, 0.6);
-		DataBead params2 = AddFlanger.defaultParams();
-		params2.put(AddFlanger.MIN_DELAY_MS, 0);
-		params2.put(AddFlanger.MAX_DELAY_MS, 5);
-		params2.put(AddFlanger.FREQ_HZ, 1.0);
-		addfx(monosynth2, new AddFlanger(params2));
-		addfx(monosynth2, new AddOscillatingBandPassFilter(20, 4000, 0.125));
+		v(monosynth2, 0.4);
+//		DataBead params2 = AddFlanger.defaultParams();
+//		params2.put(AddFlanger.MIN_DELAY_MS, 0);
+//		params2.put(AddFlanger.MAX_DELAY_MS, 5);
+//		params2.put(AddFlanger.FREQ_HZ, 1.0);
+//		addfx(monosynth2, new AddFlanger(params2));
+		DataBead params = AddPingPongStereoDelays.defaultParams();
+		params.put(AddPingPongStereoDelays.DELAY_MS, 500);
+		params.put(AddPingPongStereoDelays.NUM_DELAYS, 8);
+		params.put(AddPingPongStereoDelays.FIRST_DELAY_GAIN, 0.6);
+		params.put(AddPingPongStereoDelays.SPREAD, 0.9);
+		addfx(monosynth2, new AddPingPongStereoDelays(params));
 		addfx(monosynth2, new AddReverb());
+		addfx(monosynth2, new AddOscillatingBandPassFilter(200, 1500, 0.125));
 		
 //		Rhythm clickr = rr(s(0,.5,101), 1, 8);
 //		Figure clickf = pf(clickr, 42, tr909);
@@ -88,16 +95,28 @@ public class Demo6 extends DemoBase {
 			an(74), an(76), an(77), an(65), an(76), an(77), an(60), an(81), an(77), an(76), an(74), an(60), an(62), an(71), an(72), an(74), an(72), an(71), an(60), an(62), an(77), an(76), an(77), an(76), an(77), an(76), an(62), an(77), an(76), an(77), an(76), an(77), an(76), an(64));
 		Figure lead1f = f(lead1r, lead1m, monosynth2);
 
-		add1(gf(percf,bassf));
-		add1(gf(percf,bassf));
-		add1(gf(percf,bassf,lead1f));
-		add1(gf(percf,bassf));
-		add1(gf(percf,bassf));
-		add1(gf(percf,bassf));
-		add1(gf(percf,bassf));
-		add1(gf(percf,bassf));
-		add1(gf(percf,bassf));
-		add1(gf(percf,bassf));
+//		add1(gf(percf,bassf));
+//		add1(gf(percf,bassf));
+//		add1(gf(percf,bassf,lead1f));
+//		add1(gf(percf,bassf));
+//		add1(gf(percf,bassf));
+//		add1(gf(percf,bassf));
+//		add1(gf(percf,bassf));
+//		add1(gf(percf,bassf));
+//		add1(gf(percf,bassf));
+//		add1(gf(percf,bassf));
+		add1(gf(percf));
+		add1(gf(percf));
+		add1(gf(percf));
+		add1(gf(percf));
+		add1(gf(percf));
+		add1(gf(percf));
+		add1(gf(percf));
+		add1(gf(percf));
+		add1(gf(percf));
+		add1(gf(percf));
+		add1(gf(percf));
+		add1(gf(percf));
 		
 		audition(monosynth2);
 	}
@@ -130,7 +149,7 @@ public class Demo6 extends DemoBase {
 					params.put(MonoSynthUGen.GLIDE_TIME_MS, 40);
 					MonoSynthUGen synth = new MonoSynthUGen(
 							ac,
-							Buffer.SAW,
+							Buffer.SQUARE,
 							params,
 							new double[]{1.0, Util.freqShift(7), 2.0, 2.0*Util.freqShift(7)},
 							new double[]{0.6, 0.3, 0.5, 0.2});

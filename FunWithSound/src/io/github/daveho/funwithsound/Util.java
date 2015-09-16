@@ -123,4 +123,18 @@ public class Util {
 		Number val = (Number) params.get(propName);
 		return val.floatValue();
 	}
+
+	/**
+	 * Get a float parameter from a DataBead.
+	 * Throws an exception if the stored parameter value can't
+	 * be converted to an int.
+	 * 
+	 * @param params     the DataBead
+	 * @param propName   the parameter name
+	 * @return the int value
+	 */
+	public static int getInt(DataBead params, String propName) {
+		Number val = (Number) params.get(propName);
+		return val.intValue();
+	}
 }
