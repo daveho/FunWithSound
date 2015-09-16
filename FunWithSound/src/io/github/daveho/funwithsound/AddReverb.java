@@ -17,44 +17,52 @@ package io.github.daveho.funwithsound;
 
 import net.beadsproject.beads.core.AudioContext;
 import net.beadsproject.beads.core.UGen;
+import net.beadsproject.beads.data.DataBead;
 import net.beadsproject.beads.ugens.Gain;
 import net.beadsproject.beads.ugens.Reverb;
 
+/**
+ * Add a reverb effect.
+ * Accepts parameter configuration via a DataBead.
+ * Note that parameters can only be set at effect creation time,
+ * not during runtime.
+ * The parameter DataBead uses the same property names
+ * as the Reverb UGen.
+ */
 public class AddReverb implements AddEffect {
-	/**
-	 * Reverb parameters.
-	 */
-	public static class Params {
-		public double damping;
-		public double earlyReflectionsLevel;
-		public double lateReverbLevel;
-		public double roomSize;
-		
-		public Params(double damping, double earlyReflectionsLevel, double lateReverbLevel, double roomSize) {
-			this.damping = damping;
-			this.earlyReflectionsLevel = earlyReflectionsLevel;
-			this.lateReverbLevel = lateReverbLevel;
-			this.roomSize = roomSize;
-		}
-	}
-	
+	/** DataBead property name: Late reverb level, in the range 0-1. */
+	public static final String LATE_REVERB_LEVEL = "lateReverbLevel";
+	/** DataBead property name: Early reflections level, in the range 0-1. */
+	public static final String EARLY_REFLECTIONS_LEVEL = "earlyReflectionsLevel";
+	/** DataBead property name: Room size, in the range 0-1. */
+	public static final String ROOM_SIZE = "roomSize";
+	/** DataBead property name: Damping, in the range 0-1. */
+	public static final String DAMPING = "damping";
+
 	/**
 	 * Get default reverb parameters.
 	 * 
 	 * @return default reverb parameters
 	 */
-	public static Params defaultParams() {
-		// These are the Beads defaults
-		return new Params(0.7, 1.0, 1.0, 0.5);
+	public static DataBead defaultParams() {
+		DataBead params = new DataBead();
+		
+		// These are the defaults for the Reverb UGen
+		params.put(DAMPING, .7f);
+		params.put(ROOM_SIZE, .5f);
+		params.put(EARLY_REFLECTIONS_LEVEL, 1.0f);
+		params.put(LATE_REVERB_LEVEL, 1.0f);
+		
+		return params;
 	}
-	
-	private Params params;
+
+	private DataBead params;
 	
 	/**
 	 * Constructor: adds reverb with default parameters.
 	 */
 	public AddReverb() {
-		this.params = null;
+		this.params = defaultParams();
 	}
 	
 	/**
@@ -62,7 +70,7 @@ public class AddReverb implements AddEffect {
 	 * 
 	 * @param params the reverb parameters
 	 */
-	public AddReverb(Params params) {
+	public AddReverb(DataBead params) {
 		this.params = params;
 	}
 	
@@ -70,13 +78,8 @@ public class AddReverb implements AddEffect {
 	public UGen apply(AudioContext ac, InstrumentInfo info) {
 		Reverb reverb = new Reverb(ac, 2);
 		reverb.addInput(info.tail);
-		
-		if (params != null) {
-			reverb.setDamping((float)params.damping);
-			reverb.setEarlyReflectionsLevel((float)params.earlyReflectionsLevel);
-			reverb.setLateReverbLevel((float)params.lateReverbLevel);
-			reverb.setSize((float)params.roomSize);
-		}
+
+		reverb.sendData(params);
 
 		// A Gain is used to mix the reverb output with the original signal
 		Gain mix = new Gain(ac, 2);

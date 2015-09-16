@@ -15,7 +15,6 @@
 
 package io.github.daveho.funwithsound.demo;
 
-import io.github.daveho.funwithsound.AddDelay;
 import io.github.daveho.funwithsound.AddReverb;
 import io.github.daveho.funwithsound.Figure;
 import io.github.daveho.funwithsound.Instrument;
@@ -25,6 +24,8 @@ import io.github.daveho.funwithsound.Rhythm;
 import java.io.IOException;
 
 import javax.sound.midi.MidiUnavailableException;
+
+import net.beadsproject.beads.data.DataBead;
 
 public class Demo4 extends DemoBase {
 
@@ -41,8 +42,8 @@ public class Demo4 extends DemoBase {
 		v(hh, 0.5);
 		
 		Instrument sax = instr(ARACHNO, 66);
-		AddReverb.Params params = AddReverb.defaultParams();
-		params.roomSize = .95;
+		DataBead params = AddReverb.defaultParams();
+		params.put(AddReverb.ROOM_SIZE, .95);
 		addfx(sax, new AddReverb(params));
 		
 		Instrument str = instr(ARACHNO, 41);
