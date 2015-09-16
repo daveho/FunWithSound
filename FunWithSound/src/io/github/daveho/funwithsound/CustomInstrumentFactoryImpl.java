@@ -21,10 +21,10 @@ import java.util.Map;
 import net.beadsproject.beads.core.AudioContext;
 
 /**
- * Convenient base class for {@link CustomInstrumentFactory}
- * implementations.
+ * Convenient implementation of {@link CustomInstrumentFactory}.
+ * Maintains a map of custom instrument codes to creator callbacks.
  */
-public abstract class AbstractCustomInstrumentFactory implements CustomInstrumentFactory {
+public class CustomInstrumentFactoryImpl implements CustomInstrumentFactory {
 	/**
 	 * Callback to create an {@link InstrumentInfo} for a custom instrument.
 	 */
@@ -40,12 +40,28 @@ public abstract class AbstractCustomInstrumentFactory implements CustomInstrumen
 	
 	private Map<Integer, CreateCustomInstrument> creatorMap;
 	
-	public AbstractCustomInstrumentFactory() {
+	/**
+	 * Constructor.  The arguments should be a sequence of pairs
+	 * of <code>Integer,CreateCustomInstrument</code> specifying custom
+	 * instrument codes and the creator callbacks for those codes.
+	 */
+	public CustomInstrumentFactoryImpl(Object... pairs) {
 		this.creatorMap = new HashMap<Integer, CreateCustomInstrument>();
+		if (pairs.length % 2 != 0) {
+			throw new IllegalArgumentException("There should be an even number of arguments");
+		}
+		for (int i = 0; i < pairs.length; i += 2) {
+			Integer code = (Integer) pairs[i];
+			CreateCustomInstrument creator = (CreateCustomInstrument) pairs[i+1];
+			addCreator(code, creator);
+		}
 	}
 	
 	/**
 	 * Add a creator callback for a custom instrument.
+	 * (It is generally not necessary to call this method directly
+	 * if all creator callbacks for all custom instruments have been
+	 * registered by the constructor.)
 	 * 
 	 * @param code     the code of the custom instrument
 	 * @param creator  the creator callback

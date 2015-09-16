@@ -1,6 +1,6 @@
 package io.github.daveho.funwithsound.demo;
 
-import io.github.daveho.funwithsound.AbstractCustomInstrumentFactory;
+import io.github.daveho.funwithsound.CustomInstrumentFactoryImpl;
 import io.github.daveho.funwithsound.AddDelay;
 import io.github.daveho.funwithsound.AddFlanger;
 import io.github.daveho.funwithsound.AddOscillatingBandPassFilter;
@@ -110,8 +110,8 @@ public class Demo6 extends DemoBase {
 	
 	@Override
 	protected void onCreatePlayer(Player player) {
-		CustomInstrumentFactory fac = new AbstractCustomInstrumentFactory() {{
-			addCreator(0, new CreateCustomInstrument() {
+		CustomInstrumentFactory fac = new CustomInstrumentFactoryImpl(
+			0, new CustomInstrumentFactoryImpl.CreateCustomInstrument() {
 				@Override
 				public InstrumentInfo create(AudioContext ac) {
 					BandpassFilterMonoSynthUGen.Params params = BandpassFilterMonoSynthUGen.defaultParams();
@@ -128,8 +128,8 @@ public class Demo6 extends DemoBase {
 							new double[]{1.0, /*0.2, 0.5, 0.1, 0.4,*/ 0.7});
 					return new InstrumentInfo(synth, ac);
 				}
-			});
-			addCreator(1, new CreateCustomInstrument() {
+			},
+			1, new CustomInstrumentFactoryImpl.CreateCustomInstrument() {
 				@Override
 				public InstrumentInfo create(AudioContext ac) {
 					MonoSynthUGen.Params params = MonoSynthUGen.defaultParams();
@@ -143,7 +143,7 @@ public class Demo6 extends DemoBase {
 					return new InstrumentInfo(synth, ac);
 				}
 			});
-		}};
+		
 		player.setCustomInstrumentFactory(fac);
 	}
 	
