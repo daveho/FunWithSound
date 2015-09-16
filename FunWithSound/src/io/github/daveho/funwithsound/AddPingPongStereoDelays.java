@@ -84,12 +84,12 @@ public class AddPingPongStereoDelays implements AddEffect {
 		for (int i = 0; i < numDelays; i++) {
 			double delayMs = Math.ceil(Util.getDouble(params, DELAY_MS) * (i+1));
 			int delaySamples = (int) Math.ceil(ac.msToSamples(delayMs));
-			System.out.printf("Delay by %d samples\n", delaySamples);
+			//System.out.printf("Delay by %d samples\n", delaySamples);
 			CombFilter cf = new CombFilter(ac, delaySamples);
 			cf.setDelay(delaySamples);
 			cf.setA(0.0f);
 			float curGain = firstDelayGain - i*gainDrop;
-			System.out.printf("Set delay gain to %f\n", curGain);
+			//System.out.printf("Set delay gain to %f\n", curGain);
 			cf.setG(curGain);
 			cf.setH(0.0f);
 			cf.addInput(info.tail);
