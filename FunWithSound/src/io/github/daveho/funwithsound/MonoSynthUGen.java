@@ -24,6 +24,8 @@ import net.beadsproject.beads.core.Bead;
 import net.beadsproject.beads.core.UGen;
 import net.beadsproject.beads.core.UGenChain;
 import net.beadsproject.beads.data.Buffer;
+import net.beadsproject.beads.data.DataBead;
+import net.beadsproject.beads.data.DataBeadReceiver;
 import net.beadsproject.beads.data.Pitch;
 import net.beadsproject.beads.ugens.Envelope;
 import net.beadsproject.beads.ugens.Function;
@@ -37,40 +39,40 @@ import net.beadsproject.beads.ugens.WavePlayer;
  * parts of a composition (as the runtime implementation of
  * a custom {@link Instrument}.)  It actually sounds pretty
  * decent!
+ * Accepts parameter configuration via a DataBead.
  */
-public class MonoSynthUGen extends UGenChain {
-	/**
-	 * Parameters.
-	 */
-	public static class Params {
-		/** Glide time between notes (for portamento). */
-		public double glideTimeMs;
-		/** Time to ramp up to full gain when note starts. */
-		public double attackTimeMs;
-		/** Time to decay to silence when note ends. */
-		public double decayTimeMs;
-		/** Minimum gain (for notes with velocity 0.) */
-		public double minGain;
-	}
+public class MonoSynthUGen extends UGenChain implements DataBeadReceiver {
+	/** DataBead property name: Glide time between notes (for portamento). */
+	public static final String GLIDE_TIME_MS = "glideTimeMs";
+	/** DataBead property name: Time to ramp up to full gain when note starts. */
+	public static final String ATTACK_TIME_MS = "attackTimeMs";
+	/** DataBead property name: Time to decay to silence when note ends. */
+	public static final String DECAY_TIME_MS = "decayTimeMs";
+	/** DataBead property name: Minimum gain (for notes with velocity 0.) */
+	public static final String MIN_GAIN = "minGain";
 	
 	/**
 	 * Get default parameters.  These are abitrary, but sound pretty good.
 	 * @return
 	 */
-	public static Params defaultParams() {
-		Params params = new Params();
+	public static DataBead defaultParams() {
+		DataBead params = new DataBead();
 		setToDefault(params);
 		return params;
 	}
 
-	public static void setToDefault(Params params) {
-		params.glideTimeMs = 200;
-		params.attackTimeMs = 20;
-		params.decayTimeMs = 200;
-		params.minGain = .1f;
+	/**
+	 * Fill the given DataBead with the default parameters.
+	 * @param params the DataBead to fill
+	 */
+	public static void setToDefault(DataBead params) {
+		params.put(GLIDE_TIME_MS, 200f);
+		params.put(ATTACK_TIME_MS, 20f);
+		params.put(DECAY_TIME_MS, 200f);
+		params.put(MIN_GAIN, 0.1f);
 	}
 	
-	private Params params;
+	private DataBead params;
 	private double[] freqMult; // what frequencies are played (multiples of the note frequency)
 	private Glide freq;
 	private WavePlayer[] player;
@@ -87,7 +89,7 @@ public class MonoSynthUGen extends UGenChain {
 	 * @param buffer  the buffer type (sine, square, triangle, etc.)
 	 * @param params  parameters to control attack/decay, glide time, etc.
 	 */
-	public MonoSynthUGen(AudioContext ac, Buffer buffer, Params params) {
+	public MonoSynthUGen(AudioContext ac, Buffer buffer, DataBead params) {
 		this(ac, buffer, params, new double[]{ 1.0 });
 	}
 	
@@ -100,7 +102,7 @@ public class MonoSynthUGen extends UGenChain {
 	 * @param params  parameters to control attack/decay, glide time, etc.
 	 * @param freqMult create oscillators to play these multiples of the note frequency 
 	 */
-	public MonoSynthUGen(AudioContext ac, Buffer buffer, Params params, double[] freqMult) {
+	public MonoSynthUGen(AudioContext ac, Buffer buffer, DataBead params, double[] freqMult) {
 		this(ac, buffer, params, freqMult, Util.filledDoubleArray(freqMult.length, 1.0));
 	}
 	
@@ -115,7 +117,7 @@ public class MonoSynthUGen extends UGenChain {
 	 * @param freqMult create oscillators to play these multiples of the note frequency 
 	 * @param oscGains the gains for each oscillator
 	 */
-	public MonoSynthUGen(AudioContext ac, Buffer buffer, Params params, double[] freqMult, double[] oscGains) {
+	public MonoSynthUGen(AudioContext ac, Buffer buffer, DataBead params, double[] freqMult, double[] oscGains) {
 		super(ac, 0, 2);
 		
 		this.params = params;
@@ -147,7 +149,7 @@ public class MonoSynthUGen extends UGenChain {
 			gain.addInput(outGains[i]);
 		}
 		
-		freq.setGlideTime((float)params.glideTimeMs);
+		freq.setGlideTime(Util.getFloat(params, GLIDE_TIME_MS));
 		
 		UGen output = gain;
 		output = createOutputUGen(ac, output);
@@ -160,7 +162,7 @@ public class MonoSynthUGen extends UGenChain {
 	 * 
 	 * @return the parameters
 	 */
-	public Params getParams() {
+	public DataBead getParams() {
 		return params;
 	}
 	
@@ -220,8 +222,9 @@ public class MonoSynthUGen extends UGenChain {
 		gainEnv.clear();
 		
 		int velocity = smsg.getData2();
-		float gain = (float)params.minGain + ((1.0f - (float)params.minGain) * velocity/127.0f);
-		gainEnv.addSegment(gain, (float)params.attackTimeMs);
+		float minGain = Util.getFloat(params, MIN_GAIN);
+		float gain = minGain + ((1.0f - minGain) * (velocity/127.0f));
+		gainEnv.addSegment(gain, Util.getFloat(params, ATTACK_TIME_MS));
 		freq.setValue(Pitch.mtof(note));
 		this.note = note;
 	}
@@ -235,6 +238,13 @@ public class MonoSynthUGen extends UGenChain {
 	 * @param note the MIDI note number
 	 */
 	protected void onNoteOff(int note) {
-		gainEnv.addSegment(0.0f, (float)params.decayTimeMs);
+		gainEnv.addSegment(0.0f, Util.getFloat(params, DECAY_TIME_MS));
+	}
+
+	@Override
+	public DataBeadReceiver sendData(DataBead data) {
+		params.clear();
+		params.putAll(data);
+		return this;
 	}
 }

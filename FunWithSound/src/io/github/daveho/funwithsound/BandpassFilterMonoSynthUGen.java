@@ -20,6 +20,8 @@ import javax.sound.midi.ShortMessage;
 import net.beadsproject.beads.core.AudioContext;
 import net.beadsproject.beads.core.UGen;
 import net.beadsproject.beads.data.Buffer;
+import net.beadsproject.beads.data.DataBead;
+import net.beadsproject.beads.data.DataBeadReceiver;
 import net.beadsproject.beads.data.Pitch;
 import net.beadsproject.beads.ugens.BiquadFilter;
 import net.beadsproject.beads.ugens.Envelope;
@@ -29,34 +31,33 @@ import net.beadsproject.beads.ugens.Envelope;
  * notes with a bandpass filter.  The bandpass filter's center frequency
  * glides from a start frequency to a "rise" frequency, and then glides
  * from the rise frequency back to the start frequency.
+ * Accepts parameter configuration via a DataBead.
  */
-public class BandpassFilterMonoSynthUGen extends MonoSynthUGen {
-	public static class Params extends MonoSynthUGen.Params {
-		/** Start frequency (expressed as a multiple of the note frequency). */
-		public double startEndFreqFactor;
-		/** Rise frequency (expressed as a multiple of the note frequency). */
-		public double riseFreqFactor;
-		/** Time to rise from the start frequency to the rise frequency. */
-		public double riseTimeMs;
-		/** Time to decay from the rise frequency back to the start frequency. */
-		public double decayTimeMs;
-		/** Curvature of the glides from start to rise and back. */
-		public double curvature;
-	}
+public class BandpassFilterMonoSynthUGen extends MonoSynthUGen implements DataBeadReceiver {
+	/** DataBead property name: Start frequency (expressed as a multiple of the note frequency). */
+	public static final String START_END_FREQ_FACTOR = "startEndFreqFactor";
+	/** DataBead property name: Rise frequency (expressed as a multiple of the note frequency). */
+	public static final String RISE_FREQ_FACTOR = "riseFreqFactor";
+	/** DataBead property name: Time to rise from the start frequency to the rise frequency. */
+	public static final String RISE_TIME_MS = "riseTimeMs";
+	/** DataBead property name: Time to decay from the rise frequency back to the start frequency. */
+	public static final String DECAY_TIME_MS = "decayTimeMs";
+	/** DataBead property name: Curvature of the glides from start to rise and back. */
+	public static final String CURVATURE = "curvature";
 	
 	/**
 	 * Get the default parameters.
 	 * 
 	 * @return the default parameters
 	 */
-	public static Params defaultParams() {
-		Params params = new Params();
+	public static DataBead defaultParams() {
+		DataBead params = new DataBead();
 		MonoSynthUGen.setToDefault(params);
-		params.startEndFreqFactor = .25;
-		params.riseFreqFactor = 4;
-		params.riseTimeMs = 200;
-		params.decayTimeMs = 1000;
-		params.curvature = .25;
+		params.put(START_END_FREQ_FACTOR, .25f);
+		params.put(RISE_FREQ_FACTOR, 4f);
+		params.put(RISE_TIME_MS, 200f);
+		params.put(DECAY_TIME_MS, 1000f);
+		params.put(CURVATURE, .25);
 		return params;
 	}
 	
@@ -70,7 +71,7 @@ public class BandpassFilterMonoSynthUGen extends MonoSynthUGen {
 	 * @param buffer  the buffer type (sine, square, triangle, etc.)
 	 * @param params  parameters to control attack/decay, glide time, etc.
 	 */
-	public BandpassFilterMonoSynthUGen(AudioContext ac, Buffer buffer, Params params) {
+	public BandpassFilterMonoSynthUGen(AudioContext ac, Buffer buffer, DataBead params) {
 		super(ac, buffer, params);
 	}
 	
@@ -82,7 +83,7 @@ public class BandpassFilterMonoSynthUGen extends MonoSynthUGen {
 	 * @param params  parameters to control attack/decay, glide time, etc.
 	 * @param freqMult create oscillators to play these multiples of the note frequency 
 	 */
-	public BandpassFilterMonoSynthUGen(AudioContext ac, Buffer buffer, Params params, double[] freqMult) {
+	public BandpassFilterMonoSynthUGen(AudioContext ac, Buffer buffer, DataBead params, double[] freqMult) {
 		super(ac, buffer, params, freqMult);
 	}
 	
@@ -95,13 +96,8 @@ public class BandpassFilterMonoSynthUGen extends MonoSynthUGen {
 	 * @param freqMult create oscillators to play these multiples of the note frequency 
 	 * @param oscGains the gains for each oscillator
 	 */
-	public BandpassFilterMonoSynthUGen(AudioContext ac, Buffer buffer, Params params, double[] freqMult, double[] oscGains) {
+	public BandpassFilterMonoSynthUGen(AudioContext ac, Buffer buffer, DataBead params, double[] freqMult, double[] oscGains) {
 		super(ac, buffer, params, freqMult, oscGains);
-	}
-	
-	@Override
-	public Params getParams() {
-		return (Params) super.getParams();
 	}
 	
 	@Override
@@ -116,14 +112,23 @@ public class BandpassFilterMonoSynthUGen extends MonoSynthUGen {
 	
 	@Override
 	protected void onNoteOn(ShortMessage smsg, int note) {
+		DataBead params = getParams();
+		
 		super.onNoteOn(smsg, note);
 		centerFreqEnv.clear();
-		float minFreq = (float)(getParams().startEndFreqFactor * Pitch.mtof(note));
-		float maxFreq = (float)(getParams().riseFreqFactor * Pitch.mtof(note));
+		float minFreq = Util.getFloat(params, START_END_FREQ_FACTOR) * Pitch.mtof(note);
+		float maxFreq = Util.getFloat(params, RISE_FREQ_FACTOR) * Pitch.mtof(note);
 		centerFreqEnv.setValue(minFreq);
 		
-		centerFreqEnv.addSegment(maxFreq, (float)getParams().riseTimeMs, (float)getParams().curvature);
-		centerFreqEnv.addSegment(minFreq, (float)getParams().decayTimeMs, (float)getParams().curvature);
+		float curvature = Util.getFloat(params, CURVATURE);
+		centerFreqEnv.addSegment(maxFreq, Util.getFloat(params, RISE_TIME_MS), curvature);
+		centerFreqEnv.addSegment(minFreq, Util.getFloat(params, DECAY_TIME_MS), curvature);
 	}
 
+	@Override
+	public DataBeadReceiver sendData(DataBead data) {
+		getParams().clear();
+		getParams().putAll(data);
+		return this;
+	}
 }

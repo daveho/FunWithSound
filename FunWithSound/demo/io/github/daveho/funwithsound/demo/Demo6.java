@@ -29,7 +29,7 @@ public class Demo6 extends DemoBase {
 	public void create() {
 		tempo(120, 8);
 		
-		Instrument tr808 = percussion(HS_TR808);
+		Instrument tr808 = percussion(TR808);
 		
 		Instrument monosynth = custom(0);
 		v(monosynth, 0.4);
@@ -108,12 +108,12 @@ public class Demo6 extends DemoBase {
 			0, new CustomInstrumentFactoryImpl.CreateCustomInstrument() {
 				@Override
 				public InstrumentInfo create(AudioContext ac) {
-					BandpassFilterMonoSynthUGen.Params params = BandpassFilterMonoSynthUGen.defaultParams();
-					params.attackTimeMs = 10;
-					params.glideTimeMs = 40;
-					params.startEndFreqFactor = .5;
-					params.riseFreqFactor = 4;
-					params.curvature = .25;
+					DataBead params = BandpassFilterMonoSynthUGen.defaultParams();
+					params.put(MonoSynthUGen.ATTACK_TIME_MS, 10);
+					params.put(MonoSynthUGen.GLIDE_TIME_MS, 40);
+					params.put(BandpassFilterMonoSynthUGen.START_END_FREQ_FACTOR, .5);
+					params.put(BandpassFilterMonoSynthUGen.RISE_FREQ_FACTOR, 4);
+					params.put(BandpassFilterMonoSynthUGen.CURVATURE, .25);
 					BandpassFilterMonoSynthUGen synth = new BandpassFilterMonoSynthUGen(
 							ac,
 							Buffer.SINE,
@@ -126,8 +126,8 @@ public class Demo6 extends DemoBase {
 			1, new CustomInstrumentFactoryImpl.CreateCustomInstrument() {
 				@Override
 				public InstrumentInfo create(AudioContext ac) {
-					MonoSynthUGen.Params params = MonoSynthUGen.defaultParams();
-					params.glideTimeMs = 40;
+					DataBead params = MonoSynthUGen.defaultParams();
+					params.put(MonoSynthUGen.GLIDE_TIME_MS, 40);
 					MonoSynthUGen synth = new MonoSynthUGen(
 							ac,
 							Buffer.SAW,
