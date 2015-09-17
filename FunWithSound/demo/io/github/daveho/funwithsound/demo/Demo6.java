@@ -55,6 +55,9 @@ public class Demo6 extends DemoBase {
 		addfx(monosynth2, new AddOscillatingBandPassFilter(200, 1200, 0.125));
 		addfx(monosynth2, new AddReverb());
 		
+		Instrument blarp = instr(MINIMOOG, 11);
+		
+		
 //		Rhythm clickr = rr(s(0,.5,101), 1, 8);
 //		Figure clickf = pf(clickr, 42, tr909);
 		
@@ -81,13 +84,13 @@ public class Demo6 extends DemoBase {
 		
 		Figure percf = gf(hihatf,drumf,/*hihat_fill1f,hihat_fill2f,clapf,*/kickf,stickf);
 		
-		Rhythm bassr = r(
-				s(0.000,.45,96), s(.5,1.5,99), s(2,20,75),
-				s(4,0.45,65), s(4.5,1.5,96), s(5.5,.9,77), s(6.5,.45,73), s(7,.9,69));
-		Melody bassm = m(
-				an(36), an(38), an(53),
-				an(36), an(38), an(50), an(48), an(47));
-		Figure bassf = f(bassr, bassm, monosynth);
+//		Rhythm bassr = r(
+//				s(0.000,.45,96), s(.5,1.5,99), s(2,20,75),
+//				s(4,0.45,65), s(4.5,1.5,96), s(5.5,.9,77), s(6.5,.45,73), s(7,.9,69));
+//		Melody bassm = m(
+//				an(36), an(38), an(53),
+//				an(36), an(38), an(50), an(48), an(47));
+//		Figure bassf = f(bassr, bassm, monosynth);
 		
 //		Rhythm lead1r = r(
 //				s(0.000,4.925,127), s(4.886,1.879,96), s(6.661,1.345,80), s(7.970,5.028,110), s(12.937,1.921,102), s(14.734,1.050,83), s(15.708,2.266,80), s(17.920,3.073,76), s(20.926,0.517,67), s(21.377,0.992,83), s(22.310,1.639,93), s(23.897,0.467,80), s(24.339,1.848,96), s(26.142,1.914,102), s(28.064,0.687,90), s(28.699,0.925,79), s(29.491,1.262,99), s(30.588,0.592,102), s(31.083,0.980,60), s(32.082,3.898,102), s(35.935,9.057,74), s(44.946,0.635,79), s(45.533,0.840,102), s(46.371,0.682,74), s(47.004,1.035,93), s(47.980,0.834,79), s(48.689,0.928,99), s(49.574,3.325,83), s(52.869,0.570,75), s(53.421,1.030,93), s(54.428,0.548,78), s(54.979,0.538,71), s(55.372,0.654,74), s(56.016,6.375,102));
@@ -116,6 +119,12 @@ public class Demo6 extends DemoBase {
 				an(71), an(72), an(71), an(72));
 		Figure lead1f= f(lead1r, lead1m, monosynth2);
 		
+//		Rhythm bassr = r(
+//				s(0.000,12.021,118), s(12.012,4.039,106), s(16.044,8.012,118), s(24.034,4.489,106), s(28.506,0.462,96), s(28.963,0.481,96), s(29.388,1.017,106), s(30.398,0.480,102), s(30.863,1.132,99), s(31.943,8.054,110), s(40.001,3.935,102), s(43.926,4.013,83), s(47.889,8.207,102), s(56.109,4.325,102), s(60.423,0.488,85), s(60.891,0.531,90), s(61.374,1.113,102), s(62.475,0.506,96), s(63.010,1.030,87), s(64.075,8.219,106));
+//		Melody bassm = m(
+//				an(48), an(55), an(48), an(55), an(52), an(53), an(52), an(53), an(47), an(48), an(53), an(55), an(48), an(55), an(52), an(53), an(52), an(53), an(47), an(48));
+//		Figure bassf = f(bassr, bassm, blarp);
+		
 //		add1(gf(percf,bassf));
 //		add1(gf(percf,bassf));
 //		add1(gf(percf,bassf,lead1f));
@@ -129,6 +138,8 @@ public class Demo6 extends DemoBase {
 		
 //		add1(gf(percf));
 //		add1(gf(percf));
+		add1(gf(percf));
+		add1(gf(percf));
 		add1(gf(percf,lead1f));
 		add1(gf(percf));
 		add1(gf(percf));
@@ -137,10 +148,18 @@ public class Demo6 extends DemoBase {
 		add1(gf(percf));
 		add1(gf(percf));
 		add1(gf(percf));
+//		add1(gf(percf,lead1f,bassf));
+//		add1(gf(percf));
+//		add1(gf(percf));
+//		add1(gf(percf));
+//		add1(gf(percf));
+//		add1(gf(percf));
+//		add1(gf(percf));
+//		add1(gf(percf));
 		add1(gf(percf));
 		add1(gf(percf));
 		
-		audition(monosynth2);
+//		audition(blarp);
 	}
 	
 	@Override
