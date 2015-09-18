@@ -26,6 +26,8 @@ import io.github.daveho.funwithsound.Strike;
 
 public abstract class DemoBase extends Composer {
 	private static final String SOUNDFONT_DIR = "/home/dhovemey/SoundFonts";
+	
+	public static final String SAMPLE_DIR = "/home/dhovemey/Samples";
 
 	// Some soundfonts
 	
