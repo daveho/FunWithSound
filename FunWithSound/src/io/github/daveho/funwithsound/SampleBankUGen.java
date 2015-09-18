@@ -147,7 +147,9 @@ public class SampleBankUGen extends UGenChain {
 						sp.env.clear();
 						float middleTimeMs = durationMs - 2*RAMP_TIME_MS;
 						sp.env.addSegment(1.0f, RAMP_TIME_MS);
-						sp.env.addSegment(1.0f, middleTimeMs);
+						if (middleTimeMs > 0) {
+							sp.env.addSegment(1.0f, middleTimeMs);
+						}
 						sp.env.addSegment(0.0f, RAMP_TIME_MS);
 						
 						sp.player.start();
