@@ -19,7 +19,7 @@ package io.github.daveho.funwithsound;
  * Describes a range of a sample to be played
  * by {@link SampleBankUGen}.
  */
-class SampleRange {
+public class SampleRange {
 	final double startMs;
 	final double endMs;
 

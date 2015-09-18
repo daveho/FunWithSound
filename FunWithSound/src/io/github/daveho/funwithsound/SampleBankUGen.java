@@ -25,6 +25,7 @@ import javax.sound.midi.ShortMessage;
 
 import net.beadsproject.beads.core.AudioContext;
 import net.beadsproject.beads.core.Bead;
+import net.beadsproject.beads.core.UGen;
 import net.beadsproject.beads.core.UGenChain;
 import net.beadsproject.beads.data.Sample;
 import net.beadsproject.beads.ugens.Envelope;
@@ -108,12 +109,17 @@ public class SampleBankUGen extends UGenChain {
 		senvGain.setGain(sp.env);
 		senvGain.addInput(sp.player);
 		
+		// Give subclasses an opportunity to capture the sample player
+		// output and do something with it before it enters the
+		// per-sample static gain
+		UGen senvOut = createSampleOutput(ac, note, senvGain);
+		
 		// Create a single static Gain to control the volume of
 		// the sample
 		sp.out = new Gain(ac, 2);
 		System.out.printf("Setting static gain for sample %d to %f\n", note, gain);
 		sp.out.setGain((float)gain);
-		sp.out.addInput(senvGain);
+		sp.out.addInput(senvOut);
 		
 		// Range of the sample to be played
 		sp.range = range;
@@ -123,6 +129,21 @@ public class SampleBankUGen extends UGenChain {
 		
 		// Feed the sample player's output into the mixer UGen
 		mixer.addInput(sp.out);
+	}
+
+	/**
+	 * Returns the UGen that should be the output of the
+	 * sample player before it enters the per-sample gain UGen.
+	 * By default, just returns the parameter (the sample player gain
+	 * envelope UGen.) Subclasses may override to attach effects.
+	 * 
+	 * @param ac the AudioContext 
+	 * @param note the MIDI note corresponding to this sample
+	 * @param senvGain the output of the sampler player's gain envelope UGen
+	 * @return sample player output
+	 */
+	protected UGen createSampleOutput(AudioContext ac, int note, Gain senvGain) {
+		return senvGain;
 	}
 
 	@Override
