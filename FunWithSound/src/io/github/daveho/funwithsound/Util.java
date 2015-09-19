@@ -86,6 +86,29 @@ public class Util {
 	}
 	
 	/**
+	 * Create a UGen that generates a sine wave ranging between specified
+	 * minimum and maximum values, oscillating at the frequency
+	 * specified by a UGen.
+	 * 
+	 * @param ac    the AudioContext
+	 * @param min   the minimum value in the range
+	 * @param max   the maximum value in the range
+	 * @param freq  the oscillation frequency UGen
+	 * @return the UGen
+	 */
+	public static UGen getRangedSineFunction(AudioContext ac, final double min, double max, UGen freq) {
+		WavePlayer sin = new WavePlayer(ac, freq, Buffer.SINE);
+		final float range = (float)(max - min);
+		return new Function(sin) {
+			@Override
+			public float calculate() {
+				float f = (x[0] + 1.0f) / 2.0f;
+				return (float)(min + f*range);
+			}
+		};
+	}
+	
+	/**
 	 * Compute the multiplier needed to shift a frequency up
 	 * or down by specified number of half steps. 
 	 * 
@@ -137,4 +160,21 @@ public class Util {
 		Number val = (Number) params.get(propName);
 		return val.intValue();
 	}
+
+//	/**
+//	 * Multiply output of given input UGen by given multiple.
+//	 * 
+//	 * @param input the input UGen
+//	 * @param fac the multiple
+//	 * @return UGen which multiplies the input UGen by the given multiple
+//	 */
+//	public static UGen multiply(UGen input, double fac) {
+//		final float f = (float)fac;
+//		return new Function(input) {
+//			@Override
+//			public float calculate() {
+//				return x[0] * f;
+//			}
+//		};
+//	}
 }

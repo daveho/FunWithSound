@@ -15,10 +15,11 @@
 
 package io.github.daveho.funwithsound;
 
+import io.github.daveho.gervill4beads.Midi;
+
 import javax.sound.midi.MidiMessage;
 import javax.sound.midi.ShortMessage;
 
-import io.github.daveho.gervill4beads.Midi;
 import net.beadsproject.beads.core.AudioContext;
 import net.beadsproject.beads.core.Bead;
 import net.beadsproject.beads.core.UGen;
@@ -75,7 +76,7 @@ public class MonoSynthUGen extends UGenChain implements DataBeadReceiver {
 	private DataBead params;
 	private double[] freqMult; // what frequencies are played (multiples of the note frequency)
 	private Glide freq;
-	private WavePlayer[] player;
+	private UGen[] player; // the oscillator UGens
 	private Envelope gainEnv;
 	private Gain gain;
 	private Gain[] outGains;
@@ -139,7 +140,7 @@ public class MonoSynthUGen extends UGenChain implements DataBeadReceiver {
 					return (float)MonoSynthUGen.this.freqMult[index] * x[0];
 				}
 			};
-			player[i] = new WavePlayer(ac, multFreq, buffer);
+			player[i] = createOscillator(ac, buffer, multFreq);
 			
 			outGains[i] = new Gain(ac, 2);
 			outGains[i].setGain((float)oscGains[i]);
@@ -155,6 +156,20 @@ public class MonoSynthUGen extends UGenChain implements DataBeadReceiver {
 		output = createOutputUGen(ac, output);
 
 		addToChainOutput(output);
+	}
+
+	/**
+	 * Create an oscillator UGen.  The default implementation creates
+	 * a WavePlayer controlled by the given frequency UGen.
+	 * Subclasses may override.
+	 * 
+	 * @param ac the AudioContext
+	 * @param buffer the Buffer specifying the type of signal to generate
+	 * @param freqUGen the frequency UGen
+	 * @return the oscillator UGen
+	 */
+	protected UGen createOscillator(AudioContext ac, Buffer buffer, UGen freqUGen) {
+		return new WavePlayer(ac, freqUGen, buffer);
 	}
 	
 	/**

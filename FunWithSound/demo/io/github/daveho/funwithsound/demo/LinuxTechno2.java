@@ -30,6 +30,7 @@ import io.github.daveho.funwithsound.SampleRange;
 import io.github.daveho.funwithsound.WeirdSampleBankUGen;
 
 import java.io.IOException;
+import java.util.Random;
 
 import javax.sound.midi.MidiUnavailableException;
 
@@ -133,10 +134,10 @@ public class LinuxTechno2 extends DemoBase {
 
 		// Stutter "Linux" pattern
 		Rhythm llr = rr(p(0), .5, 5);
-		Melody llm = m(an(1),an(1),an(5),an(4),an(1));
+		Melody llm = m(an(8),an(9),an(5),an(4),an(1));
 		Figure llf = f(llr, llm, sp);
 		
-		Melody llm2 = m(an(1),an(1),an(7),an(6),an(1));
+		Melody llm2 = m(an(10),an(11),an(7),an(6),an(1));
 		Figure llf2 = f(llr, llm2, sp);
 		
 		
@@ -226,20 +227,33 @@ public class LinuxTechno2 extends DemoBase {
 					public RealizedInstrument create(AudioContext ac) {
 						WeirdSampleBankUGen spu = new WeirdSampleBankUGen(ac);
 						// These samples are local to the project - sorry, Github
-						spu.addSample(0, SampleManager.sample("samples/torvalds-says-linux-noclip.wav"), 0.7, 110.0);
-						spu.addSample(1, SampleManager.sample("samples/torvalds-says-linux-noclip.wav"), 0.9, new SampleRange(3162,  3600), 440.0);
+						spu.addSample(0, SampleManager.sample("samples/torvalds-says-linux-noclip.wav"), 0.7, randFreq());
+						spu.addSample(1, SampleManager.sample("samples/torvalds-says-linux-noclip.wav"), 0.9, new SampleRange(3162,  3600)/*, randFreq()*/);
 						spu.addSample(2, SampleManager.sample("samples/201571__julien-matthey__jm-fx-boom-01a.wav"), 0.4);
 
-						spu.addSample(3, SampleManager.sample("samples/torvalds-says-linux-noclip.wav"), 0.7, 880.0);
-						spu.addSample(4, SampleManager.sample("samples/torvalds-says-linux-noclip.wav"), 0.9, new SampleRange(3162,  3600), 880.0);
-						spu.addSample(5, SampleManager.sample("samples/torvalds-says-linux-noclip.wav"), 0.9, new SampleRange(3162,  3600), 1760.0);
+						spu.addSample(3, SampleManager.sample("samples/torvalds-says-linux-noclip.wav"), 0.7, randFreq());
+						spu.addSample(4, SampleManager.sample("samples/torvalds-says-linux-noclip.wav"), 0.9, new SampleRange(3162,  3600), randFreq());
+						spu.addSample(5, SampleManager.sample("samples/torvalds-says-linux-noclip.wav"), 0.9, new SampleRange(3162,  3600), randFreq());
 						
-						spu.addSample(6, SampleManager.sample("samples/torvalds-says-linux-noclip.wav"), 0.9, new SampleRange(3162,  3600), 110.0);
-						spu.addSample(7, SampleManager.sample("samples/torvalds-says-linux-noclip.wav"), 0.9, new SampleRange(3162,  3600), 220.0);
+						spu.addSample(6, SampleManager.sample("samples/torvalds-says-linux-noclip.wav"), 0.9, new SampleRange(3162,  3600), randFreq());
+						spu.addSample(7, SampleManager.sample("samples/torvalds-says-linux-noclip.wav"), 0.9, new SampleRange(3162,  3600), randFreq());
+						spu.addSample(8, SampleManager.sample("samples/torvalds-says-linux-noclip.wav"), 0.9, new SampleRange(3162,  3600), randFreq());
+						spu.addSample(9, SampleManager.sample("samples/torvalds-says-linux-noclip.wav"), 0.9, new SampleRange(3162,  3600), randFreq());
+						spu.addSample(10, SampleManager.sample("samples/torvalds-says-linux-noclip.wav"), 0.9, new SampleRange(3162,  3600), randFreq());
+						spu.addSample(11, SampleManager.sample("samples/torvalds-says-linux-noclip.wav"), 0.9, new SampleRange(3162,  3600), randFreq());
 
 						return new RealizedInstrument(spu, ac);
 					}
 				}));
+	}
+	
+	Random rng = new Random(1234567L);
+	final double minFreq = 100.0;
+	final double maxFreq = 2000.0;
+	private double randFreq() {
+		double freq = minFreq + (rng.nextDouble() * (maxFreq-minFreq));
+		System.out.printf("Random freq=%f\n", freq);
+		return freq;
 	}
 	
 	public static void main(String[] args) throws MidiUnavailableException, IOException {
