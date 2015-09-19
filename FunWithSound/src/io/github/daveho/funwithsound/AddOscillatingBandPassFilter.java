@@ -48,7 +48,7 @@ public class AddOscillatingBandPassFilter implements AddEffect {
 	public UGen apply(AudioContext ac, RealizedInstrument info) {
 		BiquadFilter filter = new BiquadFilter(ac, 2, BiquadFilter.Type.BP_SKIRT);
 		
-		UGen osc = Util.getRangedSineFunction(ac, minFreqHz, maxFreqHz, oscFreqHz);
+		UGen osc = Util.rangedSineFunction(ac, minFreqHz, maxFreqHz, oscFreqHz);
 		filter.setFrequency(osc);
 		
 		filter.addInput(info.tail);

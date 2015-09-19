@@ -42,8 +42,9 @@ public class FMMonoSynthUGen extends MonoSynthUGen {
 	@Override
 	protected UGen createOscillator(AudioContext ac, Buffer buffer, UGen freqUGen) {
 		this.modFreq = new Static(ac, 0.0f); // ctor will set the actual frequency
-		UGen mod = Util.getRangedSineFunction(ac, .5, 2, modFreq);
-//		UGen mod = new WavePlayer(ac, modFreq, Buffer.SINE);
+//		UGen mod = Util.rangedSineFunction(ac, -1, 1, modFreq);
+		UGen mod = new WavePlayer(ac, modFreq, Buffer.SAW);
+//		UGen mod = Util.rangedOscillator(ac, -1, 1, modFreq, Buffer.SAW);
 		
 		UGen modulatedFrequency = new Function(freqUGen, mod) {
 			@Override

@@ -73,8 +73,23 @@ public class Util {
 	 * @param freq  the oscillation frequency
 	 * @return the UGen
 	 */
-	public static UGen getRangedSineFunction(AudioContext ac, final double min, double max, double freq) {
-		WavePlayer sin = new WavePlayer(ac, (float)freq, Buffer.SINE);
+	public static UGen rangedSineFunction(AudioContext ac, final double min, double max, double freq) {
+		return rangedOscillator(ac, min, max, freq, Buffer.SINE);
+	}
+
+	/**
+	 * Create a UGen that generates a waveform ranging between specified
+	 * minimum and maximum values, oscillating at the specified frequency.
+	 * 
+	 * @param ac    the AudioContext
+	 * @param min   the minimum value in the range
+	 * @param max   the maximum value in the range
+	 * @param freq  the oscillation frequency
+	 * @param waveform the waveform (sine, square, etc.)
+	 * @return the UGen
+	 */
+	public static UGen rangedOscillator(AudioContext ac, final double min, double max, double freq, Buffer waveform) {
+		WavePlayer sin = new WavePlayer(ac, (float)freq, waveform);
 		final float range = (float)(max - min);
 		return new Function(sin) {
 			@Override
@@ -96,8 +111,25 @@ public class Util {
 	 * @param freq  the oscillation frequency UGen
 	 * @return the UGen
 	 */
-	public static UGen getRangedSineFunction(AudioContext ac, final double min, double max, UGen freq) {
-		WavePlayer sin = new WavePlayer(ac, freq, Buffer.SINE);
+	public static UGen rangedSineFunction(AudioContext ac, final double min, double max, UGen freq) {
+		Buffer waveform = Buffer.SINE;
+		return rangedOscillator(ac, min, max, freq, waveform);
+	}
+
+	/**
+	 * Create a UGen that generates a waveform ranging between specified
+	 * minimum and maximum values, oscillating at the frequency
+	 * specified by a UGen.
+	 * 
+	 * @param ac    the AudioContext
+	 * @param min   the minimum value in the range
+	 * @param max   the maximum value in the range
+	 * @param freq  the oscillation frequency UGen
+	 * @param waveform the waveform
+	 * @return the UGen
+	 */
+	public static UGen rangedOscillator(AudioContext ac, final double min, double max, UGen freq, Buffer waveform) {
+		WavePlayer sin = new WavePlayer(ac, freq, waveform);
 		final float range = (float)(max - min);
 		return new Function(sin) {
 			@Override

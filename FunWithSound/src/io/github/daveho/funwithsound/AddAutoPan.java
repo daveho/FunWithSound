@@ -45,7 +45,7 @@ public class AddAutoPan implements AddEffect {
 	@Override
 	public UGen apply(AudioContext ac, RealizedInstrument info) {
 		// Constrain the sine wave to be between min and max
-		UGen limitedSine = Util.getRangedSineFunction(ac, min, max, freqHz);
+		UGen limitedSine = Util.rangedSineFunction(ac, min, max, freqHz);
 		
 		Panner panner = new Panner(ac);
 		panner.setPos(limitedSine);

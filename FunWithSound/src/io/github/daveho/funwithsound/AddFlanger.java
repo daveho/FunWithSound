@@ -93,7 +93,7 @@ public class AddFlanger implements AddEffect {
 		CombFilter comb = new CombFilter(ac, maxdel);
 		
 		// Modulate the comb filter's delay with a sine function
-		UGen delay = Util.getRangedSineFunction(ac, mindel, maxdel, Util.getDouble(params, FREQ_HZ));
+		UGen delay = Util.rangedSineFunction(ac, mindel, maxdel, Util.getDouble(params, FREQ_HZ));
 	
 		comb.setDelay(delay);
 		comb.setA(Util.getFloat(params, A));

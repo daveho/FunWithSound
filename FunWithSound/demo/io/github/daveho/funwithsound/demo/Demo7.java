@@ -45,13 +45,13 @@ public class Demo7 extends DemoBase {
 					@Override
 					public RealizedInstrument create(AudioContext ac) {
 						DataBead params = MonoSynthUGen.defaultParams();
-						params.put(MonoSynthUGen.GLIDE_TIME_MS, 40);
+						params.put(MonoSynthUGen.GLIDE_TIME_MS, 80);
 						FMMonoSynthUGen u = new FMMonoSynthUGen(
 								ac,
 								Buffer.SINE,
 								params,
-								new double[]{1.0, 2.0, 4.0},
-								new double[]{1.0, .5, .1});
+								new double[]{1.0/*, 2.0, 4.0*/},
+								new double[]{1.0/*, .5, .1*/});
 						return new RealizedInstrument(u, ac);
 					}
 				});
