@@ -13,6 +13,7 @@ import io.github.daveho.funwithsound.FMMonoSynthUGen;
 import io.github.daveho.funwithsound.Figure;
 import io.github.daveho.funwithsound.Instrument;
 import io.github.daveho.funwithsound.MonoSynthUGen;
+import io.github.daveho.funwithsound.MonoSynthUGen2;
 import io.github.daveho.funwithsound.Player;
 import io.github.daveho.funwithsound.RealizedInstrument;
 import io.github.daveho.funwithsound.Rhythm;
@@ -46,7 +47,8 @@ public class Demo7 extends DemoBase {
 					public RealizedInstrument create(AudioContext ac) {
 						DataBead params = MonoSynthUGen.defaultParams();
 						params.put(MonoSynthUGen.GLIDE_TIME_MS, 80);
-						FMMonoSynthUGen u = new FMMonoSynthUGen(
+						//FMMonoSynthUGen u = new FMMonoSynthUGen(
+						MonoSynthUGen2 u = new MonoSynthUGen2(
 								ac,
 								Buffer.SINE,
 								params,

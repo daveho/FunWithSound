@@ -193,20 +193,20 @@ public class Util {
 		return val.intValue();
 	}
 
-//	/**
-//	 * Multiply output of given input UGen by given multiple.
-//	 * 
-//	 * @param input the input UGen
-//	 * @param fac the multiple
-//	 * @return UGen which multiplies the input UGen by the given multiple
-//	 */
-//	public static UGen multiply(UGen input, double fac) {
-//		final float f = (float)fac;
-//		return new Function(input) {
-//			@Override
-//			public float calculate() {
-//				return x[0] * f;
-//			}
-//		};
-//	}
+	/**
+	 * Multiply output of given input UGen by given multiple.
+	 * 
+	 * @param input the input UGen
+	 * @param fac the multiple
+	 * @return UGen which multiplies the input UGen by the given multiple
+	 */
+	public static UGen multiply(UGen input, double fac) {
+		final float f = (float)fac;
+		return new Function(input) {
+			@Override
+			public float calculate() {
+				return x[0] * f;
+			}
+		};
+	}
 }

@@ -44,13 +44,13 @@ import net.beadsproject.beads.ugens.WavePlayer;
  */
 public class MonoSynthUGen extends UGenChain implements DataBeadReceiver {
 	/** DataBead property name: Glide time between notes (for portamento). */
-	public static final String GLIDE_TIME_MS = "glideTimeMs";
+	public static final String GLIDE_TIME_MS = ParamNames.GLIDE_TIME_MS;
 	/** DataBead property name: Time to ramp up to full gain when note starts. */
-	public static final String ATTACK_TIME_MS = "attackTimeMs";
+	public static final String ATTACK_TIME_MS = ParamNames.ATTACK_TIME_MS;
 	/** DataBead property name: Time to decay to silence when note ends. */
-	public static final String DECAY_TIME_MS = "decayTimeMs";
+	public static final String RELEASE_TIME_MS = ParamNames.RELEASE_TIME_MS;
 	/** DataBead property name: Minimum gain (for notes with velocity 0.) */
-	public static final String MIN_GAIN = "minGain";
+	public static final String MIN_GAIN = ParamNames.MIN_GAIN;
 	
 	/**
 	 * Get default parameters.  These are abitrary, but sound pretty good.
@@ -69,7 +69,7 @@ public class MonoSynthUGen extends UGenChain implements DataBeadReceiver {
 	public static void setToDefault(DataBead params) {
 		params.put(GLIDE_TIME_MS, 200f);
 		params.put(ATTACK_TIME_MS, 20f);
-		params.put(DECAY_TIME_MS, 200f);
+		params.put(RELEASE_TIME_MS, 200f);
 		params.put(MIN_GAIN, 0.1f);
 	}
 	
@@ -134,12 +134,7 @@ public class MonoSynthUGen extends UGenChain implements DataBeadReceiver {
 		this.outGains = new Gain[freqMult.length];
 		for (int i = 0; i < freqMult.length; i++) {
 			final int index = i;
-			Function multFreq = new Function(freq) {
-				@Override
-				public float calculate() {
-					return (float)MonoSynthUGen.this.freqMult[index] * x[0];
-				}
-			};
+			UGen multFreq = Util.multiply(freq, MonoSynthUGen.this.freqMult[index]);
 			player[i] = createOscillator(ac, buffer, multFreq);
 			
 			outGains[i] = new Gain(ac, 2);
@@ -253,7 +248,7 @@ public class MonoSynthUGen extends UGenChain implements DataBeadReceiver {
 	 * @param note the MIDI note number
 	 */
 	protected void onNoteOff(int note) {
-		gainEnv.addSegment(0.0f, Util.getFloat(params, DECAY_TIME_MS));
+		gainEnv.addSegment(0.0f, Util.getFloat(params, RELEASE_TIME_MS));
 	}
 
 	@Override
