@@ -42,7 +42,7 @@ import net.beadsproject.beads.ugens.WavePlayer;
  * decent!
  * Accepts parameter configuration via a DataBead.
  */
-public class MonoSynthUGen extends UGenChain implements DataBeadReceiver {
+public class MonoSynthUGen2 extends UGenChain implements DataBeadReceiver {
 	/** DataBead property name: Glide time between notes (for portamento). */
 	public static final String GLIDE_TIME_MS = "glideTimeMs";
 	/** DataBead property name: Time to ramp up to full gain when note starts. */
@@ -76,7 +76,8 @@ public class MonoSynthUGen extends UGenChain implements DataBeadReceiver {
 	private DataBead params;
 	private double[] freqMult; // what frequencies are played (multiples of the note frequency)
 	private Glide freq;
-	private UGen[] player; // the oscillator UGens
+//	private UGen[] player; // the oscillator UGens
+	private Voice[] voices;
 	private Envelope gainEnv;
 	private Gain gain;
 	private Gain[] outGains;
@@ -90,7 +91,7 @@ public class MonoSynthUGen extends UGenChain implements DataBeadReceiver {
 	 * @param buffer  the buffer type (sine, square, triangle, etc.)
 	 * @param params  parameters to control attack/decay, glide time, etc.
 	 */
-	public MonoSynthUGen(AudioContext ac, Buffer buffer, DataBead params) {
+	public MonoSynthUGen2(AudioContext ac, Buffer buffer, DataBead params) {
 		this(ac, buffer, params, new double[]{ 1.0 });
 	}
 	
@@ -103,7 +104,7 @@ public class MonoSynthUGen extends UGenChain implements DataBeadReceiver {
 	 * @param params  parameters to control attack/decay, glide time, etc.
 	 * @param freqMult create oscillators to play these multiples of the note frequency 
 	 */
-	public MonoSynthUGen(AudioContext ac, Buffer buffer, DataBead params, double[] freqMult) {
+	public MonoSynthUGen2(AudioContext ac, Buffer buffer, DataBead params, double[] freqMult) {
 		this(ac, buffer, params, freqMult, Util.filledDoubleArray(freqMult.length, 1.0));
 	}
 	
@@ -118,7 +119,7 @@ public class MonoSynthUGen extends UGenChain implements DataBeadReceiver {
 	 * @param freqMult create oscillators to play these multiples of the note frequency 
 	 * @param oscGains the gains for each oscillator
 	 */
-	public MonoSynthUGen(AudioContext ac, Buffer buffer, DataBead params, double[] freqMult, double[] oscGains) {
+	public MonoSynthUGen2(AudioContext ac, Buffer buffer, DataBead params, double[] freqMult, double[] oscGains) {
 		super(ac, 0, 2);
 		
 		this.params = params;
@@ -130,22 +131,18 @@ public class MonoSynthUGen extends UGenChain implements DataBeadReceiver {
 
 		// Create WavePlayers to play frequencies that are multiples of
 		// the note frequency
-		this.player = new WavePlayer[freqMult.length];
+		//this.player = new WavePlayer[freqMult.length];
+		this.voices = new Voice[freqMult.length];
 		this.outGains = new Gain[freqMult.length];
 		for (int i = 0; i < freqMult.length; i++) {
 			final int index = i;
-			Function multFreq = new Function(freq) {
-				@Override
-				public float calculate() {
-					return (float)MonoSynthUGen.this.freqMult[index] * x[0];
-				}
-			};
-			player[i] = createOscillator(ac, buffer, multFreq);
+			UGen multFreq = Util.multiply(freq, freqMult[index]);
+			voices[i] = new WaveVoice(ac, buffer, multFreq); // TODO: make configurable
 			
 			outGains[i] = new Gain(ac, 2);
 			outGains[i].setGain((float)oscGains[i]);
 
-			outGains[i].addInput(player[i]);
+			outGains[i].addInput(voices[i].getOutput());
 			
 			gain.addInput(outGains[i]);
 		}
@@ -156,20 +153,6 @@ public class MonoSynthUGen extends UGenChain implements DataBeadReceiver {
 		output = createOutputUGen(ac, output);
 
 		addToChainOutput(output);
-	}
-
-	/**
-	 * Create an oscillator UGen.  The default implementation creates
-	 * a WavePlayer controlled by the given frequency UGen.
-	 * Subclasses may override.
-	 * 
-	 * @param ac the AudioContext
-	 * @param buffer the Buffer specifying the type of signal to generate
-	 * @param freqUGen the frequency UGen
-	 * @return the oscillator UGen
-	 */
-	protected UGen createOscillator(AudioContext ac, Buffer buffer, UGen freqUGen) {
-		return new WavePlayer(ac, freqUGen, buffer);
 	}
 	
 	/**
