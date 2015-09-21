@@ -28,30 +28,18 @@ import net.beadsproject.beads.data.Buffer;
 import net.beadsproject.beads.data.DataBead;
 import net.beadsproject.beads.data.DataBeadReceiver;
 import net.beadsproject.beads.data.Pitch;
-import net.beadsproject.beads.ugens.Envelope;
-import net.beadsproject.beads.ugens.Function;
 import net.beadsproject.beads.ugens.Gain;
 import net.beadsproject.beads.ugens.Glide;
-import net.beadsproject.beads.ugens.WavePlayer;
 
 /**
- * This is basically an experiment to try to create a custom
- * MIDI mono synth using Beads, and use it to render
- * parts of a composition (as the runtime implementation of
- * a custom {@link Instrument}.)  It actually sounds pretty
- * decent!
+ * Modular monosynth UGen.  Can be customized using
+ * {@link Voice} and {@link NoteEnvelope} objects.
+ * Each rendered note consists of arbitrary multiples of the
+ * base note frequency, each with an arbitrary static
+ * gain.
  * Accepts parameter configuration via a DataBead.
  */
-public class MonoSynthUGen2 extends UGenChain implements DataBeadReceiver {
-	/** DataBead property name: Glide time between notes (for portamento). */
-	public static final String GLIDE_TIME_MS = "glideTimeMs";
-	/** DataBead property name: Time to ramp up to full gain when note starts. */
-	public static final String ATTACK_TIME_MS = "attackTimeMs";
-	/** DataBead property name: Time to decay to silence when note ends. */
-	public static final String RELEASE_TIME_MS = "releaseTimeMs";
-	/** DataBead property name: Minimum gain (for notes with velocity 0.) */
-	public static final String MIN_GAIN = "minGain";
-	
+public class MonoSynthUGen2 extends UGenChain implements ParamNames, DataBeadReceiver {
 	/**
 	 * Get default parameters.  These are abitrary, but sound pretty good.
 	 * @return
@@ -74,13 +62,9 @@ public class MonoSynthUGen2 extends UGenChain implements DataBeadReceiver {
 	}
 	
 	private DataBead params;
-	private double[] freqMult; // what frequencies are played (multiples of the note frequency)
 	private Glide freq;
-//	private UGen[] player; // the oscillator UGens
 	private Voice[] voices;
-	private Envelope gainEnv;
-	private Gain gain;
-	private Gain[] outGains;
+	private NoteEnvelope noteEnv;
 	private int note;
 
 	/**
@@ -123,33 +107,43 @@ public class MonoSynthUGen2 extends UGenChain implements DataBeadReceiver {
 		super(ac, 0, 2);
 		
 		this.params = params;
-		this.freqMult = freqMult;
-		
-		freq = new Glide(ac);
-		gainEnv = new Envelope(ac);
-		gain = new Gain(ac, 2, gainEnv);
 
-		// Create WavePlayers to play frequencies that are multiples of
+		// Glide to control the note base frequency
+		freq = new Glide(ac);
+		freq.setGlideTime(Util.getFloat(params, GLIDE_TIME_MS)); // For portamento
+
+		// Mixer for all of the Voice outputs
+		Gain mixer = new Gain(ac, 2);
+
+		// Create Voices to play frequencies that are multiples of
 		// the note frequency
-		//this.player = new WavePlayer[freqMult.length];
 		this.voices = new Voice[freqMult.length];
-		this.outGains = new Gain[freqMult.length];
+		Gain[] outGains = new Gain[freqMult.length];
 		for (int i = 0; i < freqMult.length; i++) {
-			final int index = i;
-			UGen multFreq = Util.multiply(freq, freqMult[index]);
-			voices[i] = new WaveVoice(ac, buffer, multFreq); // TODO: make configurable
+			// UGen to multiply the note base frequency by the appropriate multiple
+			UGen multFreq = Util.multiply(freq, freqMult[i]);
 			
+			// Create a Voice for this multiple
+			// TODO: make configurable
+			voices[i] = new WaveVoice(ac, buffer, multFreq);
+			
+			// Create a static Gain for this Voice
 			outGains[i] = new Gain(ac, 2);
 			outGains[i].setGain((float)oscGains[i]);
-
 			outGains[i].addInput(voices[i].getOutput());
 			
-			gain.addInput(outGains[i]);
+			// Mix Voice output
+			mixer.addInput(outGains[i]);
 		}
 		
-		freq.setGlideTime(Util.getFloat(params, GLIDE_TIME_MS));
+		// Create a note envelope
+		// TODO: make this configurable
+		noteEnv = new ASRNoteEnvelope(ac, params, mixer);
+
+		// Use the note envelope to control the gain of the voice mixer
+		UGen output = noteEnv.getOutput();
 		
-		UGen output = gain;
+		// Adapt the output (add effects, etc.)
 		output = createOutputUGen(ac, output);
 
 		addToChainOutput(output);
@@ -200,7 +194,7 @@ public class MonoSynthUGen2 extends UGenChain implements DataBeadReceiver {
 				} else if (smsg.getCommand() == ShortMessage.NOTE_OFF) {
 					// Only requests to stop playing the current note will be honored
 					if (note == this.note) {
-						onNoteOff(note);
+						onNoteOff(smsg, note);
 					}
 				}
 			}
@@ -217,14 +211,19 @@ public class MonoSynthUGen2 extends UGenChain implements DataBeadReceiver {
 	 * @param note the MIDI note number
 	 */
 	protected void onNoteOn(ShortMessage smsg, int note) {
-		gainEnv.clear();
-		
-		int velocity = smsg.getData2();
-		float minGain = Util.getFloat(params, MIN_GAIN);
-		float gain = minGain + ((1.0f - minGain) * (velocity/127.0f));
-		gainEnv.addSegment(gain, Util.getFloat(params, ATTACK_TIME_MS));
-		freq.setValue(Pitch.mtof(note));
+		// Keep track of current note
 		this.note = note;
+
+		// Glide to note frequency
+		freq.setValue(Pitch.mtof(note));
+		
+		// Notify Voices of note starting
+		for (Voice v : voices) {
+			v.noteOn(smsg, note);
+		}
+		
+		// Notify note envelope of note starting
+		noteEnv.noteOn(smsg, note);
 	}
 
 	/**
@@ -235,8 +234,14 @@ public class MonoSynthUGen2 extends UGenChain implements DataBeadReceiver {
 	 * 
 	 * @param note the MIDI note number
 	 */
-	protected void onNoteOff(int note) {
-		gainEnv.addSegment(0.0f, Util.getFloat(params, RELEASE_TIME_MS));
+	protected void onNoteOff(ShortMessage smsg, int note) {
+		// Notify voices of note off
+		for (Voice v : voices) {
+			v.noteOff(smsg, note);
+		}
+		
+		// Notify note envelope of note off
+		noteEnv.noteOff(smsg, note);
 	}
 
 	@Override

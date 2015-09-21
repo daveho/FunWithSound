@@ -15,42 +15,16 @@
 
 package io.github.daveho.funwithsound;
 
-import javax.sound.midi.ShortMessage;
-
-import net.beadsproject.beads.core.AudioContext;
 import net.beadsproject.beads.core.UGen;
-import net.beadsproject.beads.data.Buffer;
-import net.beadsproject.beads.ugens.WavePlayer;
 
 /**
- * Voice implementation that uses a WavePlayer.
+ * Generic note envelope interface.
+ * Can be used with {@link MonoSynthUGen2}.
  */
-public class WaveVoice implements Voice {
-	private WavePlayer output;
-
+public interface NoteEnvelope extends PlayNote {
 	/**
-	 * Constructor.
-	 * @param ac the AudioContext
-	 * @param buffer the waveform
-	 * @param freq frequency controller UGen
+	 * Get the output UGen
+	 * @return the output UGen
 	 */
-	public WaveVoice(AudioContext ac, Buffer buffer, UGen freq) {
-		this.output = new WavePlayer(ac, freq, buffer);
-	}
-
-	@Override
-	public UGen getOutput() {
-		return output;
-	}
-
-	@Override
-	public void noteOn(ShortMessage smsg, int note) {
-		// Nothing to do
-	}
-
-	@Override
-	public void noteOff(ShortMessage smsg, int note) {
-		// Nothing to do
-	}
-	
+	public UGen getOutput();
 }
