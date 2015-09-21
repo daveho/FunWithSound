@@ -17,11 +17,17 @@ public interface ParamNames {
 	/** DataBead property name: Minimum gain (for notes with velocity 0.) */
 	public static final String MIN_GAIN = "minGain";
 	
-	// Used by RingModulationVoice
-	/** The multiple of the note frequency that should be used to generate the modulator frequency. */
+	// Used by RingModulationVoice and FMVoice
+	/** DataBead property name: The multiple of the note frequency that should be used to generate the modulator frequency. */
 	public static final String MOD_FREQ_MULTIPLE = "modFreqMultiple";
-	/** Glide time for changes in the modulation frequency. */
+	/** DataBead property name: Glide time for changes in the modulation frequency. */
 	public static final String MOD_GLIDE_TIME_MS = "modGlideTimeMs";
+
+	// Used by FMVoice
+	/** DataBead property name: Minimum carrier frequency as multiple of base note frequency. */
+	public static final String MIN_FREQ_MULTIPLE = "minFreqMultiple";
+	/** DataBead property name: Maximum carrier frequency as multiple of base note frequency. */
+	public static final String MAX_FREQ_MULTIPLE = "maxFreqMultiple";
 
 	// Used by BandpassFilterNoteEnvelopeAdapter 
 	/** DataBead property name: Start frequency (expressed as a multiple of the note frequency). */

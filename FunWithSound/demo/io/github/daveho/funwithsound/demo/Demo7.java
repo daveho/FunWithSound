@@ -6,6 +6,7 @@ import io.github.daveho.funwithsound.AddReverb;
 import io.github.daveho.funwithsound.BandpassFilterNoteEnvelopeAdapter;
 import io.github.daveho.funwithsound.CustomInstrumentFactoryImpl;
 import io.github.daveho.funwithsound.Defaults;
+import io.github.daveho.funwithsound.FMVoice;
 import io.github.daveho.funwithsound.Figure;
 import io.github.daveho.funwithsound.Instrument;
 import io.github.daveho.funwithsound.MonoSynthUGen;
@@ -56,27 +57,30 @@ public class Demo7 extends DemoBase {
 				0, new CustomInstrumentFactoryImpl.CreateCustomInstrument() {
 					@Override
 					public RealizedInstrument create(AudioContext ac) {
-						DataBead params = MonoSynthUGen.defaultParams();
+						DataBead params = Defaults.monosynthDefaults();
 						params.putAll(Defaults.bandpassNoteEnvelopeDefaults());
+						params.putAll(Defaults.fmVoiceDefaults());
 						params.put(MonoSynthUGen.GLIDE_TIME_MS, 20);
-						params.put(ParamNames.MOD_FREQ_MULTIPLE, 2);
-						params.put(ParamNames.MOD_GLIDE_TIME_MS, 40);
 						params.put(ParamNames.START_END_FREQ_FACTOR, .5);
 						params.put(ParamNames.RISE_FREQ_FACTOR, 1);
+						
+						params.put(ParamNames.MIN_FREQ_MULTIPLE, -1);
+						params.put(ParamNames.MAX_FREQ_MULTIPLE, 1);
 						
 						SynthToolkit tk = new SynthToolkit() {
 							@Override
 							public Voice createVoice(AudioContext ac, DataBead params, UGen freq) {
 								//return new WaveVoice(ac, Buffer.SQUARE, freq);
-								return new RingModulationVoice(ac, params, Buffer.SAW, Buffer.SINE, freq);
+								//return new RingModulationVoice(ac, params, Buffer.SAW, Buffer.SINE, freq);
+								return new FMVoice(ac, params, Buffer.SAW, Buffer.SINE, freq);
 							}
 							
 							@Override
 							public NoteEnvelope createNoteEnvelope(AudioContext ac, DataBead params, UGen input) {
 								NoteEnvelope delegate = new ASRNoteEnvelope(ac, params, input);
-								BandpassFilterNoteEnvelopeAdapter adapter = new BandpassFilterNoteEnvelopeAdapter(ac, params, delegate);
-								return adapter;
-								//return delegate;
+								//BandpassFilterNoteEnvelopeAdapter adapter = new BandpassFilterNoteEnvelopeAdapter(ac, params, delegate);
+								//return adapter;
+								return delegate;
 							}
 						};
 						

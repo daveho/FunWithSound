@@ -20,6 +20,30 @@ public class Defaults implements ParamNames {
 	}
 
 	/**
+	 * Get some reasonable defaults for {@link RingModulationVoice}.
+	 * @return reasonable defaults for {@link RingModulationVoice}
+	 */
+	public static DataBead ringModulationVoiceDefaults() {
+		DataBead params = new DataBead();
+		params.put(MOD_FREQ_MULTIPLE, 2);
+		params.put(MOD_GLIDE_TIME_MS, 40);
+		return params;
+	}
+	
+	/**
+	 * Get some reasonable defaults for {@link FMVoice}.
+	 * @return reasonable defaults for {@link FMVoice}
+	 */
+	public static DataBead fmVoiceDefaults() {
+		DataBead params = ringModulationVoiceDefaults();
+		// Oddly, WavePlayer seems to work even if you give it
+		// negative frequencies.
+		params.put(MIN_FREQ_MULTIPLE, -1.0f);
+		params.put(MAX_FREQ_MULTIPLE, 1.0f);
+		return params;
+	}
+
+	/**
 	 * Get some reasonable defaults for {@link BandpassFilterNoteEnvelopeAdapter}.
 	 * @return reasonable {@link BandpassFilterNoteEnvelopeAdapter} defaults
 	 */
