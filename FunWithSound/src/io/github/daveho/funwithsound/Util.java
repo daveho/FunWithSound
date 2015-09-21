@@ -182,6 +182,25 @@ public class Util {
 	/**
 	 * Get a float parameter from a DataBead.
 	 * Throws an exception if the stored parameter value can't
+	 * be converted to a float.
+	 * Returns a specified default value if there is no stored
+	 * parameter value.
+	 * 
+	 * @param params      the DataBead
+	 * @param propName    the parameter name
+	 * @param value       the default value
+	 * @return the float value
+	 */
+	public static float getFloat(DataBead params, String propName, double value) {
+		if (!params.containsKey(propName)) {
+			return (float)value;
+		}
+		return getFloat(params, propName);
+	}
+
+	/**
+	 * Get a float parameter from a DataBead.
+	 * Throws an exception if the stored parameter value can't
 	 * be converted to an int.
 	 * 
 	 * @param params     the DataBead

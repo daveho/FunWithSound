@@ -24,7 +24,6 @@ import net.beadsproject.beads.core.AudioContext;
 import net.beadsproject.beads.core.Bead;
 import net.beadsproject.beads.core.UGen;
 import net.beadsproject.beads.core.UGenChain;
-import net.beadsproject.beads.data.Buffer;
 import net.beadsproject.beads.data.DataBead;
 import net.beadsproject.beads.data.DataBeadReceiver;
 import net.beadsproject.beads.data.Pitch;
@@ -40,57 +39,11 @@ import net.beadsproject.beads.ugens.Glide;
  * Accepts parameter configuration via a DataBead.
  */
 public class MonoSynthUGen2 extends UGenChain implements ParamNames, DataBeadReceiver {
-	/**
-	 * Get default parameters.  These are abitrary, but sound pretty good.
-	 * @return
-	 */
-	public static DataBead defaultParams() {
-		DataBead params = new DataBead();
-		setToDefault(params);
-		return params;
-	}
-
-	/**
-	 * Fill the given DataBead with the default parameters.
-	 * @param params the DataBead to fill
-	 */
-	public static void setToDefault(DataBead params) {
-		params.put(GLIDE_TIME_MS, 200f);
-		params.put(ATTACK_TIME_MS, 20f);
-		params.put(RELEASE_TIME_MS, 200f);
-		params.put(MIN_GAIN, 0.1f);
-	}
-	
 	private DataBead params;
 	private Glide freq;
 	private Voice[] voices;
 	private NoteEnvelope noteEnv;
 	private int note;
-
-	/**
-	 * Constructor.
-	 * The synth will play a single frequency when a note is played.
-	 * 
-	 * @param ac      the AudioContext
-	 * @param buffer  the buffer type (sine, square, triangle, etc.)
-	 * @param params  parameters to control attack/decay, glide time, etc.
-	 */
-	public MonoSynthUGen2(AudioContext ac, Buffer buffer, DataBead params) {
-		this(ac, buffer, params, new double[]{ 1.0 });
-	}
-	
-	/**
-	 * Constructor.
-	 * The synth will play multiple frequencies when a note is played.
-	 * 
-	 * @param ac      the AudioContext
-	 * @param buffer  the buffer type (sine, square, triangle, etc.)
-	 * @param params  parameters to control attack/decay, glide time, etc.
-	 * @param freqMult create oscillators to play these multiples of the note frequency 
-	 */
-	public MonoSynthUGen2(AudioContext ac, Buffer buffer, DataBead params, double[] freqMult) {
-		this(ac, buffer, params, freqMult, Util.filledDoubleArray(freqMult.length, 1.0));
-	}
 	
 	/**
 	 * Constructor.
@@ -98,12 +51,17 @@ public class MonoSynthUGen2 extends UGenChain implements ParamNames, DataBeadRec
 	 * Each frequency has a specified static gain.
 	 * 
 	 * @param ac      the AudioContext
-	 * @param buffer  the buffer type (sine, square, triangle, etc.)
+	 * @param toolkit the {@link SynthToolkit} to use to create voices,
+	 *                note envelope, etc.
 	 * @param params  parameters to control attack/decay, glide time, etc.
-	 * @param freqMult create oscillators to play these multiples of the note frequency 
+	 * @param freqMult create voices to play these multiples of the note frequency 
 	 * @param oscGains the gains for each oscillator
 	 */
-	public MonoSynthUGen2(AudioContext ac, Buffer buffer, DataBead params, double[] freqMult, double[] oscGains) {
+	public MonoSynthUGen2(AudioContext ac,
+			SynthToolkit toolkit,
+			DataBead params,
+			double[] freqMult,
+			double[] oscGains) {
 		super(ac, 0, 2);
 		
 		this.params = params;
@@ -124,8 +82,7 @@ public class MonoSynthUGen2 extends UGenChain implements ParamNames, DataBeadRec
 			UGen multFreq = Util.multiply(freq, freqMult[i]);
 			
 			// Create a Voice for this multiple
-			// TODO: make configurable
-			voices[i] = new WaveVoice(ac, buffer, multFreq);
+			voices[i] = toolkit.createVoice(ac, params, multFreq);
 			
 			// Create a static Gain for this Voice
 			outGains[i] = new Gain(ac, 2);
@@ -137,8 +94,7 @@ public class MonoSynthUGen2 extends UGenChain implements ParamNames, DataBeadRec
 		}
 		
 		// Create a note envelope
-		// TODO: make this configurable
-		noteEnv = new ASRNoteEnvelope(ac, params, mixer);
+		noteEnv = toolkit.createNoteEnvelope(ac, params, mixer);
 
 		// Use the note envelope to control the gain of the voice mixer
 		UGen output = noteEnv.getOutput();
