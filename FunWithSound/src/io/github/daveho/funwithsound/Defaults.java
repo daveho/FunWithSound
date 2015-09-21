@@ -25,7 +25,6 @@ public class Defaults implements ParamNames {
 	 */
 	public static DataBead bandpassNoteEnvelopeDefaults() {
 		DataBead params = new DataBead();
-		MonoSynthUGen.setToDefault(params);
 		params.put(START_END_FREQ_FACTOR, .5f);
 		params.put(RISE_FREQ_FACTOR, 2f);
 		params.put(RISE_TIME_MS, 200f);
