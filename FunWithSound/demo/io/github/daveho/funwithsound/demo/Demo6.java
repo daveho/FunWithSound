@@ -1,27 +1,35 @@
 package io.github.daveho.funwithsound.demo;
 
-import io.github.daveho.funwithsound.AddPingPongStereoDelays;
-import io.github.daveho.funwithsound.CustomInstrumentFactoryImpl;
+import io.github.daveho.funwithsound.ASRNoteEnvelope;
 import io.github.daveho.funwithsound.AddDelay;
 import io.github.daveho.funwithsound.AddFlanger;
 import io.github.daveho.funwithsound.AddOscillatingBandPassFilter;
+import io.github.daveho.funwithsound.AddPingPongStereoDelays;
 import io.github.daveho.funwithsound.AddReverb;
-import io.github.daveho.funwithsound.BandpassFilterMonoSynthUGen;
+import io.github.daveho.funwithsound.BandpassFilterNoteEnvelopeAdapter;
 import io.github.daveho.funwithsound.CustomInstrumentFactory;
+import io.github.daveho.funwithsound.CustomInstrumentFactoryImpl;
+import io.github.daveho.funwithsound.Defaults;
 import io.github.daveho.funwithsound.Figure;
 import io.github.daveho.funwithsound.Instrument;
-import io.github.daveho.funwithsound.RealizedInstrument;
 import io.github.daveho.funwithsound.Melody;
-import io.github.daveho.funwithsound.MonoSynthUGen;
+import io.github.daveho.funwithsound.MonoSynthUGen2;
+import io.github.daveho.funwithsound.NoteEnvelope;
+import io.github.daveho.funwithsound.ParamNames;
 import io.github.daveho.funwithsound.Player;
+import io.github.daveho.funwithsound.RealizedInstrument;
 import io.github.daveho.funwithsound.Rhythm;
+import io.github.daveho.funwithsound.SynthToolkit;
 import io.github.daveho.funwithsound.Util;
+import io.github.daveho.funwithsound.Voice;
+import io.github.daveho.funwithsound.WaveVoice;
 
 import java.io.IOException;
 
 import javax.sound.midi.MidiUnavailableException;
 
 import net.beadsproject.beads.core.AudioContext;
+import net.beadsproject.beads.core.UGen;
 import net.beadsproject.beads.data.Buffer;
 import net.beadsproject.beads.data.DataBead;
 
@@ -55,7 +63,7 @@ public class Demo6 extends DemoBase {
 		addfx(monosynth2, new AddOscillatingBandPassFilter(200, 1200, 0.125));
 		addfx(monosynth2, new AddReverb());
 		
-		Instrument blarp = instr(MINIMOOG, 11);
+//		Instrument blarp = instr(MINIMOOG, 11);
 		
 		
 //		Rhythm clickr = rr(s(0,.5,101), 1, 8);
@@ -159,7 +167,7 @@ public class Demo6 extends DemoBase {
 		add1(gf(percf));
 		add1(gf(percf));
 		
-//		audition(blarp);
+		audition(monosynth);
 	}
 	
 	@Override
@@ -168,15 +176,25 @@ public class Demo6 extends DemoBase {
 			0, new CustomInstrumentFactoryImpl.CreateCustomInstrument() {
 				@Override
 				public RealizedInstrument create(AudioContext ac) {
-					DataBead params = BandpassFilterMonoSynthUGen.defaultParams();
-					params.put(MonoSynthUGen.ATTACK_TIME_MS, 10);
-					params.put(MonoSynthUGen.GLIDE_TIME_MS, 40);
-					params.put(BandpassFilterMonoSynthUGen.START_END_FREQ_FACTOR, .5);
-					params.put(BandpassFilterMonoSynthUGen.RISE_FREQ_FACTOR, 4);
-					params.put(BandpassFilterMonoSynthUGen.CURVATURE, .25);
-					BandpassFilterMonoSynthUGen synth = new BandpassFilterMonoSynthUGen(
+					DataBead params = new DataBead();
+					params.putAll(Defaults.monosynthDefaults());
+					params.putAll(Defaults.bandpassNoteEnvelopeDefaults());
+					SynthToolkit tk = new SynthToolkit() {
+						@Override
+						public Voice createVoice(AudioContext ac, DataBead params, UGen freq) {
+							return new WaveVoice(ac, Buffer.SAW, freq);
+						}
+						
+						@Override
+						public NoteEnvelope createNoteEnvelope(AudioContext ac, DataBead params, UGen input) {
+							ASRNoteEnvelope delegate = new ASRNoteEnvelope(ac, params, input);
+							BandpassFilterNoteEnvelopeAdapter adapter = new BandpassFilterNoteEnvelopeAdapter(ac, params, delegate);
+							return adapter;
+						}
+					};
+					MonoSynthUGen2 synth = new MonoSynthUGen2(
 							ac,
-							Buffer.SINE,
+							tk,
 							params,
 							new double[]{1.0, /*Util.freqShift(7), 2.0, 2.0*Util.freqShift(7), 4.0,*/ 3.0},
 							new double[]{1.0, /*0.2, 0.5, 0.1, 0.4,*/ 0.7});
@@ -186,11 +204,22 @@ public class Demo6 extends DemoBase {
 			1, new CustomInstrumentFactoryImpl.CreateCustomInstrument() {
 				@Override
 				public RealizedInstrument create(AudioContext ac) {
-					DataBead params = MonoSynthUGen.defaultParams();
-					params.put(MonoSynthUGen.GLIDE_TIME_MS, 40);
-					MonoSynthUGen synth = new MonoSynthUGen(
+					DataBead params = Defaults.monosynthDefaults();
+					params.put(ParamNames.GLIDE_TIME_MS, 40);
+					SynthToolkit tk = new SynthToolkit() {
+						@Override
+						public Voice createVoice(AudioContext ac, DataBead params, UGen freq) {
+							return new WaveVoice(ac, Buffer.SAW, freq);
+						}
+						
+						@Override
+						public NoteEnvelope createNoteEnvelope(AudioContext ac, DataBead params, UGen input) {
+							return new ASRNoteEnvelope(ac, params, input);
+						}
+					};
+					MonoSynthUGen2 synth = new MonoSynthUGen2(
 							ac,
-							Buffer.SAW,
+							tk,
 							params,
 							new double[]{1.0, Util.freqShift(7), 2.0, 2.0*Util.freqShift(7)},
 							new double[]{0.6, 0.3, 0.5, 0.2});
