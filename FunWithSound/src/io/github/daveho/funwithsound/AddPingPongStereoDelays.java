@@ -27,17 +27,7 @@ import net.beadsproject.beads.ugens.Panner;
  * bounces between the left and right channels.
  * Accepts parameter configuration via a DataBead.
  */
-public class AddPingPongStereoDelays implements AddEffect {
-	/** DataBead property name: Number of delays. */
-	public static final String NUM_DELAYS = "numDelays";
-	/** DataBead property name: How many milliseconds per delay. */
-	public static final String DELAY_MS = "delayMs";
-	/** DataBead property name: degree of stereo spread (0=none, 1=total). */
-	public static final String SPREAD = "spread";
-	/** DataBead property name: Gain of the first delay. */
-	public static final String FIRST_DELAY_GAIN = "firstDelayGain";
-	/** DataBead property name: How much the delay decreases per delay. */
-	public static final String GAIN_DROP = "gainDrop";
+public class AddPingPongStereoDelays implements ParamNames, AddEffect {
 
 	/**
 	 * Get the default parameters.

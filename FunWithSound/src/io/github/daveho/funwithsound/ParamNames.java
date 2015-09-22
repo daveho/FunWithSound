@@ -40,4 +40,16 @@ public interface ParamNames {
 	public static final String FALL_TIME_MS = "fallTimeMs";
 	/** DataBead property name: Curvature of the glides from start to rise and back. */
 	public static final String CURVATURE = "curvature";
+	
+	// Used by AddPingPongStereoDelays
+	/** DataBead property name: Number of delays. */
+	public static final String NUM_DELAYS = "numDelays";
+	/** DataBead property name: How many milliseconds per delay. */
+	public static final String DELAY_MS = "delayMs";
+	/** DataBead property name: degree of stereo spread (0=none, 1=total). */
+	public static final String SPREAD = "spread";
+	/** DataBead property name: Gain of the first delay. */
+	public static final String FIRST_DELAY_GAIN = "firstDelayGain";
+	/** DataBead property name: How much the delay decreases per delay. */
+	public static final String GAIN_DROP = "gainDrop";
 }
