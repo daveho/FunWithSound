@@ -238,7 +238,7 @@ public class FunWithSound {
 		player.startPlaying();
 	}
 
-	private Player createPlayer() {
+	protected Player createPlayer() {
 		return new Player() {
 			@Override
 			protected void prepareToPlay() throws MidiUnavailableException, IOException {
