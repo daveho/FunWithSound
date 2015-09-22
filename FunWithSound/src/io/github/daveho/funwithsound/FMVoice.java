@@ -43,7 +43,7 @@ public class FMVoice implements ParamNames, Voice {
 //		UGen mod = Util.rangedOscillator(ac, -1, 1, modFreq, Buffer.SAW);
 		float minFreqMultiple = Util.getFloat(params, MIN_FREQ_MULTIPLE);
 		float maxFreqMultiple = Util.getFloat(params, MAX_FREQ_MULTIPLE);
-		UGen mod = Util.rangedOscillator(ac, minFreqMultiple, maxFreqMultiple, modFreq, Buffer.SAW);
+		UGen mod = Util.rangedOscillator(ac, minFreqMultiple, maxFreqMultiple, modFreq, modWaveform);
 		
 		UGen modulatedFrequency = new Function(freq, mod) {
 			@Override
