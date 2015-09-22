@@ -71,8 +71,8 @@ public class Demo7 extends DemoBase {
 							@Override
 							public Voice createVoice(AudioContext ac, DataBead params, UGen freq) {
 								//return new WaveVoice(ac, Buffer.SQUARE, freq);
-								//return new RingModulationVoice(ac, params, Buffer.SAW, Buffer.SINE, freq);
-								return new FMVoice(ac, params, Buffer.SAW, Buffer.SINE, freq);
+								return new RingModulationVoice(ac, params, Buffer.SAW, Buffer.SAW, freq);
+								//return new FMVoice(ac, params, Buffer.SAW, Buffer.SAW, freq);
 							}
 							
 							@Override
