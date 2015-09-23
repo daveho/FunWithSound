@@ -54,6 +54,11 @@ public class Demo8 extends DemoBase {
 		Instrument bass = instr(HS_VDW, 21);
 		v(bass, 0.5);
 		
+		// Nice high percussive sounds: 22, 23, 25
+		Instrument fun = instr(HS_VDW, 28);
+		addfx(fun, new AddPingPongStereoDelays());
+		v(fun, 0.5);
+		
 		Rhythm kick1r = r(p(0,127), p(1,110), p(2,127), p(5, 127), p(6.5, 110), p(7.5, 127));
 		Melody kick1m = m(an(25), an(24), an(26), an(26), an(26), an(24));
 		Figure kick1f = f(kick1r, kick1m, d);
@@ -129,6 +134,9 @@ public class Demo8 extends DemoBase {
 		Melody lead4m = m(
 				an(60), an(62), an(60), an(62), an(50), an(52));
 		Figure lead4f = f(lead4r, lead4m, lead);
+		
+//		Rhythm tinkler = rr(s(0,.6,81), 1, 8);
+//		Melody tinkle1m = m();
 
 //		add1(gf(kick1f,hihatf));
 //		add1(gf(kick2f,hihatf));
@@ -168,7 +176,7 @@ public class Demo8 extends DemoBase {
 		add1(gf(kick1f,hihatf,bass1f,accent1f));
 		add1(gf(kick2f,hihatf,bass3f,accent2f));
 		
-		audition(lead);
+		audition(fun);
 	}
 	@Override
 	protected void onCreatePlayer(Player player) {
