@@ -27,7 +27,7 @@ import java.util.List;
  * Note that a chord does not represent any start time or
  * duration: that is represented by a {@link Strike}.
  */
-public class Chord implements Iterable<Integer> {
+public class Chord implements Iterable<Integer>, Cloneable {
 	private List<Integer> pitches;
 	
 	public Chord() {
@@ -49,5 +49,17 @@ public class Chord implements Iterable<Integer> {
 	@Override
 	public Iterator<Integer> iterator() {
 		return pitches.iterator();
+	}
+	
+	@Override
+	public Chord clone() {
+		try {
+			Chord dup = (Chord) super.clone();
+			dup.pitches = new ArrayList<Integer>();
+			dup.pitches.addAll(this.pitches);
+			return dup;
+		} catch (CloneNotSupportedException e) {
+			throw new IllegalStateException("This can't happen", e);
+		}
 	}
 }

@@ -249,6 +249,40 @@ public class Composer {
 	}
 	
 	/**
+	 * Create a melody consisting of a specified number of repetitions
+	 * of the given {@link Chord}.
+	 * 
+	 * @param chord  the {@link Chord} to repeat
+	 * @param n      the number of times to repeat the chord
+	 * @return the melody
+	 */
+	public Melody rm(Chord chord, int n) {
+		Melody result = new Melody();
+		for (int i = 0; i < n; i++) {
+			Chord c = chord.clone();
+			result.add(c);
+		}
+		return result;
+	}
+	
+	/**
+	 * Combine several {@link Melody} objects into a single {@link Melody}.
+	 * The chords of each melody are added to the result in order.
+	 * 
+	 * @param melodies the {@link Melody} objects to combine
+	 * @return the combined {@link Melody}
+	 */
+	public Melody gm(Melody... melodies) {
+		Melody result = new Melody();
+		for (Melody m : melodies) {
+			for (Chord chord : m) {
+				result.add(chord.clone());
+			}
+		}
+		return result;
+	}
+	
+	/**
 	 * Shift the octave of a note/chord.
 	 * 
 	 * @param octave the octave: -1 for one octave down, 1 for one octave up, etc.
