@@ -30,11 +30,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 
+import javax.sound.midi.InvalidMidiDataException;
 import javax.sound.midi.MidiDevice;
 import javax.sound.midi.MidiMessage;
+import javax.sound.midi.MidiSystem;
 import javax.sound.midi.MidiUnavailableException;
 import javax.sound.midi.Receiver;
 import javax.sound.midi.ShortMessage;
+import javax.sound.midi.Soundbank;
+import javax.sound.midi.Synthesizer;
 
 import net.beadsproject.beads.core.AudioContext;
 import net.beadsproject.beads.core.Bead;
@@ -43,9 +47,6 @@ import net.beadsproject.beads.data.Sample;
 import net.beadsproject.beads.data.SampleManager;
 import net.beadsproject.beads.ugens.Gain;
 import net.beadsproject.beads.ugens.RecordToFile;
-
-import com.sun.media.sound.SF2Soundbank;
-import com.sun.media.sound.SoftSynthesizer;
 
 /**
  * Play a composition.
@@ -60,7 +61,7 @@ public class Player {
 	
 	private Composition composition;
 	private AudioContext ac;
-	private HashMap<String, SF2Soundbank> soundBanks;
+	private HashMap<String, Soundbank> soundBanks;
 	private RealizedInstrument liveSynth;
 	private Map<Instrument, RealizedInstrument> instrMap;
 	private String outputFile;
@@ -72,7 +73,7 @@ public class Player {
 	private CustomInstrumentFactory customInstrumentFactory;
 	
 	public Player() {
-		soundBanks = new HashMap<String, SF2Soundbank>();
+		soundBanks = new HashMap<String, Soundbank>();
 		instrMap = new IdentityHashMap<Instrument, RealizedInstrument>();
 		customInstrumentFactory = new CustomInstrumentFactory() {
 			@Override
@@ -126,8 +127,8 @@ public class Player {
 		GervillUGen gervill = new GervillUGen(ac, Collections.<String, Object>emptyMap());
 		RealizedInstrument info = new RealizedInstrument(gervill);
 		if (instrument.hasSoundFont()) {
-			SoftSynthesizer synth = ((GervillUGen)info.head).getSynth();
-			SF2Soundbank sb = getSoundBank(instrument);
+			Synthesizer synth = ((GervillUGen)info.head).getSynth();
+			Soundbank sb = getSoundBank(instrument);
 			if (sb != null) {
 				synth.loadAllInstruments(sb);
 			} else {
@@ -479,13 +480,17 @@ public class Player {
 		return info;
 	}
 
-	private SF2Soundbank getSoundBank(Instrument instrument) throws IOException {
+	private Soundbank getSoundBank(Instrument instrument) throws IOException {
 		System.out.println("Loading soundfont " + instrument.getSoundFont());
-		SF2Soundbank sb = null;
+		Soundbank sb = null;
 		if (!soundBanks.containsKey(instrument.getSoundFont())) {
 			File file = new File(instrument.getSoundFont());
 			if (file.exists()) {
-				sb = new SF2Soundbank(file);
+				try {
+					sb = MidiSystem.getSoundbank(file);
+				} catch (InvalidMidiDataException e) {
+					throw new IOException("Could not load soundbank " + file.getPath(), e);
+				}
 			}
 			soundBanks.put(instrument.getSoundFont(), sb);
 		}
