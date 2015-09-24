@@ -48,7 +48,7 @@ public class Demo8 extends DemoBase {
 		delayParams.put(AddPingPongStereoDelays.SPREAD, 1);
 		addfx(lead, new AddPingPongStereoDelays(delayParams));
 		addfx(lead, new AddReverb());
-		v(lead, 0.2);
+		v(lead, 0.3);
 		
 		// Good bass sounds: 4, 20, 21
 		Instrument bass = instr(HS_VDW, 21);

@@ -45,6 +45,7 @@ import net.beadsproject.beads.core.Bead;
 import net.beadsproject.beads.core.UGen;
 import net.beadsproject.beads.data.Sample;
 import net.beadsproject.beads.data.SampleManager;
+import net.beadsproject.beads.ugens.DelayTrigger;
 import net.beadsproject.beads.ugens.Gain;
 import net.beadsproject.beads.ugens.RecordToFile;
 
@@ -53,14 +54,17 @@ import net.beadsproject.beads.ugens.RecordToFile;
  */
 public class Player {
 	// Delay before starting playback,
-	// to avoid early audio buffer underruns.
-	private static final long START_DELAY_US = 1000000L;
+	// to avoid glitches in the early audio.
+	// (I think the GervillUGens are sending junk audio
+	// early on, prior to the first MIDI event.)
+	private static final long START_DELAY_US = 2000000L;
 	
 	// Shut down this many microseconds after the last note off message.
 	private static final long IDLE_WAIT_US = 2000000L;
 	
 	private Composition composition;
 	private AudioContext ac;
+	private Gain masterGain;
 	private HashMap<String, Soundbank> soundBanks;
 	private RealizedInstrument liveSynth;
 	private Map<Instrument, RealizedInstrument> instrMap;
@@ -72,6 +76,9 @@ public class Player {
 	private boolean playing;
 	private CustomInstrumentFactory customInstrumentFactory;
 	
+	/**
+	 * Constructor.
+	 */
 	public Player() {
 		soundBanks = new HashMap<String, Soundbank>();
 		instrMap = new IdentityHashMap<Instrument, RealizedInstrument>();
@@ -113,6 +120,11 @@ public class Player {
 		return playing;
 	}
 	
+	/**
+	 * Set the {@link Composition} to play.
+	 * 
+	 * @param composition the {@link Composition} to play.
+	 */
 	public void setComposition(Composition composition) {
 		this.composition = composition;
 	}
@@ -262,7 +274,23 @@ public class Player {
 		
 		// Prepare instrument effects (and connect the GervillUGens
 		// to the AudioContext's output)
-		configureInstrumentEffects();
+		prepareInstrumentsAndEffects();
+		
+		// Initially, mute the master Gain
+		System.out.println("Muting!");
+		masterGain.setGain(0.0f);
+
+		// Create a DelayTrigger to unmute the master Gain
+		// once the start delay has elapsed
+		Bead unmute = new Bead() {
+			@Override
+			protected void messageReceived(Bead message) {
+				System.out.println("Unmuting!");
+				masterGain.setGain(1.0f);
+			}
+		};
+		DelayTrigger unmuteTrigger = new DelayTrigger(ac, START_DELAY_US/1000.0, unmute);
+		ac.out.addDependent(unmuteTrigger);
 	}
 
 	private void prepareForAudition() throws MidiUnavailableException,
@@ -353,7 +381,13 @@ public class Player {
 		}
 	}
 	
-	private void configureInstrumentEffects() {
+	private void prepareInstrumentsAndEffects() {
+		// Create a "master gain".  For now, this is just used
+		// to mute the RealizedInstruments during the start delay.
+		// Eventually we can make this controllable (for things
+		// like fade-in and fade-out.)
+		this.masterGain = new Gain(ac, 2);
+		
 		for (Map.Entry<Instrument, RealizedInstrument> entry : instrMap.entrySet()) {
 			RealizedInstrument info = entry.getValue();
 			
@@ -367,8 +401,11 @@ public class Player {
 			UGen gainEnvelope = new InstrumentGainEnvelope(ac, info.gainEvents);
 			info.gain = new Gain(ac, 2, gainEnvelope);
 			info.gain.addInput(info.tail);
-			ac.out.addInput(info.gain);
+
+			masterGain.addInput(info.gain);
 		}
+		
+		ac.out.addInput(masterGain);
 	}
 
 	private void addShutdownHook(final long idleTimeUs) {
