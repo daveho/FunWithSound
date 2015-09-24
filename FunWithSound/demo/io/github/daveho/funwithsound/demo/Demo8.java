@@ -38,24 +38,25 @@ public class Demo8 extends DemoBase {
 		Instrument d = percussion(HS_VDW);
 		
 		Instrument d2 = percussion(HS_VDW);
+		Instrument a = percussion(ARACHNO);
 		
 		Instrument lead = custom(0);
 		DataBead delayParams = AddPingPongStereoDelays.defaultParams();
 		delayParams.put(AddPingPongStereoDelays.NUM_DELAYS, 8);
-		delayParams.put(AddPingPongStereoDelays.FIRST_DELAY_GAIN, .6);
-		delayParams.put(AddPingPongStereoDelays.GAIN_DROP, .25);
+		delayParams.put(AddPingPongStereoDelays.FIRST_DELAY_GAIN, .7);
+		delayParams.put(AddPingPongStereoDelays.GAIN_DROP, .05);
 		delayParams.put(AddPingPongStereoDelays.DELAY_MS, 400);
 		delayParams.put(AddPingPongStereoDelays.SPREAD, 1);
-		addfx(lead, new AddPingPongStereoDelays());
-//		addfx(lead, new AddReverb());
-		v(lead, 0.4);
+		addfx(lead, new AddPingPongStereoDelays(delayParams));
+		addfx(lead, new AddReverb());
+		v(lead, 0.2);
 		
 		// Good bass sounds: 4, 20, 21
 		Instrument bass = instr(HS_VDW, 21);
 		v(bass, 0.5);
 		
 		// Nice high percussive sounds: 22, 23, 25
-		Instrument fun = instr(HS_VDW, 28);
+		Instrument fun = instr(HS_VDW, 77);
 		addfx(fun, new AddPingPongStereoDelays());
 		v(fun, 0.5);
 		
@@ -75,9 +76,9 @@ public class Demo8 extends DemoBase {
 		
 		Rhythm accentr = r(p(5,105));
 		Melody accent1m = m(an(56));
-		Melody accent2m = m(an(54));
+		Melody accent2m = m(an(72));
 		Figure accent1f = f(accentr, accent1m, d2);
-		Figure accent2f = f(accentr, accent2m, d2);
+		Figure accent2f = f(accentr, accent2m, a);
 		
 		Rhythm bass1r = r(
 				s(0.000,0.5,102), s(0.5,1.5,90), s(2,0.5,106),
@@ -186,14 +187,15 @@ public class Demo8 extends DemoBase {
 					public RealizedInstrument create(AudioContext ac) {
 						DataBead params = Defaults.monosynthDefaults();
 						params.putAll(Defaults.fmVoiceDefaults());
-						params.put(MonoSynthUGen.GLIDE_TIME_MS, 80);
+						params.put(MonoSynthUGen.GLIDE_TIME_MS, 100);
 						params.put(ParamNames.MIN_FREQ_MULTIPLE, -1);
 						params.put(ParamNames.MAX_FREQ_MULTIPLE, 1);
+						params.put(ParamNames.MOD_GLIDE_TIME_MS, 80);
 						
 						SynthToolkit tk = new SynthToolkit() {
 							@Override
 							public Voice createVoice(AudioContext ac, DataBead params, UGen freq) {
-								return new RingModulationVoice(ac, params, Buffer.SINE, Buffer.SINE, freq);
+								return new RingModulationVoice(ac, params, Buffer.SAW, Buffer.SAW, freq);
 							}
 							
 							@Override
