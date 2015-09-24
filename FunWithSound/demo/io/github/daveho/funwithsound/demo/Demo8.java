@@ -37,7 +37,6 @@ public class Demo8 extends DemoBase {
 		
 		Instrument d = percussion(HS_VDW);
 		
-		Instrument d2 = percussion(HS_VDW);
 		Instrument a = percussion(ARACHNO);
 		
 		Instrument lead = custom(0);
@@ -77,7 +76,7 @@ public class Demo8 extends DemoBase {
 		Rhythm accentr = r(p(5,105));
 		Melody accent1m = m(an(56));
 		Melody accent2m = m(an(72));
-		Figure accent1f = f(accentr, accent1m, d2);
+		Figure accent1f = f(accentr, accent1m, d);
 		Figure accent2f = f(accentr, accent2m, a);
 		
 		Rhythm bass1r = r(
