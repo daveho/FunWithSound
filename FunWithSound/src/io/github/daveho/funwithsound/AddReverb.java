@@ -30,31 +30,13 @@ import net.beadsproject.beads.ugens.Reverb;
  * as the Reverb UGen.
  */
 public class AddReverb implements ParamNames, AddEffect {
-
-	/**
-	 * Get default reverb parameters.
-	 * 
-	 * @return default reverb parameters
-	 */
-	public static DataBead defaultParams() {
-		DataBead params = new DataBead();
-		
-		// These are the defaults for the Reverb UGen
-		params.put(DAMPING, .7f);
-		params.put(ROOM_SIZE, .5f);
-		params.put(EARLY_REFLECTIONS_LEVEL, 1.0f);
-		params.put(LATE_REVERB_LEVEL, 1.0f);
-		
-		return params;
-	}
-
 	private DataBead params;
 	
 	/**
 	 * Constructor: adds reverb with default parameters.
 	 */
 	public AddReverb() {
-		this.params = defaultParams();
+		this.params = Defaults.reverbDefaults();
 	}
 	
 	/**

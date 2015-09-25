@@ -56,4 +56,39 @@ public class Defaults implements ParamNames {
 		params.put(CURVATURE, .25);
 		return params;
 	}
+
+	/**
+	 * Create default flanger parameters.
+	 * They are completely arbitrary, but
+	 * can serve as a useful starting point.
+	 * 
+	 * @return default flanger parameters
+	 */
+	public static final DataBead flangerDefaults() {
+		return new DataBead(
+				FREQ_HZ, 1.0,
+				MIN_DELAY_MS, 5.0,
+				MAX_DELAY_MS, 10.0,
+				A, .8,
+				G, .8,
+				H, .3
+		);
+	}
+
+	/**
+	 * Get default reverb parameters.
+	 * 
+	 * @return default reverb parameters
+	 */
+	public static DataBead reverbDefaults() {
+		DataBead params = new DataBead();
+		
+		// These are the defaults for the Reverb UGen
+		params.put(DAMPING, .7f);
+		params.put(ROOM_SIZE, .5f);
+		params.put(EARLY_REFLECTIONS_LEVEL, 1.0f);
+		params.put(LATE_REVERB_LEVEL, 1.0f);
+		
+		return params;
+	}
 }

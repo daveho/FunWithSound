@@ -16,6 +16,7 @@
 package io.github.daveho.funwithsound.demo;
 
 import io.github.daveho.funwithsound.AddReverb;
+import io.github.daveho.funwithsound.Defaults;
 import io.github.daveho.funwithsound.Figure;
 import io.github.daveho.funwithsound.Instrument;
 import io.github.daveho.funwithsound.Melody;
@@ -42,7 +43,7 @@ public class Demo4 extends DemoBase {
 		v(hh, 0.5);
 		
 		Instrument sax = instr(ARACHNO, 66);
-		DataBead params = AddReverb.defaultParams();
+		DataBead params = Defaults.reverbDefaults();
 		params.put(AddReverb.ROOM_SIZE, .95);
 		addfx(sax, new AddReverb(params));
 		

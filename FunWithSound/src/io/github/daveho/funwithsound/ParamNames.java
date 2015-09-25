@@ -62,4 +62,18 @@ public interface ParamNames {
 	public static final String FIRST_DELAY_GAIN = "firstDelayGain";
 	/** DataBead property name: How much the delay decreases per delay. */
 	public static final String GAIN_DROP = "gainDrop";
+
+	// Used by AddFlanger
+	/** DataBead property name: Frequency (rate at which the flanger's delay changes). */
+	public static final String FREQ_HZ = "freqHz";
+	/** DataBead property name: Minimum delay in milliseconds. */
+	public static final String MIN_DELAY_MS = "minDelayMs";
+	/** DataBead property name: Maximum delay in milliseconds. */
+	public static final String MAX_DELAY_MS = "maxDelayMs";
+	/** DataBead property name: Gain for original signal through the flanger's comb filter. */
+	public static final String A = "a";
+	/** DataBead property name: Gain for the delayed signal through the flanger's comb filter. */
+	public static final String G = "g";
+	/** DataBead property name: Gain for the feed-forward component of the flanger's comb filter. */
+	public static final String H = "h";
 }

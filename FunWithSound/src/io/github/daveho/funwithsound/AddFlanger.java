@@ -26,46 +26,7 @@ import net.beadsproject.beads.ugens.CombFilter;
  * Note that parameters can only be set at effect creation time,
  * not during runtime.
  */
-public class AddFlanger implements AddEffect {
-	// default parameter values as constants
-	public static final double DEFAULT_H = .3;
-	public static final double DEFAULT_G = .8;
-	public static final double DEFAULT_A = .8;
-	public static final double DEFAULT_MAX_DELAY_MS = 10.0;
-	public static final double DEFAULT_MIN_DELAY_MS = 5.0;
-	public static final double DEFAULT_FREQ_HZ = 1.0;
-	
-	// Property names
-	
-	/** DataBead property name: Frequency (rate at which the flanger's delay changes). */
-	public static final String FREQ_HZ = "freqHz";
-	/** DataBead property name: Minimum delay in milliseconds. */
-	public static final String MIN_DELAY_MS = "minDelayMs";
-	/** DataBead property name: Maximum delay in milliseconds. */
-	public static final String MAX_DELAY_MS = "maxDelayMs";
-	/** DataBead property name: Gain for original signal through the flanger's comb filter. */
-	public static final String A = "a";
-	/** DataBead property name: Gain for the delayed signal through the flanger's comb filter. */
-	public static final String G = "g";
-	/** DataBead property name: Gain for the feed-forward component of the flanger's comb filter. */
-	public static final String H = "h";
-	
-	/**
-	 * Create default parameters.
-	 * They are completely arbitrary, but
-	 * can serve as a useful starting point.
-	 */
-	public static final DataBead defaultParams() {
-		return new DataBead(
-				FREQ_HZ, DEFAULT_FREQ_HZ,
-				MIN_DELAY_MS, DEFAULT_MIN_DELAY_MS,
-				MAX_DELAY_MS, DEFAULT_MAX_DELAY_MS,
-				A, DEFAULT_A,
-				G, DEFAULT_G,
-				H, DEFAULT_H
-				);
-	}
-
+public class AddFlanger implements ParamNames, AddEffect {
 	private DataBead params;
 	
 	/**
@@ -73,7 +34,7 @@ public class AddFlanger implements AddEffect {
 	 * The default parameters will be used.
 	 */
 	public AddFlanger() {
-		this.params = defaultParams();
+		this.params = Defaults.flangerDefaults();
 	}
 	
 	/**
