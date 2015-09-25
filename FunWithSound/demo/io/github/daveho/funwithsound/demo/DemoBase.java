@@ -84,8 +84,6 @@ public abstract class DemoBase extends Composer {
 	
 	public static final String BAZZ = SOUNDFONT_DIR + "/hammersound/Bazz.SF2";
 	
-	private String outputFile;
-	
 	public abstract void create();
 	
 	public Rhythm dr(double c, Rhythm r) {
@@ -99,10 +97,6 @@ public abstract class DemoBase extends Composer {
 		return result;
 	}
 	
-	public void setOutputFile(String outputFile) {
-		this.outputFile = outputFile;
-	}
-	
 	public void demo() throws MidiUnavailableException, IOException {
 		create();
 		play();
@@ -112,10 +106,14 @@ public abstract class DemoBase extends Composer {
 		Player player = new Player();
 		onCreatePlayer(player);
 		player.setComposition(getComposition());
-		if (outputFile != null) {
-			player.setOutputFile(outputFile);
-		}
 		player.play();
+	}
+	
+	public void saveWaveFile(String outputFile) throws MidiUnavailableException, IOException {
+		Player player = new Player();
+		onCreatePlayer(player);
+		player.setComposition(getComposition());
+		player.saveWaveFile(outputFile);
 	}
 
 	protected void onCreatePlayer(Player player) {

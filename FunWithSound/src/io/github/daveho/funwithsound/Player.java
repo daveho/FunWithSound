@@ -68,7 +68,7 @@ public class Player {
 	private HashMap<String, Soundbank> soundBanks;
 	private RealizedInstrument liveSynth;
 	private Map<Instrument, RealizedInstrument> instrMap;
-	private String outputFile;
+//	private String outputFile;
 	private long idleTimeUs;
 	private CountDownLatch latch;
 	private ArrayList<MidiMessageAndTimeStamp> capturedEvents;
@@ -128,10 +128,6 @@ public class Player {
 	public void setComposition(Composition composition) {
 		this.composition = composition;
 	}
-
-	public void setOutputFile(String outputFile) {
-		this.outputFile = outputFile;
-	}
 	
 	private RealizedInstrument createGervill(Instrument instrument) throws MidiUnavailableException, IOException {
 		// Note that the GervillUGen isn't connected to an effects chain,
@@ -158,22 +154,14 @@ public class Player {
 	}
 
 	/**
-	 * Play the composition synchronously (if playing live),
-	 * or render it to an output file (if {@link #setOutputFile(String)}
-	 * was called.)
+	 * Play the composition synchronously.
 	 * 
 	 * @throws MidiUnavailableException
 	 * @throws IOException
 	 */
 	public void play() throws MidiUnavailableException, IOException {
 		prepareToPlay();
-		
-		if (outputFile != null) {
-			renderToOutputFile();
-		} else {
-			playLiveAndWait();
-		}
-		
+		playLiveAndWait();
 		onPlayingFinished();
 	}
 	
@@ -232,8 +220,21 @@ public class Player {
 		}
 		System.out.println("Playback finished");
 	}
+	
+	/**
+	 * Save the rendered composition as a wave file.
+	 * 
+	 * @param outputFile the name of the wave file to write
+	 * @throws MidiUnavailableException
+	 * @throws IOException
+	 */
+	public void saveWaveFile(String outputFile) throws MidiUnavailableException, IOException {
+		prepareToPlay();
+		renderToOutputFile(outputFile);
+		onPlayingFinished();
+	}
 
-	private void renderToOutputFile() throws IOException {
+	private void renderToOutputFile(String outputFile) throws IOException {
 		System.out.print("Saving audio data to " + outputFile + "...");
 		System.out.flush();
 		File f = new File(outputFile);
@@ -243,6 +244,7 @@ public class Player {
 		// Render to file
 		ac.logTime(true);
 		ac.runForNMillisecondsNonRealTime(idleTimeUs / 1000L);
+		recorder.kill(); // Ensure that all file output is written
 		System.out.println("done!");
 	}
 
