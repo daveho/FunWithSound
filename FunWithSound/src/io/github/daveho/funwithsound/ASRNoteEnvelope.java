@@ -40,7 +40,7 @@ public class ASRNoteEnvelope implements NoteEnvelope {
 	public ASRNoteEnvelope(AudioContext ac, DataBead params, UGen input) {
 		this.params = params;
 		this.envelope = new Envelope(ac);
-		this.envelope.setValue(1.0f);
+		this.envelope.setValue(0.0f);
 		this.gain = new Gain(ac, 2, envelope);
 		this.gain.addInput(input);
 	}
