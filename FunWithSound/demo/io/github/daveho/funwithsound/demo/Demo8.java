@@ -11,6 +11,7 @@ import io.github.daveho.funwithsound.Melody;
 import io.github.daveho.funwithsound.MonoSynthUGen;
 import io.github.daveho.funwithsound.MonoSynthUGen2;
 import io.github.daveho.funwithsound.NoteEnvelope;
+import io.github.daveho.funwithsound.OnOffNoteEnvelope;
 import io.github.daveho.funwithsound.ParamNames;
 import io.github.daveho.funwithsound.Player;
 import io.github.daveho.funwithsound.RealizedInstrument;
@@ -18,6 +19,7 @@ import io.github.daveho.funwithsound.Rhythm;
 import io.github.daveho.funwithsound.RingModulationVoice;
 import io.github.daveho.funwithsound.SynthToolkit;
 import io.github.daveho.funwithsound.Voice;
+import io.github.daveho.funwithsound.WaveVoice;
 
 import java.io.IOException;
 
@@ -34,12 +36,19 @@ public class Demo8 extends DemoBase {
 		tempo(220, 8);
 		
 		Instrument tr808 = percussion(TR808);
+		v(tr808, 0.9);
 		
-		Instrument d = percussion(HS_VDW);
+		Instrument vdwDrums = percussion(HS_VDW);
+		v(vdwDrums, 0.7);
 		
-		Instrument a = percussion(ARACHNO);
+		Instrument arachnoDrums = percussion(ARACHNO);
+		v(arachnoDrums, 0.9);
 		
 		Instrument lead = custom(0);
+		//Instrument lead = custom(1);
+		//Instrument lead = instr(ARACHNO, 82);
+		
+		
 		DataBead delayParams = AddPingPongStereoDelays.defaultParams();
 		delayParams.put(AddPingPongStereoDelays.NUM_DELAYS, 8);
 		delayParams.put(AddPingPongStereoDelays.FIRST_DELAY_GAIN, .7);
@@ -48,7 +57,7 @@ public class Demo8 extends DemoBase {
 		delayParams.put(AddPingPongStereoDelays.SPREAD, 1);
 		addfx(lead, new AddPingPongStereoDelays(delayParams));
 		addfx(lead, new AddReverb());
-		v(lead, 0.3);
+		v(lead, 0.2);
 		
 		// Good bass sounds: 4, 20, 21
 		Instrument bass = instr(HS_VDW, 21);
@@ -61,11 +70,11 @@ public class Demo8 extends DemoBase {
 		
 		Rhythm kick1r = r(p(0,127), p(1,110), p(2,127), p(5, 127), p(6.5, 110), p(7.5, 127));
 		Melody kick1m = m(an(25), an(24), an(26), an(26), an(26), an(24));
-		Figure kick1f = f(kick1r, kick1m, d);
+		Figure kick1f = f(kick1r, kick1m, vdwDrums);
 		
 		Rhythm kick2r = r(p(0,127), p(1,110), p(2,127), p(5, 127), p(6.5, 110), p(7.5, 127));
 		Melody kick2m = m(an(25), an(24), an(26), an(26), an(26), an(26));
-		Figure kick2f = f(kick2r, kick2m, d);
+		Figure kick2f = f(kick2r, kick2m, vdwDrums);
 		
 //		Rhythm hihatr = gr( rr(p(.5,127), .125, 4), rr(p(1,127), .25, 4), rr(p(2,127), .5,4), r(s(4,1.5,127), s(5.5,2,127)) );
 //		Melody hihatm = gm( rm(an(42), 12), m(an(49),an(49)) );
@@ -76,8 +85,8 @@ public class Demo8 extends DemoBase {
 		Rhythm accentr = r(p(5,105));
 		Melody accent1m = m(an(56));
 		Melody accent2m = m(an(72));
-		Figure accent1f = f(accentr, accent1m, d);
-		Figure accent2f = f(accentr, accent2m, a);
+		Figure accent1f = f(accentr, accent1m, vdwDrums);
+		Figure accent2f = f(accentr, accent2m, arachnoDrums);
 		
 		Rhythm bass1r = r(
 				s(0.000,0.5,102), s(0.5,1.5,90), s(2,0.5,106),
@@ -200,6 +209,7 @@ public class Demo8 extends DemoBase {
 							@Override
 							public NoteEnvelope createNoteEnvelope(AudioContext ac, DataBead params, UGen input) {
 								NoteEnvelope env = new ASRNoteEnvelope(ac, params, input);
+								//NoteEnvelope env = new OnOffNoteEnvelope(ac, input);
 								return env;
 							}
 						};
@@ -212,6 +222,28 @@ public class Demo8 extends DemoBase {
 								new double[]{.5/*, .5, .1*/});
 						return new RealizedInstrument(u, ac);
 					}
+				},
+				1, new CustomInstrumentFactoryImpl.CreateCustomInstrument() {
+					@Override
+					public RealizedInstrument create(AudioContext ac) {
+						DataBead params = Defaults.monosynthDefaults();
+						params.put(MonoSynthUGen.GLIDE_TIME_MS, 40);
+						SynthToolkit tk = new SynthToolkit() {
+							@Override
+							public Voice createVoice(AudioContext ac, DataBead params, UGen freq) {
+								return new WaveVoice(ac, Buffer.SAW, freq);
+							}
+							
+							@Override
+							public NoteEnvelope createNoteEnvelope(AudioContext ac, DataBead params, UGen input) {
+								return new OnOffNoteEnvelope(ac, input);
+							}
+						};
+						MonoSynthUGen2 u = new MonoSynthUGen2(ac, tk, params,
+								new double[]{1.0},
+								new double[]{1.0});
+						return new RealizedInstrument(u, ac);
+					}
 				});
 		player.setCustomInstrumentFactory(fac);
 	}
@@ -219,6 +251,7 @@ public class Demo8 extends DemoBase {
 	public static void main(String[] args) throws IOException, MidiUnavailableException {
 		Demo8 demo = new Demo8();
 		demo.create();
-		demo.play();
+		//demo.play();
+		demo.saveWaveFile("demo8.wav");
 	}
 }
