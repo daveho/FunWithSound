@@ -1,27 +1,23 @@
 package io.github.daveho.funwithsound.demo;
 
-import io.github.daveho.funwithsound.ASRNoteEnvelope;
 import io.github.daveho.funwithsound.AddReverb;
 import io.github.daveho.funwithsound.CustomInstrumentFactoryImpl;
 import io.github.daveho.funwithsound.Defaults;
 import io.github.daveho.funwithsound.Figure;
 import io.github.daveho.funwithsound.Instrument;
 import io.github.daveho.funwithsound.MonoSynthUGen2;
-import io.github.daveho.funwithsound.NoteEnvelope;
 import io.github.daveho.funwithsound.ParamNames;
 import io.github.daveho.funwithsound.Player;
 import io.github.daveho.funwithsound.RealizedInstrument;
 import io.github.daveho.funwithsound.Rhythm;
-import io.github.daveho.funwithsound.RingModulationVoice;
 import io.github.daveho.funwithsound.SynthToolkit;
-import io.github.daveho.funwithsound.Voice;
+import io.github.daveho.funwithsound.SynthToolkitBuilder;
 
 import java.io.IOException;
 
 import javax.sound.midi.MidiUnavailableException;
 
 import net.beadsproject.beads.core.AudioContext;
-import net.beadsproject.beads.core.UGen;
 import net.beadsproject.beads.data.Buffer;
 import net.beadsproject.beads.data.DataBead;
 
@@ -63,22 +59,10 @@ public class Demo7 extends DemoBase {
 						params.put(ParamNames.MIN_FREQ_MULTIPLE, -1);
 						params.put(ParamNames.MAX_FREQ_MULTIPLE, 1);
 						
-						SynthToolkit tk = new SynthToolkit() {
-							@Override
-							public Voice createVoice(AudioContext ac, DataBead params, UGen freq) {
-								//return new WaveVoice(ac, Buffer.SQUARE, freq);
-								return new RingModulationVoice(ac, params, Buffer.SAW, Buffer.SAW, freq);
-								//return new FMVoice(ac, params, Buffer.SAW, Buffer.SAW, freq);
-							}
-							
-							@Override
-							public NoteEnvelope createNoteEnvelope(AudioContext ac, DataBead params, UGen input) {
-								NoteEnvelope delegate = new ASRNoteEnvelope(ac, params, input);
-								//BandpassFilterNoteEnvelopeAdapter adapter = new BandpassFilterNoteEnvelopeAdapter(ac, params, delegate);
-								//return adapter;
-								return delegate;
-							}
-						};
+						SynthToolkit tk = SynthToolkitBuilder.start()
+								.withRingModulationVoice(Buffer.SAW, Buffer.SAW)
+								.withASRNoteEnvelope()
+								.getTk();
 						
 						MonoSynthUGen2 u = new MonoSynthUGen2(
 								ac,

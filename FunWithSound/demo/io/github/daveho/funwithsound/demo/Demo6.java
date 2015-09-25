@@ -6,7 +6,6 @@ import io.github.daveho.funwithsound.AddFlanger;
 import io.github.daveho.funwithsound.AddOscillatingBandPassFilter;
 import io.github.daveho.funwithsound.AddPingPongStereoDelays;
 import io.github.daveho.funwithsound.AddReverb;
-import io.github.daveho.funwithsound.BandpassFilterNoteEnvelopeAdapter;
 import io.github.daveho.funwithsound.CustomInstrumentFactory;
 import io.github.daveho.funwithsound.CustomInstrumentFactoryImpl;
 import io.github.daveho.funwithsound.Defaults;
@@ -20,6 +19,7 @@ import io.github.daveho.funwithsound.Player;
 import io.github.daveho.funwithsound.RealizedInstrument;
 import io.github.daveho.funwithsound.Rhythm;
 import io.github.daveho.funwithsound.SynthToolkit;
+import io.github.daveho.funwithsound.SynthToolkitBuilder;
 import io.github.daveho.funwithsound.Util;
 import io.github.daveho.funwithsound.Voice;
 import io.github.daveho.funwithsound.WaveVoice;
@@ -55,10 +55,10 @@ public class Demo6 extends DemoBase {
 //		params2.put(AddFlanger.FREQ_HZ, 1.0);
 //		addfx(monosynth2, new AddFlanger(params2));
 		DataBead params = AddPingPongStereoDelays.defaultParams();
-		params.put(AddPingPongStereoDelays.DELAY_MS, 500);
-		params.put(AddPingPongStereoDelays.NUM_DELAYS, 8);
-		params.put(AddPingPongStereoDelays.FIRST_DELAY_GAIN, 0.6);
-		params.put(AddPingPongStereoDelays.SPREAD, 0.9);
+		params.put(ParamNames.DELAY_MS, 500);
+		params.put(ParamNames.NUM_DELAYS, 8);
+		params.put(ParamNames.FIRST_DELAY_GAIN, 0.6);
+		params.put(ParamNames.SPREAD, 0.9);
 		addfx(monosynth2, new AddPingPongStereoDelays(params));
 		addfx(monosynth2, new AddOscillatingBandPassFilter(200, 1200, 0.125));
 		addfx(monosynth2, new AddReverb());
@@ -179,19 +179,13 @@ public class Demo6 extends DemoBase {
 					DataBead params = new DataBead();
 					params.putAll(Defaults.monosynthDefaults());
 					params.putAll(Defaults.bandpassNoteEnvelopeDefaults());
-					SynthToolkit tk = new SynthToolkit() {
-						@Override
-						public Voice createVoice(AudioContext ac, DataBead params, UGen freq) {
-							return new WaveVoice(ac, Buffer.SAW, freq);
-						}
-						
-						@Override
-						public NoteEnvelope createNoteEnvelope(AudioContext ac, DataBead params, UGen input) {
-							ASRNoteEnvelope delegate = new ASRNoteEnvelope(ac, params, input);
-							BandpassFilterNoteEnvelopeAdapter adapter = new BandpassFilterNoteEnvelopeAdapter(ac, params, delegate);
-							return adapter;
-						}
-					};
+					
+					SynthToolkit tk = SynthToolkitBuilder.start()
+							.withWaveVoice(Buffer.SAW)
+							.withASRNoteEnvelope()
+							.withBandpassFilterNoteEnvelopeAdapter()
+							.getTk();
+					
 					MonoSynthUGen2 synth = new MonoSynthUGen2(
 							ac,
 							tk,

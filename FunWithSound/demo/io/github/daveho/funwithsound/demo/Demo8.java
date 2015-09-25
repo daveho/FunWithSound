@@ -1,6 +1,5 @@
 package io.github.daveho.funwithsound.demo;
 
-import io.github.daveho.funwithsound.ASRNoteEnvelope;
 import io.github.daveho.funwithsound.AddPingPongStereoDelays;
 import io.github.daveho.funwithsound.AddReverb;
 import io.github.daveho.funwithsound.CustomInstrumentFactoryImpl;
@@ -9,23 +8,18 @@ import io.github.daveho.funwithsound.Figure;
 import io.github.daveho.funwithsound.Instrument;
 import io.github.daveho.funwithsound.Melody;
 import io.github.daveho.funwithsound.MonoSynthUGen2;
-import io.github.daveho.funwithsound.NoteEnvelope;
-import io.github.daveho.funwithsound.OnOffNoteEnvelope;
 import io.github.daveho.funwithsound.ParamNames;
 import io.github.daveho.funwithsound.Player;
 import io.github.daveho.funwithsound.RealizedInstrument;
 import io.github.daveho.funwithsound.Rhythm;
-import io.github.daveho.funwithsound.RingModulationVoice;
 import io.github.daveho.funwithsound.SynthToolkit;
-import io.github.daveho.funwithsound.Voice;
-import io.github.daveho.funwithsound.WaveVoice;
+import io.github.daveho.funwithsound.SynthToolkitBuilder;
 
 import java.io.IOException;
 
 import javax.sound.midi.MidiUnavailableException;
 
 import net.beadsproject.beads.core.AudioContext;
-import net.beadsproject.beads.core.UGen;
 import net.beadsproject.beads.data.Buffer;
 import net.beadsproject.beads.data.DataBead;
 
@@ -193,32 +187,23 @@ public class Demo8 extends DemoBase {
 					@Override
 					public RealizedInstrument create(AudioContext ac) {
 						DataBead params = Defaults.monosynthDefaults();
-						params.putAll(Defaults.fmVoiceDefaults());
+						params.putAll(Defaults.ringModulationVoiceDefaults());
 						params.put(ParamNames.GLIDE_TIME_MS, 100);
 						params.put(ParamNames.MIN_FREQ_MULTIPLE, -1);
 						params.put(ParamNames.MAX_FREQ_MULTIPLE, 1);
 						params.put(ParamNames.MOD_GLIDE_TIME_MS, 80);
 						
-						SynthToolkit tk = new SynthToolkit() {
-							@Override
-							public Voice createVoice(AudioContext ac, DataBead params, UGen freq) {
-								return new RingModulationVoice(ac, params, Buffer.SAW, Buffer.SAW, freq);
-							}
-							
-							@Override
-							public NoteEnvelope createNoteEnvelope(AudioContext ac, DataBead params, UGen input) {
-								NoteEnvelope env = new ASRNoteEnvelope(ac, params, input);
-								//NoteEnvelope env = new OnOffNoteEnvelope(ac, input);
-								return env;
-							}
-						};
+						SynthToolkit tk = SynthToolkitBuilder.start()
+								.withRingModulationVoice(Buffer.SAW, Buffer.SAW)
+								.withASRNoteEnvelope()
+								.getTk();
 						
 						MonoSynthUGen2 u = new MonoSynthUGen2(
 								ac,
 								tk,
 								params,
-								new double[]{1.0/*, 2.0, 4.0*/},
-								new double[]{.5/*, .5, .1*/});
+								new double[]{1.0, 2.0},
+								new double[]{.6, .2});
 						return new RealizedInstrument(u, ac);
 					}
 				},
@@ -227,17 +212,10 @@ public class Demo8 extends DemoBase {
 					public RealizedInstrument create(AudioContext ac) {
 						DataBead params = Defaults.monosynthDefaults();
 						params.put(ParamNames.GLIDE_TIME_MS, 40);
-						SynthToolkit tk = new SynthToolkit() {
-							@Override
-							public Voice createVoice(AudioContext ac, DataBead params, UGen freq) {
-								return new WaveVoice(ac, Buffer.SAW, freq);
-							}
-							
-							@Override
-							public NoteEnvelope createNoteEnvelope(AudioContext ac, DataBead params, UGen input) {
-								return new OnOffNoteEnvelope(ac, input);
-							}
-						};
+						SynthToolkit tk = SynthToolkitBuilder.start()
+								.withWaveVoice(Buffer.SAW)
+								.withOnOffNoteEnvelope()
+								.getTk();
 						MonoSynthUGen2 u = new MonoSynthUGen2(ac, tk, params,
 								new double[]{1.0},
 								new double[]{1.0});
