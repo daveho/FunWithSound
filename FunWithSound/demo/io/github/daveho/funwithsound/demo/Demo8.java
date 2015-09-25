@@ -8,7 +8,6 @@ import io.github.daveho.funwithsound.Defaults;
 import io.github.daveho.funwithsound.Figure;
 import io.github.daveho.funwithsound.Instrument;
 import io.github.daveho.funwithsound.Melody;
-import io.github.daveho.funwithsound.MonoSynthUGen;
 import io.github.daveho.funwithsound.MonoSynthUGen2;
 import io.github.daveho.funwithsound.NoteEnvelope;
 import io.github.daveho.funwithsound.OnOffNoteEnvelope;
@@ -195,7 +194,7 @@ public class Demo8 extends DemoBase {
 					public RealizedInstrument create(AudioContext ac) {
 						DataBead params = Defaults.monosynthDefaults();
 						params.putAll(Defaults.fmVoiceDefaults());
-						params.put(MonoSynthUGen.GLIDE_TIME_MS, 100);
+						params.put(ParamNames.GLIDE_TIME_MS, 100);
 						params.put(ParamNames.MIN_FREQ_MULTIPLE, -1);
 						params.put(ParamNames.MAX_FREQ_MULTIPLE, 1);
 						params.put(ParamNames.MOD_GLIDE_TIME_MS, 80);
@@ -227,7 +226,7 @@ public class Demo8 extends DemoBase {
 					@Override
 					public RealizedInstrument create(AudioContext ac) {
 						DataBead params = Defaults.monosynthDefaults();
-						params.put(MonoSynthUGen.GLIDE_TIME_MS, 40);
+						params.put(ParamNames.GLIDE_TIME_MS, 40);
 						SynthToolkit tk = new SynthToolkit() {
 							@Override
 							public Voice createVoice(AudioContext ac, DataBead params, UGen freq) {
@@ -251,7 +250,7 @@ public class Demo8 extends DemoBase {
 	public static void main(String[] args) throws IOException, MidiUnavailableException {
 		Demo8 demo = new Demo8();
 		demo.create();
-		//demo.play();
-		demo.saveWaveFile("demo8.wav");
+		demo.play();
+		//demo.saveWaveFile("demo8.wav");
 	}
 }

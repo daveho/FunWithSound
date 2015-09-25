@@ -29,15 +29,7 @@ import net.beadsproject.beads.ugens.Reverb;
  * The parameter DataBead uses the same property names
  * as the Reverb UGen.
  */
-public class AddReverb implements AddEffect {
-	/** DataBead property name: Late reverb level, in the range 0-1. */
-	public static final String LATE_REVERB_LEVEL = "lateReverbLevel";
-	/** DataBead property name: Early reflections level, in the range 0-1. */
-	public static final String EARLY_REFLECTIONS_LEVEL = "earlyReflectionsLevel";
-	/** DataBead property name: Room size, in the range 0-1. */
-	public static final String ROOM_SIZE = "roomSize";
-	/** DataBead property name: Damping, in the range 0-1. */
-	public static final String DAMPING = "damping";
+public class AddReverb implements ParamNames, AddEffect {
 
 	/**
 	 * Get default reverb parameters.

@@ -41,6 +41,16 @@ public interface ParamNames {
 	/** DataBead property name: Curvature of the glides from start to rise and back. */
 	public static final String CURVATURE = "curvature";
 	
+	// User by AddReverb
+	/** DataBead property name: Late reverb level, in the range 0-1. */
+	public static final String LATE_REVERB_LEVEL = "lateReverbLevel";
+	/** DataBead property name: Early reflections level, in the range 0-1. */
+	public static final String EARLY_REFLECTIONS_LEVEL = "earlyReflectionsLevel";
+	/** DataBead property name: Room size, in the range 0-1. */
+	public static final String ROOM_SIZE = "roomSize";
+	/** DataBead property name: Damping, in the range 0-1. */
+	public static final String DAMPING = "damping";
+	
 	// Used by AddPingPongStereoDelays
 	/** DataBead property name: Number of delays. */
 	public static final String NUM_DELAYS = "numDelays";

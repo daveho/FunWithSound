@@ -1,15 +1,11 @@
 package io.github.daveho.funwithsound.demo;
 
 import io.github.daveho.funwithsound.ASRNoteEnvelope;
-import io.github.daveho.funwithsound.AddOscillatingBandPassFilter;
 import io.github.daveho.funwithsound.AddReverb;
-import io.github.daveho.funwithsound.BandpassFilterNoteEnvelopeAdapter;
 import io.github.daveho.funwithsound.CustomInstrumentFactoryImpl;
 import io.github.daveho.funwithsound.Defaults;
-import io.github.daveho.funwithsound.FMVoice;
 import io.github.daveho.funwithsound.Figure;
 import io.github.daveho.funwithsound.Instrument;
-import io.github.daveho.funwithsound.MonoSynthUGen;
 import io.github.daveho.funwithsound.MonoSynthUGen2;
 import io.github.daveho.funwithsound.NoteEnvelope;
 import io.github.daveho.funwithsound.ParamNames;
@@ -60,7 +56,7 @@ public class Demo7 extends DemoBase {
 						DataBead params = Defaults.monosynthDefaults();
 						params.putAll(Defaults.bandpassNoteEnvelopeDefaults());
 						params.putAll(Defaults.fmVoiceDefaults());
-						params.put(MonoSynthUGen.GLIDE_TIME_MS, 20);
+						params.put(ParamNames.GLIDE_TIME_MS, 20);
 						params.put(ParamNames.START_END_FREQ_FACTOR, .5);
 						params.put(ParamNames.RISE_FREQ_FACTOR, 1);
 						
