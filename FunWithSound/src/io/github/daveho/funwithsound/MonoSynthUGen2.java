@@ -68,7 +68,7 @@ public class MonoSynthUGen2 extends UGenChain implements ParamNames, DataBeadRec
 
 		// Glide to control the note base frequency
 		freq = new Glide(ac);
-		freq.setGlideTime(Util.getFloat(params, GLIDE_TIME_MS)); // For portamento
+		freq.setGlideTime(Util.getFloat(params, GLIDE_TIME_MS, 0.0f)); // For portamento
 
 		// Mixer for all of the Voice outputs
 		Gain mixer = new Gain(ac, 2);
