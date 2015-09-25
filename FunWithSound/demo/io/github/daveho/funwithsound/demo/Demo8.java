@@ -41,6 +41,9 @@ public class Demo8 extends DemoBase {
 		//Instrument lead = custom(1);
 		//Instrument lead = instr(ARACHNO, 82);
 		
+		Instrument sp = samplePlayer();
+		sp.addSample(0, SAMPLE_DIR + "/freesound/46620__dangerbabe__summer04.wav");
+		
 		
 		DataBead delayParams = AddPingPongStereoDelays.defaultParams();
 		delayParams.put(AddPingPongStereoDelays.NUM_DELAYS, 8);
@@ -137,22 +140,29 @@ public class Demo8 extends DemoBase {
 				an(60), an(62), an(60), an(62), an(50), an(52));
 		Figure lead4f = f(lead4r, lead4m, lead);
 		
+		Rhythm sr = r(p(3));
+		Melody sm = m(an(0));
+		Figure sf = f(sr, sm, sp);
+		
 //		Rhythm tinkler = rr(s(0,.6,81), 1, 8);
 //		Melody tinkle1m = m();
 
 //		add1(gf(kick1f,hihatf));
 //		add1(gf(kick2f,hihatf));
 
-		add1(gf(kick1f,hihatf));
-		add1(gf(kick1f,hihatf));
+		add1(gf(kick1f,hihatf,sf));
+		add1(gf(kick1f,hihatf,sf));
+		// Bass pattern starts
 		add1(gf(kick1f,hihatf,bass1f));
 		add1(gf(kick2f,hihatf,bass2f));
-		add1(gf(kick1f,hihatf,bass1f));
-		add1(gf(kick2f,hihatf,bass3f));
+		add1(gf(kick1f,hihatf,bass1f,sf));
+		add1(gf(kick2f,hihatf,bass3f,sf));
+		// Percussion accents start
 		add1(gf(kick1f,hihatf,bass4f,accent1f));
 		add1(gf(kick1f,hihatf,accent2f));
-		add1(gf(kick1f,hihatf,accent1f));
-		add1(gf(kick1f,hihatf,accent2f));
+		add1(gf(kick1f,hihatf,accent1f,sf));
+		add1(gf(kick1f,hihatf,accent2f,sf));
+		// Lead starts
 		add1(gf(kick1f,hihatf,bass1f,accent1f,lead1f));
 		add1(gf(kick2f,hihatf,bass2f,accent2f));
 		add1(gf(kick1f,hihatf,bass1f,accent1f));
@@ -169,10 +179,20 @@ public class Demo8 extends DemoBase {
 		add1(gf(kick2f,hihatf,bass2f,accent2f));
 		add1(gf(kick1f,hihatf,bass1f,accent1f,lead4f));
 		add1(gf(kick2f,hihatf,bass3f,accent2f));
+		// Lead ends, hihats drop out, bass pattern is just bass4f
 		add1(gf(kick1f,bass4f,accent1f));
 		add1(gf(kick2f,bass4f,accent2f));
 		add1(gf(kick1f,bass4f,accent1f));
 		add1(gf(kick2f,bass4f,accent2f));
+		// Hihats and full bass pattern return
+		add1(gf(kick1f,hihatf,bass1f,accent1f));
+		add1(gf(kick2f,hihatf,bass2f,accent2f));
+		add1(gf(kick1f,hihatf,bass1f,accent1f));
+		add1(gf(kick2f,hihatf,bass3f,accent2f));
+		add1(gf(kick1f,hihatf,bass1f,accent1f));
+		add1(gf(kick2f,hihatf,bass2f,accent2f));
+		add1(gf(kick1f,hihatf,bass1f,accent1f));
+		add1(gf(kick2f,hihatf,bass3f,accent2f));
 		add1(gf(kick1f,hihatf,bass1f,accent1f));
 		add1(gf(kick2f,hihatf,bass2f,accent2f));
 		add1(gf(kick1f,hihatf,bass1f,accent1f));

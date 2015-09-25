@@ -57,10 +57,10 @@ public class Player {
 	// to avoid glitches in the early audio.
 	// (I think the GervillUGens are sending junk audio
 	// early on, prior to the first MIDI event.)
-	private static final long START_DELAY_US = 2000000L;
+	private static final long DEFAULT_START_DELAY_US = 2000000L;
 	
 	// Shut down this many microseconds after the last note off message.
-	private static final long IDLE_WAIT_US = 2000000L;
+	private static final long DEFAULT_IDLE_WAIT_US = 2000000L;
 	
 	private Composition composition;
 	private AudioContext ac;
@@ -69,6 +69,8 @@ public class Player {
 	private RealizedInstrument liveSynth;
 	private Map<Instrument, RealizedInstrument> instrMap;
 //	private String outputFile;
+	private long startDelayUs;
+	private long idleWaitUs;
 	private long idleTimeUs;
 	private CountDownLatch latch;
 	private ArrayList<MidiMessageAndTimeStamp> capturedEvents;
@@ -88,6 +90,8 @@ public class Player {
 				throw new RuntimeException("No custom instrument factory is registered!");
 			}
 		};
+		startDelayUs = DEFAULT_START_DELAY_US;
+		idleWaitUs = DEFAULT_IDLE_WAIT_US;
 	}
 	
 	/**
@@ -98,6 +102,26 @@ public class Player {
 	 */
 	public void setCustomInstrumentFactory(CustomInstrumentFactory customInstrumentFactory) {
 		this.customInstrumentFactory = customInstrumentFactory;
+	}
+	
+	/**
+	 * Set the start delay (in microseconds).
+	 * 
+	 * @param startDelayUs the start delay (in microseconds)
+	 */
+	public void setStartDelayUs(long startDelayUs) {
+		this.startDelayUs = startDelayUs;
+	}
+	
+	/**
+	 * Set the idle wait time (in microseconds).
+	 * This is the time between the last note off event
+	 * and shutting down the AudioContext.
+	 * 
+	 * @param idleWaitUs the idle wait time (in microseconds)
+	 */
+	public void setIdleWaitUs(long idleWaitUs) {
+		this.idleWaitUs = idleWaitUs;
 	}
 
 	/**
@@ -291,7 +315,7 @@ public class Player {
 				masterGain.setGain(1.0f);
 			}
 		};
-		DelayTrigger unmuteTrigger = new DelayTrigger(ac, START_DELAY_US/1000.0, unmute);
+		DelayTrigger unmuteTrigger = new DelayTrigger(ac, startDelayUs/1000.0, unmute);
 		ac.out.addDependent(unmuteTrigger);
 	}
 
@@ -449,7 +473,7 @@ public class Player {
 					// 0, and 10 is encoded as 9.)
 					int channel = instrument.getType() == InstrumentType.MIDI_PERCUSSION ? 9 : 0;
 					
-					long onTime = START_DELAY_US + e.getStartUs() + s.getStartUs();
+					long onTime = startDelayUs + e.getStartUs() + s.getStartUs();
 //					System.out.printf("Note on at %d\n", onTime);
 					long offTime = onTime + s.getDurationUs();
 					ShortMessage noteOn = Midi.createShortMessage(ShortMessage.NOTE_ON|channel, note, s.getVelocity());
@@ -464,7 +488,7 @@ public class Player {
 			}
 		}
 		
-		final long idleTimeUs = lastNoteOffUs + IDLE_WAIT_US;
+		final long idleTimeUs = lastNoteOffUs + this.idleWaitUs;
 		return idleTimeUs;
 	}
 
