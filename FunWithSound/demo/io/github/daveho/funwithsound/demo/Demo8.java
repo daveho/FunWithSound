@@ -1,5 +1,6 @@
 package io.github.daveho.funwithsound.demo;
 
+import io.github.daveho.funwithsound.AddAutoPan;
 import io.github.daveho.funwithsound.AddPingPongStereoDelays;
 import io.github.daveho.funwithsound.AddReverb;
 import io.github.daveho.funwithsound.CustomInstrumentFactoryImpl;
@@ -41,16 +42,17 @@ public class Demo8 extends DemoBase {
 		//Instrument lead = custom(1);
 		//Instrument lead = instr(ARACHNO, 82);
 		
-		Instrument sp = samplePlayer();
-		sp.addSample(0, SAMPLE_DIR + "/freesound/46620__dangerbabe__summer04.wav");
+//		Instrument sp = samplePlayer();
+//		sp.addSample(0, SAMPLE_DIR + "/freesound/46620__dangerbabe__summer04.wav");
 		
+		addfx(lead, new AddAutoPan(.25, -.8, .8));
 		
 		DataBead delayParams = AddPingPongStereoDelays.defaultParams();
 		delayParams.put(AddPingPongStereoDelays.NUM_DELAYS, 8);
 		delayParams.put(AddPingPongStereoDelays.FIRST_DELAY_GAIN, .7);
 		delayParams.put(AddPingPongStereoDelays.GAIN_DROP, .05);
-		delayParams.put(AddPingPongStereoDelays.DELAY_MS, 400);
-		delayParams.put(AddPingPongStereoDelays.SPREAD, 1);
+		delayParams.put(AddPingPongStereoDelays.DELAY_MS, getComposition().getTempo().beatToUs(1.0)/1000.0);
+		delayParams.put(AddPingPongStereoDelays.SPREAD, 0);
 		addfx(lead, new AddPingPongStereoDelays(delayParams));
 		addfx(lead, new AddReverb());
 		v(lead, 0.15);
@@ -140,9 +142,9 @@ public class Demo8 extends DemoBase {
 				an(60), an(62), an(60), an(62), an(50), an(52));
 		Figure lead4f = f(lead4r, lead4m, lead);
 		
-		Rhythm sr = r(p(3));
-		Melody sm = m(an(0));
-		Figure sf = f(sr, sm, sp);
+//		Rhythm sr = r(p(3));
+//		Melody sm = m(an(0));
+//		Figure sf = f(sr, sm, sp);
 		
 //		Rhythm tinkler = rr(s(0,.6,81), 1, 8);
 //		Melody tinkle1m = m();
@@ -150,18 +152,18 @@ public class Demo8 extends DemoBase {
 //		add1(gf(kick1f,hihatf));
 //		add1(gf(kick2f,hihatf));
 
-		add1(gf(kick1f,hihatf,sf));
-		add1(gf(kick1f,hihatf,sf));
+		add1(gf(kick1f,hihatf));
+		add1(gf(kick1f,hihatf));
 		// Bass pattern starts
 		add1(gf(kick1f,hihatf,bass1f));
 		add1(gf(kick2f,hihatf,bass2f));
-		add1(gf(kick1f,hihatf,bass1f,sf));
-		add1(gf(kick2f,hihatf,bass3f,sf));
+		add1(gf(kick1f,hihatf,bass1f));
+		add1(gf(kick2f,hihatf,bass3f));
 		// Percussion accents start
 		add1(gf(kick1f,hihatf,bass4f,accent1f));
 		add1(gf(kick1f,hihatf,accent2f));
-		add1(gf(kick1f,hihatf,accent1f,sf));
-		add1(gf(kick1f,hihatf,accent2f,sf));
+		add1(gf(kick1f,hihatf,accent1f));
+		add1(gf(kick1f,hihatf,accent2f));
 		// Lead starts
 		add1(gf(kick1f,hihatf,bass1f,accent1f,lead1f));
 		add1(gf(kick2f,hihatf,bass2f,accent2f));
