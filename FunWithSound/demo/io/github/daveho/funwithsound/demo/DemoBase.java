@@ -58,7 +58,7 @@ public abstract class DemoBase extends Composer {
 	public static final String ANALOG_AGE = SOUNDFONT_DIR+"/analogage/Analog Age_set.sf2";
 	
 	// http://www.hammersound.com/cgi-bin/soundlink_download2.pl/Download%20Norway;hs_tb303.zip;20
-	public static final String TB303 = SOUNDFONT_DIR+"/tb303/HS TB-303.SF2";
+	public static final String TB303 = SOUNDFONT_DIR+"/hammersound/HS TB-303.SF2";
 	
 	// http://www.hammersound.com/cgi-bin/soundlink_download2.pl/Download%20Norway;hs_pt1.zip;22
 	public static final String HS_PT1 = SOUNDFONT_DIR + "/hammersound/HS Pads and Textures I.sf2";
