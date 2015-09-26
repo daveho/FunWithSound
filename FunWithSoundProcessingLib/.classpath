@@ -6,7 +6,6 @@
 	<classpathentry kind="lib" path="lib/beads-io.jar"/>
 	<classpathentry kind="lib" path="lib/beads.jar"/>
 	<classpathentry kind="lib" path="lib/funwithsound-core.jar"/>
-	<classpathentry kind="lib" path="lib/gervill.jar"/>
 	<classpathentry kind="lib" path="lib/gervill4beads.jar"/>
 	<classpathentry kind="lib" path="lib/tritonus_aos-0.3.6.jar"/>
 	<classpathentry kind="lib" path="lib/tritonus_share.jar"/>
