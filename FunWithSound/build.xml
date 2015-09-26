@@ -42,6 +42,7 @@
     </target>
     <target name="clean">
         <delete dir="bin"/>
+        <delete file="funwithsound-core.jar"/>
     </target>
     <target depends="clean" name="cleanall">
         <ant antfile="build.xml" dir="${Gervill4Beads.location}" inheritAll="false" target="clean"/>
