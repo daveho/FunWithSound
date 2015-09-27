@@ -21,6 +21,7 @@ import io.github.daveho.gervill4beads.MidiMessageAndTimeStamp;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -77,6 +78,7 @@ public class Player {
 	private MidiDevice device;
 	private boolean playing;
 	private CustomInstrumentFactory customInstrumentFactory;
+	private Soundbank emergency;
 	
 	/**
 	 * Constructor.
@@ -158,13 +160,24 @@ public class Player {
 		// or the AudioContext output, at this point.
 		GervillUGen gervill = new GervillUGen(ac, Collections.<String, Object>emptyMap());
 		RealizedInstrument info = new RealizedInstrument(gervill);
+		Synthesizer synth = gervill.getSynth();
 		if (instrument.hasSoundFont()) {
-			Synthesizer synth = ((GervillUGen)info.head).getSynth();
 			Soundbank sb = getSoundBank(instrument);
 			if (sb != null) {
 				synth.loadAllInstruments(sb);
 			} else {
 				System.err.println("Warning: couldn't load soundfont " + instrument.getSoundFont());
+			}
+		} else  {
+			// The built-in JDK implementation of Gervill doesn't seem
+			// to create/find the emergency soundbank reliably.  I'm
+			// guessing this is due to the way we're instantiating
+			// SoftSynthesizer by reflection rather than going through
+			// MidiSystem.  In any case, we can just use reflection to
+			// create the emergency soundbank in memory.
+			Soundbank emergency = getEmergencySoundbank();
+			if (emergency == null) {
+				synth.loadAllInstruments(emergency);
 			}
 		}
 		int patch = instrument.getPatch();
@@ -172,9 +185,35 @@ public class Player {
 			// The MIDI patches are numbered 1..128, but encoded as 0..127
 			patch--;
 			ShortMessage programChange = Midi.createShortMessage(ShortMessage.PROGRAM_CHANGE, patch);
-			((GervillUGen)info.head).getSynthRecv().send(programChange, -1L);
+			info.source.send(programChange, -1L);
 		}
 		return info;
+	}
+
+	private Soundbank getEmergencySoundbank() {
+		if (this.emergency != null) {
+			return this.emergency;
+		}
+		try {
+			String esbClsName = "com.sun.media.sound.EmergencySoundbank";
+			Class<?> esbCls = Class.forName(esbClsName);
+			Method[] methods = esbCls.getDeclaredMethods();
+			for (Method m : methods) {
+				if (m.getName().equals("createSoundbank")) {
+					System.out.print("Creating emergency soundbank...");
+					System.out.flush();
+					Soundbank sb = (Soundbank) m.invoke(null);
+					System.out.println("done");
+					this.emergency = sb;
+					return sb;
+				}
+			}
+			System.out.println("Could not find createSoundbank method in " + esbClsName);
+			return null;
+		} catch (Exception e) {
+			System.out.println("Warning: could not create emergency soundbank: " + e.toString());
+			return null;
+		}
 	}
 
 	/**
