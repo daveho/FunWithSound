@@ -91,4 +91,18 @@ public class Defaults implements ParamNames {
 		
 		return params;
 	}
+
+	/**
+	 * Get the default parameters for {@link AddPingPongStereoDelays}.
+	 * @return the default parameters
+	 */
+	public static DataBead pingPongStereoDelayDefaults() {
+		DataBead params = new DataBead();
+		params.put(NUM_DELAYS, 4);
+		params.put(DELAY_MS, 250);
+		params.put(SPREAD, .8);
+		params.put(FIRST_DELAY_GAIN, .4);
+		params.put(GAIN_DROP, .05);
+		return params;
+	}
 }

@@ -32,21 +32,16 @@ public class AddPingPongStereoDelays implements ParamNames, AddEffect {
 	/**
 	 * Get the default parameters.
 	 * @return the default parameters
+	 * @deprecated Use {@link Defaults#pingPongStereoDelayDefaults()} instead
 	 */
 	public static DataBead defaultParams() {
-		DataBead params = new DataBead();
-		params.put(NUM_DELAYS, 4);
-		params.put(DELAY_MS, 250);
-		params.put(SPREAD, .8);
-		params.put(FIRST_DELAY_GAIN, .4);
-		params.put(GAIN_DROP, .05);
-		return params;
+		return Defaults.pingPongStereoDelayDefaults();
 	}
 	
 	private DataBead params;
 	
 	public AddPingPongStereoDelays() {
-		params = defaultParams();
+		params = Defaults.pingPongStereoDelayDefaults();
 	}
 	
 	public AddPingPongStereoDelays(DataBead params) {

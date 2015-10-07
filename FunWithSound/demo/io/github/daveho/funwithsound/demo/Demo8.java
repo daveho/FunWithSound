@@ -47,7 +47,7 @@ public class Demo8 extends DemoBase {
 		
 		addfx(lead, new AddAutoPan(.25, -.8, .8));
 		
-		DataBead delayParams = AddPingPongStereoDelays.defaultParams();
+		DataBead delayParams = Defaults.pingPongStereoDelayDefaults();
 		delayParams.put(AddPingPongStereoDelays.NUM_DELAYS, 8);
 		delayParams.put(AddPingPongStereoDelays.FIRST_DELAY_GAIN, .7);
 		delayParams.put(AddPingPongStereoDelays.GAIN_DROP, .05);

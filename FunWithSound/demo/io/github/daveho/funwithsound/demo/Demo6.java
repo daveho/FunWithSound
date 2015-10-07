@@ -54,7 +54,7 @@ public class Demo6 extends DemoBase {
 //		params2.put(AddFlanger.MAX_DELAY_MS, 5);
 //		params2.put(AddFlanger.FREQ_HZ, 1.0);
 //		addfx(monosynth2, new AddFlanger(params2));
-		DataBead params = AddPingPongStereoDelays.defaultParams();
+		DataBead params = Defaults.pingPongStereoDelayDefaults();
 		params.put(ParamNames.DELAY_MS, 500);
 		params.put(ParamNames.NUM_DELAYS, 8);
 		params.put(ParamNames.FIRST_DELAY_GAIN, 0.6);
