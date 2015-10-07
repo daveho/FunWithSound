@@ -69,7 +69,6 @@ public class Player {
 	private HashMap<String, Soundbank> soundBanks;
 	private RealizedInstrument liveSynth;
 	private Map<Instrument, RealizedInstrument> instrMap;
-//	private String outputFile;
 	private long startDelayUs;
 	private long idleWaitUs;
 	private long idleTimeUs;
@@ -241,7 +240,10 @@ public class Player {
 		ac.start();
 		this.playing = true;
 	}
-	
+
+	/**
+	 * Check whether asynchronous playing has ended.
+	 */
 	public void checkForEndOfPlaying() {
 		if (playing && latch.getCount() == 0) {
 			onPlayingFinished();
@@ -249,6 +251,9 @@ public class Player {
 		}
 	}
 
+	/**
+	 * Force asynchronous playing to stop.
+	 */
 	public void forceStopPlaying() {
 		if (playing) {
 			if (latch.getCount() > 0) {
@@ -566,15 +571,6 @@ public class Player {
 					// Play entire sample
 					sb.addSample(sampleInfo.note, sample, sampleInfo.gain);
 				}
-				
-				/*
-				SampleRange sampleRange = instr.getSampleRanges().get(entry.getKey());
-				if (sampleRange != null) {
-					sb.addSample(entry.getKey(), sample, sampleRange);
-				} else {
-					sb.addSample(entry.getKey(), sample);
-				}
-				*/
 			}
 			info = new RealizedInstrument(sb, ac);
 			instrMap.put(instr, info);

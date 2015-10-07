@@ -28,30 +28,63 @@ public class SimpleFigure implements Figure {
 	private Melody melody;
 	private Instrument instrument;
 	
+	/**
+	 * Constructor.
+	 */
 	public SimpleFigure() {
 		
 	}
 	
+	/**
+	 * Set the {@link Rhythm}.
+	 * 
+	 * @param rhythm the {@link Rhythm} to set
+	 */
 	public void setRhythm(Rhythm rhythm) {
 		this.rhythm = rhythm;
 	}
 	
+	/**
+	 * Get the {@link Rhythm}.
+	 * 
+	 * @return the {@link Rhythm}
+	 */
 	public Rhythm getRhythm() {
 		return rhythm;
 	}
 	
+	/**
+	 * Set the {@link Melody}.
+	 * 
+	 * @param melody the {@link Melody} to set
+	 */
 	public void setMelody(Melody melody) {
 		this.melody = melody;
 	}
 	
+	/**
+	 * Get the {@link Melody}.
+	 * 
+	 * @return the {@link Melody}
+	 */
 	public Melody getMelody() {
 		return melody;
 	}
 	
+	/**
+	 * Set the {@link Instrument}.
+	 * 
+	 * @param instrument the {@link Instrument} to set
+	 */
 	public void setInstrument(Instrument instrument) {
 		this.instrument = instrument;
 	}
 	
+	/**
+	 * Get the {@link Instrument}.
+	 * 
+	 * @return the {@link Instrument}
+	 */
 	public Instrument getInstrument() {
 		return instrument;
 	}

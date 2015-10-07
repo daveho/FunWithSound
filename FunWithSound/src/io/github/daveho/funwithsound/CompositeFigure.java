@@ -26,10 +26,18 @@ import java.util.List;
 public class CompositeFigure implements Figure {
 	private List<Figure> figures;
 	
+	/**
+	 * Constructor.
+	 */
 	public CompositeFigure() {
 		figures = new ArrayList<Figure>();
 	}
 	
+	/**
+	 * Add a child {@link Figure}.
+	 * 
+	 * @param child the child {@link Figure} to add
+	 */
 	public void add(Figure child) {
 		figures.add(child);
 	}

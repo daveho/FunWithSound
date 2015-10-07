@@ -122,10 +122,20 @@ public class InstrumentType implements Comparable<InstrumentType> {
 		return buf.toString();
 	}
 
+	/**
+	 * Determine if this instrument type is a MIDI instrument type.
+	 * 
+	 * @return true if this is a MIDI instrument type, false otherwise
+	 */
 	public boolean isMidi() {
 		return kind.isMidi();
 	}
 
+	/**
+	 * Determine if this instrument type designates a custom instrument.
+	 * 
+	 * @return true if this is a custom instrument type, false otherwise
+	 */
 	public boolean isCustom() {
 		return kind == Kind.CUSTOM;
 	}

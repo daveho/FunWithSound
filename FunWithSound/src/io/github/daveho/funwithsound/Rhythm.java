@@ -26,18 +26,37 @@ import java.util.TreeSet;
 public class Rhythm implements Iterable<Strike> {
 	private TreeSet<Strike> strikes;
 	
+	/**
+	 * Constructor.
+	 */
 	public Rhythm() {
 		strikes = new TreeSet<Strike>(Strike.COMPARE_BY_START);
 	}
 	
+	/**
+	 * Add a {@link Strike} to the rhythm.
+	 * 
+	 * @param strike the {@link Strike} to add
+	 */
 	public void add(Strike strike) {
 		strikes.add(strike);
 	}
 	
+	/**
+	 * Get the number of {@link Strike}s.
+	 * 
+	 * @return the number of {@link Strike}s
+	 */
 	public int size() {
 		return strikes.size();
 	}
 	
+	/**
+	 * Get the specified {@link Strike}.
+	 * 
+	 * @param index the index of a {@link Strike}
+	 * @return the {@link Strike}
+	 */
 	public Strike get(int index) {
 		Iterator<Strike> i = strikes.iterator();
 		int count = 0;

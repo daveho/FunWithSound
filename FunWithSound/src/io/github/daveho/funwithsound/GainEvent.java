@@ -24,6 +24,13 @@ public class GainEvent {
 	public final Instrument instr;
 	public final double gain;
 	
+	/**
+	 * Constructor.
+	 * 
+	 * @param ts timestamp in microseconds
+	 * @param instr the {@link Instrument} whose gain should be set
+	 * @param gain the gain to set
+	 */
 	public GainEvent(long ts, Instrument instr, double gain) {
 		if (gain < 0.0 || gain > 1.0) {
 			throw new IllegalArgumentException("invalid gain: " + gain + " (must be between 0 and 1)");

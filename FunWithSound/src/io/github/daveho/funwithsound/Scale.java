@@ -40,10 +40,20 @@ public class Scale implements Iterable<Integer> {
 		pitches = new ArrayList<Integer>();
 	}
 	
+	/**
+	 * Add a pitch to the scale.
+	 * 
+	 * @param pitch the pitch to add
+	 */
 	public void add(int pitch) {
 		pitches.add(pitch);
 	}
 	
+	/**
+	 * Return the number of pitches in the scale.
+	 * 
+	 * @return the number of pitches
+	 */
 	public int size() {
 		return pitches.size();
 	}
@@ -75,18 +85,42 @@ public class Scale implements Iterable<Integer> {
 		return pitches.iterator();
 	}
 	
+	/**
+	 * Create a major scale rooted at the given MIDI note number.
+	 * 
+	 * @param start the root MIDI note number
+	 * @return the major {@link Scale}
+	 */
 	public static Scale major(int start) {
 		return makeScale(start, MAJOR_INTERVALS);
 	}
 	
+	/**
+	 * Create a natural minor scale rooted at the given MIDI note number.
+	 * 
+	 * @param start the root MIDI note number
+	 * @return the natural minor {@link Scale}
+	 */
 	public static Scale naturalMinor(int start) {
 		return makeScale(start, NATURAL_MINOR_INTERVALS);
 	}
 	
+	/**
+	 * Create a harmonic minor scale rooted at the given MIDI note number.
+	 * 
+	 * @param start the root MIDI note number
+	 * @return the harmonic minor {@link Scale}
+	 */
 	public static Scale harmonicMinor(int start) {
 		return makeScale(start, HARMONIC_MINOR_INTERVALS);
 	}
 	
+	/**
+	 * Create a melodic minor scale rooted at the given MIDI note number.
+	 * 
+	 * @param start the root MIDI note number
+	 * @return the melodic minor {@link Scale}
+	 */
 	public static Scale melodicMinor(int start) {
 		return makeScale(start, MELODIC_MINOR_INTERVALS);
 	}

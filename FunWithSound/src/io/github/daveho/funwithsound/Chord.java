@@ -20,7 +20,7 @@ import java.util.Iterator;
 import java.util.List;
 
 /**
- * A chord is a collection of one or more midi pitches.
+ * A chord is a collection of one or more midi pitches (note numbers).
  * Note that most chords will actually represent a single
  * note, but it is useful to allow combinations of notes
  * to be represented (so that they are played together).
@@ -30,18 +30,37 @@ import java.util.List;
 public class Chord implements Iterable<Integer>, Cloneable {
 	private List<Integer> pitches;
 	
+	/**
+	 * Constructor.
+	 */
 	public Chord() {
 		pitches = new ArrayList<Integer>();
 	}
 	
+	/**
+	 * Add a pitch (MIDI note number).
+	 * 
+	 * @param pitch the pitch to add
+	 */
 	public void add(int pitch) {
 		pitches.add(pitch);
 	}
 	
+	/**
+	 * Get the number of pitches.
+	 * 
+	 * @return the number of pitches
+	 */
 	public int size() {
 		return pitches.size();
 	}
 	
+	/**
+	 * Get specified pitch.
+	 * 
+	 * @param index the index of the pitch
+	 * @return the pitch
+	 */
 	public int get(int index) {
 		return pitches.get(index);
 	}

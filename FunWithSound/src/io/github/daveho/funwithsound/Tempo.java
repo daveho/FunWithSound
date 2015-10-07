@@ -26,20 +26,41 @@ public class Tempo {
 	private int beatsPerMeasure;
 	private long usPerBeat;
 	
+	/**
+	 * Constructor.
+	 * 
+	 * @param beatsPerMinute number of beats per minute
+	 * @param beatsPerMeasure number of beats per measure
+	 */
 	public Tempo(int beatsPerMinute, int beatsPerMeasure) {
 		this.beatsPerMinute = beatsPerMinute;
 		this.beatsPerMeasure = beatsPerMeasure;
 		this.usPerBeat = (60L * 1000000L) / beatsPerMinute;
 	}
 	
+	/**
+	 * Get number of beats per minute.
+	 * 
+	 * @return number of beats per minute
+	 */
 	public int getBeatsPerMinute() {
 		return beatsPerMinute;
 	}
 	
+	/**
+	 * Get number of beats per measure.
+	 * 
+	 * @return number of beats per measure
+	 */
 	public int getBeatsPerMeasure() {
 		return beatsPerMeasure;
 	}
 	
+	/**
+	 * Get number of microseconds per beat.
+	 * 
+	 * @return number of microseconds per beat
+	 */
 	public long getUsPerBeat() {
 		return usPerBeat;
 	}

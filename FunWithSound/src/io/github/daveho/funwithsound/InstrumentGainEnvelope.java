@@ -34,6 +34,12 @@ class InstrumentGainEnvelope extends UGen {
 	private float nextGain;
 	private long effectiveSampleCount;
 	
+	/**
+	 * Constructor.
+	 * 
+	 * @param ac the AudioContext
+	 * @param gainEvents the list of {@link GainEvent}s
+	 */
 	public InstrumentGainEnvelope(AudioContext ac, List<GainEvent> gainEvents) {
 		super(ac, 1);
 		this.ac = ac;

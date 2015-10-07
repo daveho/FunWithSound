@@ -22,22 +22,45 @@ public class PlayFigureEvent {
 	private SimpleFigure figure;
 	long startUs;
 	
+	/**
+	 * Constructor.
+	 */
 	public PlayFigureEvent() {
 		
 	}
 	
+	/**
+	 * Set the {@link SimpleFigure} to play.
+	 * 
+	 * @param figure the {@link SimpleFigure} to play
+	 */
 	public void setFigure(SimpleFigure figure) {
 		this.figure = figure;
 	}
 	
+	/**
+	 * Get the {@link SimpleFigure} to play.
+	 * 
+	 * @return the {@link SimpleFigure} to play
+	 */
 	public SimpleFigure getFigure() {
 		return figure;
 	}
 	
+	/**
+	 * Set the start time in microseconds.
+	 * 
+	 * @param startTimeUs the start time in microseconds
+	 */
 	public void setStartUs(long startTimeUs) {
 		this.startUs = startTimeUs;
 	}
 	
+	/**
+	 * Get the start time in microseconds.
+	 * 
+	 * @return the start time in microseconds
+	 */
 	public long getStartUs() {
 		return startUs;
 	}

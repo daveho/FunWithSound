@@ -34,6 +34,13 @@ public class BandpassFilterNoteEnvelopeAdapter implements ParamNames, NoteEnvelo
 	private BiquadFilter filter;
 	private NoteEnvelope delegate;
 	
+	/**
+	 * Constructor.
+	 * 
+	 * @param ac the AudioContext
+	 * @param params the parameters
+	 * @param delegate the {@link NoteEnvelope} to which this object will delegate
+	 */
 	public BandpassFilterNoteEnvelopeAdapter(AudioContext ac, DataBead params, NoteEnvelope delegate) {
 		this.params = params;
 		this.centerFreqEnv = new Envelope(ac);

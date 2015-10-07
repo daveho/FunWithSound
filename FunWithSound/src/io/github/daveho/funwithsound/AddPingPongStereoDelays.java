@@ -40,10 +40,18 @@ public class AddPingPongStereoDelays implements ParamNames, AddEffect {
 	
 	private DataBead params;
 	
+	/**
+	 * Constructor using default parameters.
+	 */
 	public AddPingPongStereoDelays() {
 		params = Defaults.pingPongStereoDelayDefaults();
 	}
 	
+	/**
+	 * Constructor.
+	 * 
+	 * @param params parameters
+	 */
 	public AddPingPongStereoDelays(DataBead params) {
 		this.params = params.clone();
 	}

@@ -47,20 +47,42 @@ public class Strike {
 	private final long durationUs;
 	private final int velocity;
 	
+	/**
+	 * Constructor.
+	 * 
+	 * @param startUs the start time (in microseconds)
+	 * @param durationUs the duration (in microseconds)
+	 * @param velocity the velocity (in the range 0..127)
+	 */
 	public Strike(long startUs, long durationUs, int velocity) {
 		this.startUs = startUs;
 		this.durationUs = durationUs;
 		this.velocity = velocity;
 	}
 	
+	/**
+	 * Get the start time (in microseconds).
+	 * 
+	 * @return the start time (in microseconds)
+	 */
 	public long getStartUs() {
 		return startUs;
 	}
 	
+	/**
+	 * Get the duration (in microseconds).
+	 * 
+	 * @return the duration (in microseconds)
+	 */
 	public long getDurationUs() {
 		return durationUs;
 	}
 	
+	/**
+	 * Get the velocity (in the range 0..127).
+	 * 
+	 * @return the velocity (in the range 0..127)
+	 */
 	public int getVelocity() {
 		return velocity;
 	}

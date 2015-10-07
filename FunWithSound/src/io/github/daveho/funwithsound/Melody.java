@@ -29,18 +29,37 @@ import java.util.List;
 public class Melody implements Iterable<Chord> {
 	private List<Chord> chords;
 	
+	/**
+	 * Constructor.
+	 */
 	public Melody() {
 		chords = new ArrayList<Chord>();
 	}
 	
+	/**
+	 * Append a {@link Chord} to the melody.
+	 * 
+	 * @param chord the {@link Chord} to append
+	 */
 	public void add(Chord chord) {
 		chords.add(chord);
 	}
 	
+	/**
+	 * Return the number of {@link Chord}s in this melody.
+	 * 
+	 * @return the number of {@link Chord}s
+	 */
 	public int size() {
 		return chords.size();
 	}
 	
+	/**
+	 * Get a specified {@link Chord}.
+	 * 
+	 * @param index the index of the {@link Chord} to get
+	 * @return the {@link Chord}
+	 */
 	public Chord get(int index) {
 		return chords.get(index);
 	}

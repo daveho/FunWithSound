@@ -21,6 +21,7 @@ import java.util.Map;
 /**
  * An instrument plays notes/sounds as specified by
  * pairs of {@link Melody} and {@link Rhythm} objects.
+ * Instrument objects should only be created by a {@link Composer}.
  */
 public class Instrument {
 	private final InstrumentType type;
@@ -47,18 +48,38 @@ public class Instrument {
 		this(InstrumentType.MIDI, -1, soundFont);
 	}
 
+	/**
+	 * Get the {@link InstrumentType}.
+	 * 
+	 * @return the {@link InstrumentType}
+	 */
 	public InstrumentType getType() {
 		return type;
 	}
 	
+	/**
+	 * Get the patch.
+	 * 
+	 * @return the patch
+	 */
 	public int getPatch() {
 		return patch;
 	}
 	
+	/**
+	 * Get the soundfont (if any).
+	 * 
+	 * @return the soundfont, or null if there is no soundfont
+	 */
 	public String getSoundFont() {
 		return soundFont;
 	}
 
+	/**
+	 * Return whether or not this instrument has a soundfont.
+	 * 
+	 * @return true if the instrument has a soundfont, false if not
+	 */
 	public boolean hasSoundFont() {
 		return soundFont != null;
 	}
@@ -116,10 +137,21 @@ public class Instrument {
 		sampleMap.put(note, new SampleInfo(note, fileName, startMs, endMs, gain));
 	}
 	
+	/**
+	 * Get the map of MIDI note numbers to {@link SampleInfo} objects
+	 * for registered samples.
+	 * 
+	 * @return the sample map
+	 */
 	public Map<Integer, SampleInfo> getSampleMap() {
 		return sampleMap;
 	}
 
+	/**
+	 * Determine whether this is a MIDI instrument.
+	 * 
+	 * @return true if this is a MIDI instrument, false otherwise
+	 */
 	public boolean isMidi() {
 		return type.isMidi();
 	}
