@@ -16,6 +16,8 @@ See the [Releases](https://github.com/daveho/FunWithSound/releases) page for dow
 
 There is documentation on the [wiki](https://github.com/daveho/FunWithSound/wiki).
 
+Also, there is [javadoc](http://daveho.github.io/FunWithSound/api/).
+
 Also, you may find some of the demo programs useful for reference.
 
 Java demo programs:
