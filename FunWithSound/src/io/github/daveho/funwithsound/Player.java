@@ -218,8 +218,8 @@ public class Player {
 	/**
 	 * Play the composition synchronously.
 	 * 
-	 * @throws MidiUnavailableException
-	 * @throws IOException
+	 * @throws MidiUnavailableException if a MIDI synthesizer and/or receiver can't be found
+	 * @throws IOException if a soundfont can't be loaded
 	 */
 	public void play() throws MidiUnavailableException, IOException {
 		prepareToPlay();
@@ -293,8 +293,8 @@ public class Player {
 	 * Save the rendered composition as a wave file.
 	 * 
 	 * @param outputFile the name of the wave file to write
-	 * @throws MidiUnavailableException
-	 * @throws IOException
+	 * @throws MidiUnavailableException if a MIDI synthesizer and/or receiver can't be found
+	 * @throws IOException if a soundfont can't be loaded
 	 */
 	public void saveWaveFile(String outputFile) throws MidiUnavailableException, IOException {
 		prepareToPlay();

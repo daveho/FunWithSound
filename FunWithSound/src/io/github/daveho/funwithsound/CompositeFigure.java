@@ -20,7 +20,7 @@ import java.util.Iterator;
 import java.util.List;
 
 /**
- * A CompositeFigure is a group of one or more {@link Figures},
+ * A CompositeFigure is a group of one or more {@link Figure}s,
  * each of which could contain any number of {@link SimpleFigure}s.
  */
 public class CompositeFigure implements Figure {

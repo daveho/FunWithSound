@@ -44,6 +44,8 @@ public class CustomInstrumentFactoryImpl implements CustomInstrumentFactory {
 	 * Constructor.  The arguments should be a sequence of pairs
 	 * of <code>Integer,CreateCustomInstrument</code> specifying custom
 	 * instrument codes and the creator callbacks for those codes.
+	 * 
+	 * @param pairs pairs of integer, {@link CreateCustomInstrument}
 	 */
 	public CustomInstrumentFactoryImpl(Object... pairs) {
 		this.creatorMap = new HashMap<Integer, CreateCustomInstrument>();

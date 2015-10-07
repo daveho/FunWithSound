@@ -392,7 +392,7 @@ public class Composer {
 	 * 
 	 * @param beat      offset in beats
 	 * @param velocity  velocity, in the range 0..127
-	 * @return
+	 * @return a quarter beat {@link Strike}
 	 */
 	public Strike qs(double beat, int velocity) {
 		return s(beat, .25, velocity);

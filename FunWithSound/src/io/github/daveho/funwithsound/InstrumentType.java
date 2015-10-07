@@ -70,7 +70,7 @@ public class InstrumentType implements Comparable<InstrumentType> {
 	/**
 	 * Get the InstrumentType's kind.
 	 * 
-	 * @return
+	 * @return the InstrumentType's kind
 	 */
 	public Kind getKind() {
 		return kind;
