@@ -34,6 +34,11 @@ public class Composer {
 	private int measure;
 	private double percussiveStrikeDuration;
 	
+	/**
+	 * Constructor.
+	 * Creates a new empty {@link Composition}, and sets the
+	 * scale to E flat major rooted at E3.
+	 */
 	public Composer() {
 		composition = new Composition();
 		major(51); // Default scale is E flat major rooted in octave 3
@@ -59,7 +64,7 @@ public class Composer {
 	 * 
 	 * @return the current measure
 	 */
-	public int m() {
+	public int currentMeasure() {
 		return this.measure;
 	}
 	

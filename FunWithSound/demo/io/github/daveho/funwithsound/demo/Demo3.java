@@ -117,13 +117,13 @@ public class Demo3 extends DemoBase {
 		
 		add1n(4, kick2f);
 		
-		here = m();
+		here = currentMeasure();
 		add1n(12, kicksf);
 		at(here, gf(hihatf, yelpf, acc1f, powf)); // <-- POW!
 		at(here+4, gf(hihatf, yelpf, acc1f));
 		at(here+8, gf(hihatf, yelpf, acc1f));
 
-		here = m();
+		here = currentMeasure();
 		add1n(12, kicksf);
 		at(here, gf(hihatf, yelpf, acc1f, powf, over0f)); // <-- POW!
 		at(here+4, gf(hihatf, yelpf, acc1f, over1f));
