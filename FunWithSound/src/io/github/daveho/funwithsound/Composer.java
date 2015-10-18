@@ -44,6 +44,10 @@ public class Composer {
 		major(51); // Default scale is E flat major rooted in octave 3
 		measure = 0;
 		percussiveStrikeDuration = 0.25;
+		
+		// Make a note that the Composition is using a default
+		// scale rather than an explicitly chosen one.
+		composition.setUsingDefaultScale(true);
 	}
 	
 	/**
@@ -166,7 +170,7 @@ public class Composer {
 	 * @param start the start note of the scale
 	 */
 	public void major(int start) {
-		composition.setScale(Scale.major(start));
+		setCompositionScale(Scale.major(start));
 	}
 	
 	/**
@@ -176,7 +180,7 @@ public class Composer {
 	 * @param start the start note of the scale
 	 */
 	public void naturalMinor(int start) {
-		composition.setScale(Scale.naturalMinor(start));
+		setCompositionScale(Scale.naturalMinor(start));
 	}
 	
 	/**
@@ -186,7 +190,7 @@ public class Composer {
 	 * @param start the start note of the scale
 	 */
 	public void harmonicMinor(int start) {
-		composition.setScale(Scale.harmonicMinor(start));
+		setCompositionScale(Scale.harmonicMinor(start));
 	}
 	
 	/**
@@ -196,7 +200,12 @@ public class Composer {
 	 * @param start the start note of the scale
 	 */
 	public void melodicMinor(int start) {
-		composition.setScale(Scale.melodicMinor(start));
+		setCompositionScale(Scale.melodicMinor(start));
+	}
+
+	private void setCompositionScale(Scale scale) {
+		composition.setScale(scale);
+		composition.setUsingDefaultScale(false);
 	}
 
 	/**

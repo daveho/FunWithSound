@@ -33,6 +33,7 @@ public class Composition implements Iterable<PlayFigureEvent> {
 	private List<GainEvent> gainEvents;
 	private Map<Instrument, List<AddEffect>> fxMap;
 	private Instrument audition;
+	private boolean usingDefaultScale;
 	
 	/**
 	 * Constructor.
@@ -174,5 +175,26 @@ public class Composition implements Iterable<PlayFigureEvent> {
 	 */
 	public void setAudition(Instrument instr) {
 		this.audition = instr;
+	}
+	
+	/**
+	 * Set whether or not this composition is using a
+	 * default scale, rather than an explicitly chosen one.
+	 * 
+	 * @param usingDefaultScale true if the composition is using
+	 *                          a default scale, false if not
+	 */
+	public void setUsingDefaultScale(boolean usingDefaultScale) {
+		this.usingDefaultScale = usingDefaultScale;
+	}
+	
+	/**
+	 * Check whether this composition is using a default scale,
+	 * rather than an explicitly chosen one. 
+	 * 
+	 * @return true if the composition is using a default scale, false otherwise
+	 */
+	public boolean isUsingDefaultScale() {
+		return this.usingDefaultScale;
 	}
 }

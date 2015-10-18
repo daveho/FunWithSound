@@ -643,36 +643,13 @@ public class Player {
 			}
 		}
 		
-		// FIXME: really should have a more general way of converting
-		// to external form
-		boolean first;
-		System.out.print("Rhythm rhythm = r(\n\t");
-		first = true;
-		for (Strike s : rhythm) {
-			double beat = s.getStartUs() / (double)tempo.getUsPerBeat();
-			double duration = s.getDurationUs() / (double)tempo.getUsPerBeat();
-			int velocity = s.getVelocity();
-			if (first) {
-				first = false;
-			} else {
-				System.out.print(", ");
-			}
-			System.out.printf("s(%.03f,%.03f,%d)", beat, duration, velocity);
-		}
-		System.out.println(");");
-
-		first = true;
-		System.out.print("Melody melody = m(\n\t");
-		for (Chord c : melody) {
-			// Each chord is guaranteed to have only one note
-			int note = c.get(0);
-			if (first) {
-				first = false;
-			} else {
-				System.out.print(", ");
-			}
-			System.out.printf("an(%d)", note);
-		}
-		System.out.println(");");
+		// Output captured Rhythm and Melody
+		Scale scale = composition.isUsingDefaultScale() ? null : composition.getScale();
+		System.out.print("Rhythm rhythm = ");
+		System.out.print(ConvertToCode.toCode(rhythm, tempo));
+		System.out.println(";");
+		System.out.print("Melody melody = ");
+		System.out.print(ConvertToCode.toCode(melody, scale));
+		System.out.println(";");
 	}
 }

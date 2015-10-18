@@ -80,6 +80,56 @@ public class Scale implements Iterable<Integer> {
 		return pitches.get(noteOffset) + octaveOffset*12;
 	}
 	
+	/**
+	 * Determine whether this scale contains the given
+	 * absolute MIDI note number.
+	 * 
+	 * @param note the absolute MIDI note number
+	 * @return true if the scale contains this MIDI note number,
+	 *         false otherwise
+	 */
+	public boolean hasMidiNote(int note) {
+		return findMidiNote(note) != Integer.MIN_VALUE;
+	}
+	
+	/**
+	 * Find the given MIDI note number in this scale,
+	 * returning it as a scale relative note number.
+	 * 
+	 * @param note the absolute MIDI note number
+	 * @return the scale-relative note number, or {@link Integer#MIN_VALUE}
+	 *         if this MIDI note number is not part of the scale
+	 */
+	public int findMidiNote(int note) {
+		// I'm sure there is a more principled way to do this,
+		// but I'm going to do it the brute force way.
+		
+		int cur = pitches.get(0);
+		int updown = (note < cur) ? -1 : 1;
+		
+		// Find the octave containing this note
+		while (note < cur || note >= cur+12) {
+			cur += updown*12;
+		}
+		
+		// Figure out the offset between the octave's start note
+		// and the scale's root note.
+		int offset = cur - pitches.get(0);
+		
+		// Check the pitches in this octave to see if one matches.
+		for (int i = 0; i < pitches.size(); i++) {
+			if (note == pitches.get(i) + offset) {
+				// Found a match!
+				// Translate it to scale relative form.
+				int octave = offset/12;
+				return i + (octave*pitches.size());
+			}
+		}
+		
+		// There was no match
+		return Integer.MIN_VALUE;
+	}
+
 	@Override
 	public Iterator<Integer> iterator() {
 		return pitches.iterator();

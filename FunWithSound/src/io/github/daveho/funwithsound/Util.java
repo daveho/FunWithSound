@@ -228,4 +228,28 @@ public class Util {
 			}
 		};
 	}
+	
+	/**
+	 * Build a string by joining elements of specified collection
+	 * using specified separator.
+	 * 
+	 * @param coll the collection
+	 * @param sep the separator
+	 * @return the joined string
+	 */
+	public static<E> String join(Iterable<E> coll, String sep) {
+		StringBuilder buf = new StringBuilder();
+		
+		boolean first = true;
+		for (E elt : coll) {
+			if (first) {
+				first = false;
+			} else {
+				buf.append(sep);
+			}
+			buf.append(elt.toString());
+		}
+		
+		return buf.toString();
+	}
 }
