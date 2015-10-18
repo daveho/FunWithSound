@@ -20,6 +20,14 @@ Also, there is [javadoc](http://daveho.github.io/FunWithSound/api/).
 
 Also, you may find some of the demo programs useful for reference.
 
+Processing demo programs:
+
+* [FWSDemo](https://github.com/daveho/FunWithSound/blob/master/FunWithSoundProcessingLib/examples/FWSDemo/FWSDemo.pde)
+* [FWSDemo2](https://github.com/daveho/FunWithSound/blob/master/FunWithSoundProcessingLib/examples/FWSDemo2/FWSDemo2.pde)
+* [WachetAuf](https://github.com/daveho/FunWithSound/blob/master/FunWithSoundProcessingLib/examples/WachetAuf/WachetAuf.pde)
+* [AuditionTest](https://github.com/daveho/FunWithSound/blob/master/FunWithSoundProcessingLib/examples/AuditionTest/AuditionTest.pde)
+* [Groove2](https://github.com/daveho/FunWithSound/blob/master/FunWithSoundProcessingLib/examples/Groove2/Groove2.pde)
+
 Java demo programs:
 
 * [Demo](https://github.com/daveho/FunWithSound/blob/master/FunWithSound/demo/io/github/daveho/funwithsound/demo/Demo.java)
@@ -27,13 +35,6 @@ Java demo programs:
 * [Demo3](https://github.com/daveho/FunWithSound/blob/master/FunWithSound/demo/io/github/daveho/funwithsound/demo/Demo3.java)
 * [Demo4](https://github.com/daveho/FunWithSound/blob/master/FunWithSound/demo/io/github/daveho/funwithsound/demo/Demo4.java)
 * [LinuxTechno](https://github.com/daveho/FunWithSound/blob/master/FunWithSound/demo/io/github/daveho/funwithsound/demo/LinuxTechno.java)
-
-Processing demo programs:
-
-* [FWSDemo](https://github.com/daveho/FunWithSound/blob/master/FunWithSoundProcessingLib/examples/FWSDemo/FWSDemo.pde)
-* [FWSDemo2](https://github.com/daveho/FunWithSound/blob/master/FunWithSoundProcessingLib/examples/FWSDemo2/FWSDemo2.pde)
-* [WachetAuf](https://github.com/daveho/FunWithSound/blob/master/FunWithSoundProcessingLib/examples/WachetAuf/WachetAuf.pde)
-* [AuditionTest](https://github.com/daveho/FunWithSound/blob/master/FunWithSoundProcessingLib/examples/AuditionTest/AuditionTest.pde)
 
 ## Technical stuff, compiling from source
 
