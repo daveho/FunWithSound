@@ -236,6 +236,7 @@ public class Util {
 	 * @param coll the collection
 	 * @param sep the separator
 	 * @return the joined string
+	 * @param <E> element type of the collection
 	 */
 	public static<E> String join(Iterable<E> coll, String sep) {
 		StringBuilder buf = new StringBuilder();
