@@ -73,17 +73,6 @@ public class Composer {
 	}
 	
 	/**
-	 * Create a new MIDI instrument using the built-in "emergency" MIDI
-	 * soundbank.
-	 * 
-	 * @param patch the MIDI patch (starting from 1)
-	 * @return the instrument
-	 */
-	public Instrument instr(int patch) {
-		return new Instrument(patch);
-	}
-	
-	/**
 	 * Create a new MIDI instrument loaded from a specified soundfont file.
 	 * The instrument will play using the default patch.
 	 * 
@@ -103,15 +92,6 @@ public class Composer {
 	 */
 	public Instrument instr(String soundFont, int patch) {
 		return new Instrument(InstrumentType.MIDI, patch, soundFont);
-	}
-	
-	/**
-	 * Create a new MIDI percussion instrument.
-	 * 
-	 * @return the instrument
-	 */
-	public Instrument percussion() {
-		return new Instrument(InstrumentType.MIDI_PERCUSSION);
 	}
 	
 	/**

@@ -36,45 +36,86 @@ import processing.event.KeyEvent;
  * @author David Hovemeyer
  */
 public class FunWithSound {
+	// Visualizations that can be turned on and off
+	/** Piano keyboard. */
+	public static final int PIANO = 0;
+	// Other visualization constants will go here
+	private static final int NUM_VISUALIZATIONS = PIANO+1; // Adjust this if more are added
+	
 	private static final int HIGH_NOTE = 108;
 	private static final int LOW_NOTE = 21;
-	PApplet parent;
-	Player player;
-	Receiver receiver;
-	int startNote; // which note corresponds to the leftmost keyboard key
-	BitSet noteOn;
 	
-	public FunWithSound(PApplet parent) {
-		this.parent = parent;
-		startNote = 60;  // is always a C
-		noteOn = new BitSet();
-		
-		parent.registerMethod("dispose", this);
-		parent.registerMethod("draw", this);
-		parent.registerMethod("keyEvent", this);
-		parent.registerMethod("post", this);
-		
-		System.out.println("Starting ##library.name## version ##library.prettyVersion##");
-	}
+	/**
+	 * Abstract base class for visualizations.
+	 */
+	private abstract class Visualization {
+		private boolean enabled;
 
-	public void dispose() {
-		if (player != null) {
-			// Make sure player has stopped
-			player.forceStopPlaying();
+		/**
+		 * Constructor.
+		 * 
+		 * @param enabled true if visualization is enabled by default,
+		 *                false otherwise
+		 */
+		public Visualization(boolean enabled) {
+			this.enabled = enabled;
+		}
+		
+		/**
+		 * @return true if the visualization is currently enabled
+		 */
+		public boolean isEnabled() {
+			return this.enabled;
+		}
+		
+		/**
+		 * Enable or disable the visualization.
+		 * 
+		 * @param b true if the visualization should be enabled,
+		 *          false if the visualization should be disabled
+		 */
+		public void setEnabled(boolean b) {
+			this.enabled = b;
+		}
+		
+		/**
+		 * @return height of the visualization in pixels
+		 */
+		public abstract int getHeight();
+		
+		/**
+		 * Downcall to handle a key press event.
+		 * Does nothing by default.
+		 * 
+		 * @param key the key
+		 */
+		public void onKeyPress(char key) {
+		}
+		
+		/**
+		 * Downcall to handle a key release event.
+		 * Does nothing by default.
+		 * 
+		 * @param key the key
+		 */
+		public void onKeyRelease(char key) {
+		}
+		
+		/**
+		 * Downcall to handle a draw event.
+		 * Does nothing by default.
+		 * 
+		 * @param parent the parent {@link PApplet}
+		 * @param y the y-coordinate of the top of the area where
+		 *        the visualization should be drawn
+		 */
+		public void onDraw(PApplet parent, int y) {
+			// Do nothing by default
 		}
 	}
 	
-	public void draw() {
-		// Draw piano keyboard
-		drawKeyboard();
-	}
-	
-	// Post-draw hook: see if playing has finished
-	public void post() {
-		if (player != null) {
-			player.checkForEndOfPlaying();
-		}
-	}
+	private static final int W = 11;
+	private static final int H = 60;
 
 	// Map of keys to offsets from current start note.
 	//  e r   y u i    are the black keys
@@ -96,6 +137,182 @@ public class FunWithSound {
 		OFFSET_MAP.put('l', 12);
 	}
 	
+	private class PianoVisualization extends Visualization {
+		int startNote; // which note corresponds to the leftmost keyboard key
+		BitSet noteOn;
+		
+		public PianoVisualization() {
+			super(true); // is enabled by default
+			startNote = 60;  // is always a C
+			noteOn = new BitSet();
+		}
+		
+		@Override
+		public int getHeight() {
+			return H;
+		}
+		
+		@Override
+		public void onKeyPress(char key) {
+			if (OFFSET_MAP.containsKey(key)) {
+				int note = startNote+OFFSET_MAP.get(key);
+				if (note >= 0 && !noteOn.get(note)) {
+					noteOn.set(note);
+					if (receiver != null) {
+						ShortMessage msg = Midi.createShortMessage(ShortMessage.NOTE_ON, note, 127);
+						receiver.send(msg, player.getCurrentTimestamp());
+					}
+				}
+			} else if (parent.key == PConstants.CODED && parent.keyCode == PConstants.UP) {
+				attemptOctaveChange(1);
+			} else if (parent.key == PConstants.CODED && parent.keyCode == PConstants.DOWN) {
+				attemptOctaveChange(-1);
+			}
+		}
+		
+		@Override
+		public void onKeyRelease(char key) {
+			if (OFFSET_MAP.containsKey(key)) {
+				int note = startNote+OFFSET_MAP.get(key);
+				if (note >= 0 && noteOn.get(note)) {
+					noteOn.clear(note);
+					if (receiver != null) {
+						ShortMessage msg = Midi.createShortMessage(ShortMessage.NOTE_OFF, note);
+						receiver.send(msg, player.getCurrentTimestamp());
+					}
+				}
+			}
+		}
+		
+		@Override
+		public void onDraw(PApplet parent, int y) {
+			// Center the keyboard horizonally
+			int xInit = (parent.width - totalWidth) / 2;
+			
+			int cyc;
+			int x;
+			
+			parent.stroke(0);
+			parent.strokeWeight(1.0f);
+			
+			// Draw the white keys first
+			cyc = 9;  // cyc%12==0 means a C, note 21 is an A (9 half steps above C)
+			x = xInit;
+			for (int note = LOW_NOTE; note <= HIGH_NOTE; note++) {
+				if (((1 << (cyc%12)) & BLACK_KEYS) == 0) {
+					// White key
+					if (noteOn.get(note)) {
+						// Note is being played
+						parent.fill(0,0,255);
+					} else if (note >= startNote && note <= startNote+12) {
+						// This note is in the active octave
+						parent.fill(152,251,152);
+					} else {
+						parent.fill(255);
+					}
+					parent.rect(x, y, W, H);
+					x += W;
+				}
+				
+				cyc++;
+			}
+			
+			// Then draw the black keys
+			cyc = 9;
+			x = xInit;
+			for (int note = 21; note <= 108; note++) {
+				if (((1 << (cyc%12)) & BLACK_KEYS) != 0) {
+					// Black key
+					if (noteOn.get(note)) {
+						// Note is being played
+						parent.fill(0,0,255);
+					} else {
+						parent.fill(0);
+					}
+					parent.rect(x-((W/2)-2)-1, y, W-2, (H*3)/5);
+				} else {
+					// White key
+					x += W;
+				}
+				
+				cyc++;
+			}
+		}
+		
+		private void attemptOctaveChange(int octave) {
+			int nextStartNote = startNote + octave*12;
+			if (nextStartNote < LOW_NOTE-12 || nextStartNote > HIGH_NOTE) {
+				return;
+			}
+			
+			// Don't update the octave if any notes are on
+			if (!noteOn.isEmpty()) {
+				return;
+			}
+			
+			startNote = nextStartNote;
+		}
+	}
+	
+	PApplet parent;
+	Player player;
+	Receiver receiver;
+	Visualization[] visualizations;
+	
+	/**
+	 * Constructor.
+	 * 
+	 * @param parent the parent {@link PApplet}
+	 */
+	public FunWithSound(PApplet parent) {
+		this.parent = parent;
+		
+		this.visualizations = new Visualization[NUM_VISUALIZATIONS];
+		this.visualizations[0] = new PianoVisualization();
+		
+		parent.registerMethod("dispose", this);
+		parent.registerMethod("draw", this);
+		parent.registerMethod("keyEvent", this);
+		parent.registerMethod("post", this);
+		
+		System.out.println("Starting ##library.name## version ##library.prettyVersion##");
+	}
+	
+	/**
+	 * Enable or disable a visualization.
+	 * 
+	 * @param visualization  the constant identifying the visualization to enable or disable
+	 * @param b              true if the visualization should be enabled,
+	 *                       false if the visualization should be disabled
+	 */
+	public void enableVis(int visualization, boolean b) {
+		visualizations[visualization].setEnabled(b);
+	}
+
+	public void dispose() {
+		if (player != null) {
+			// Make sure player has stopped
+			player.forceStopPlaying();
+		}
+	}
+	
+	public void draw() {
+		int Y = 10;
+		for (Visualization v : visualizations) {
+			if (v.isEnabled()) {
+				v.onDraw(parent, Y);
+				Y += v.getHeight();
+			}
+		}
+	}
+	
+	// Post-draw hook: see if playing has finished
+	public void post() {
+		if (player != null) {
+			player.checkForEndOfPlaying();
+		}
+	}
+	
 	public void keyEvent(KeyEvent e) {
 		if (e.getAction() == KeyEvent.PRESS) {
 			onKeyPress();
@@ -106,53 +323,23 @@ public class FunWithSound {
 	
 	private void onKeyPress() {
 		char key = parent.key;
-		if (OFFSET_MAP.containsKey(key)) {
-			int note = startNote+OFFSET_MAP.get(key);
-			if (note >= 0 && !noteOn.get(note)) {
-				noteOn.set(note);
-				if (receiver != null) {
-					ShortMessage msg = Midi.createShortMessage(ShortMessage.NOTE_ON, note, 127);
-					receiver.send(msg, player.getCurrentTimestamp());
-				}
+		
+		for (Visualization v : visualizations) {
+			if (v.isEnabled()) {
+				v.onKeyPress(key);
 			}
-		} else if (parent.key == PConstants.CODED && parent.keyCode == PConstants.UP) {
-			attemptOctaveChange(1);
-		} else if (parent.key == PConstants.CODED && parent.keyCode == PConstants.DOWN) {
-			attemptOctaveChange(-1);
 		}
 	}
 
 	private void onKeyRelease() {
 		char key = parent.key;
-		if (OFFSET_MAP.containsKey(key)) {
-			int note = startNote+OFFSET_MAP.get(key);
-			if (note >= 0 && noteOn.get(note)) {
-				noteOn.clear(note);
-				if (receiver != null) {
-					ShortMessage msg = Midi.createShortMessage(ShortMessage.NOTE_OFF, note);
-					receiver.send(msg, player.getCurrentTimestamp());
-				}
+		
+		for (Visualization v : visualizations) {
+			if (v.isEnabled()) {
+				v.onKeyRelease(key);
 			}
 		}
 	}
-	
-	private void attemptOctaveChange(int octave) {
-		int nextStartNote = startNote + octave*12;
-		if (nextStartNote < LOW_NOTE-12 || nextStartNote > HIGH_NOTE) {
-			return;
-		}
-		
-		// Don't update the octave if any notes are on
-		if (!noteOn.isEmpty()) {
-			return;
-		}
-		
-		startNote = nextStartNote;
-	}
-	
-	private static final int Y = 10;
-	private static final int W = 11;
-	private static final int H = 60;
 	
 	private static final int BLACK_KEYS = 0x54A; // bits indicate black keys
 	
@@ -164,60 +351,6 @@ public class FunWithSound {
 				// White key
 				totalWidth += W;
 			}
-		}
-	}
-	
-	private void drawKeyboard() {
-		// Center the keyboard horizonally
-		int xInit = (parent.width - totalWidth) / 2;
-		
-		int cyc;
-		int x;
-		
-		parent.stroke(0);
-		parent.strokeWeight(1.0f);
-		
-		// Draw the white keys first
-		cyc = 9;  // cyc%12==0 means a C, note 21 is an A (9 half steps above C)
-		x = xInit;
-		for (int note = LOW_NOTE; note <= HIGH_NOTE; note++) {
-			if (((1 << (cyc%12)) & BLACK_KEYS) == 0) {
-				// White key
-				if (noteOn.get(note)) {
-					// Note is being played
-					parent.fill(0,0,255);
-				} else if (note >= startNote && note <= startNote+12) {
-					// This note is in the active octave
-					parent.fill(152,251,152);
-				} else {
-					parent.fill(255);
-				}
-				parent.rect(x, Y, W, H);
-				x += W;
-			}
-			
-			cyc++;
-		}
-		
-		// Then draw the black keys
-		cyc = 9;
-		x = xInit;
-		for (int note = 21; note <= 108; note++) {
-			if (((1 << (cyc%12)) & BLACK_KEYS) != 0) {
-				// Black key
-				if (noteOn.get(note)) {
-					// Note is being played
-					parent.fill(0,0,255);
-				} else {
-					parent.fill(0);
-				}
-				parent.rect(x-((W/2)-2)-1, Y, W-2, (H*3)/5);
-			} else {
-				// White key
-				x += W;
-			}
-			
-			cyc++;
 		}
 	}
 

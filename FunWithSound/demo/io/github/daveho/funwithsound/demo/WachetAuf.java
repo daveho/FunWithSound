@@ -22,11 +22,14 @@ import javax.sound.midi.MidiUnavailableException;
 import io.github.daveho.funwithsound.*;
 
 public class WachetAuf extends Composer {
+	private static final String SOUNDFONTS = "/home/dhovemey/SoundFonts";
+	private static final String FLUID = SOUNDFONTS + "/fluid/FluidR3 GM2-2.SF2";
+	
 	public void create() {
 		tempo(200, 8);
 		major(51); //  E flat major
 
-		Instrument organ = instr(20);
+		Instrument organ = instr(FLUID, 20);
 
 		Rhythm tr = r(
 				s(0,2), s(2,1), s(3,1), s(4,1),
