@@ -1,20 +1,18 @@
 package io.github.daveho.funwithsound.demo;
 
-import java.io.IOException;
-
-import javax.sound.midi.MidiUnavailableException;
-
-import io.github.daveho.funwithsound.*;
+import io.github.daveho.funwithsound.Composer;
+import io.github.daveho.funwithsound.Composition;
+import io.github.daveho.funwithsound.Player;
 
 public class Minimal extends Composer {
-	static final String SOUNDFONTS = "/home/dhovemey/SoundFonts";
+	static final String SOUNDFONTS = "/some/dir/SoundFonts";
 	static final String FLUID = SOUNDFONTS + "/fluid/FluidR3 GM2-2.SF2";
 
 	public void create() {
 		// Composition goes here!
 	}
 	
-	public static void main(String[] args) throws MidiUnavailableException, IOException {
+	public static void main(String[] args) throws Exception {
 		Minimal m = new Minimal();
 		m.create();
 		Composition c = m.getComposition();
