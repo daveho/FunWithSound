@@ -1,4 +1,4 @@
-// Copyright 2015, David Hovemeyer <david.hovemeyer@gmail.com>
+// Copyright 2015-2016, David Hovemeyer <david.hovemeyer@gmail.com>
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -78,6 +78,8 @@ public class Player {
 	private boolean playing;
 	private CustomInstrumentFactory customInstrumentFactory;
 	private Soundbank emergency;
+	private List<NoteEvent> noteEvents;
+	private NoteEventCallback noteEventCallback;
 	
 	/**
 	 * Constructor.
@@ -152,6 +154,19 @@ public class Player {
 	 */
 	public void setComposition(Composition composition) {
 		this.composition = composition;
+	}
+	
+	/**
+	 * Set a {@link NoteEventCallback}.
+	 * The callback's {@link NoteEventCallback#onNoteEvent(NoteEvent)} method will
+	 * be called (approximately) when {@link NoteEvent}s occur.
+	 * Be aware that the callback will occur in the context of the
+	 * AudioContext thread.
+	 * 
+	 * @param noteEventCallback the {@link NoteEventCallback} to set
+	 */
+	public void setNoteEventCallback(NoteEventCallback noteEventCallback) {
+		this.noteEventCallback = noteEventCallback;
 	}
 	
 	private RealizedInstrument createGervill(Instrument instrument) throws MidiUnavailableException, IOException {
@@ -327,13 +342,20 @@ public class Player {
 	protected void prepareToPlay() throws MidiUnavailableException, IOException {
 		// Create an AudioContext
 		this.ac = new AudioContext();
+
+		// Prepare to capture NoteEvents
+		this.noteEvents = new ArrayList<NoteEvent>();
 		
+		// Create instruments, schedule MidiMessages to be sent to instruments
 		this.idleTimeUs = prepareComposition();
 		System.out.printf("Idle time at %d us\n", this.idleTimeUs);
 
 		// Register a shutdown hook to detect when playback is finished
 		this.latch = new CountDownLatch(1); 
 		addShutdownHook(idleTimeUs);
+		
+		// Register a pre-frame hook to invoke note and beat callbacks
+		addPreFrameHook();
 		
 		// If there is a live instrument, create a synthesizer for it,
 		// and arrange to feed live midi events to it
@@ -495,6 +517,33 @@ public class Player {
 			}
 		});
 	}
+	
+	private void addPreFrameHook() {
+		ac.invokeBeforeEveryFrame(new Bead() {
+			private int noteEventIndex = 0;
+			
+			@Override
+			protected void messageReceived(Bead message) {
+				// Compute end-of-frame time in microseconds
+				long endOfFrame = (long)((ac.getTime() + ac.samplesToMs(ac.getBufferSize())) * 1000.0);
+				
+				// Invoke note callback for any notes that have been schedule to play
+				if (noteEventCallback != null) {
+					// Find all NoteEvents due to occur before the end of the frame
+					while (noteEventIndex < noteEvents.size()) {
+						NoteEvent noteEvent = noteEvents.get(noteEventIndex);
+						if (noteEvent.timeStamp >= endOfFrame) {
+							break;
+						}
+						noteEventCallback.onNoteEvent(noteEvent);
+						noteEventIndex++;
+					}
+				}
+				
+				// TODO: beat callback
+			}
+		});
+	}
 
 	private long prepareComposition() throws MidiUnavailableException, IOException {
 		// Convert figures to MidiMessages and schedule them to be played
@@ -522,8 +571,10 @@ public class Player {
 					long offTime = onTime + s.getDurationUs();
 					ShortMessage noteOn = Midi.createShortMessage(ShortMessage.NOTE_ON|channel, note, s.getVelocity());
 					info.source.send(noteOn, onTime);
+					noteEvents.add(new NoteEvent(noteOn, onTime, instrument));
 					ShortMessage noteOff = Midi.createShortMessage(ShortMessage.NOTE_OFF|channel, note, s.getVelocity());
 					info.source.send(noteOff, offTime);
+					noteEvents.add(new NoteEvent(noteOff, offTime, instrument));
 					// Keep track of the time of the last note off event
 					if (offTime > lastNoteOffUs) {
 						lastNoteOffUs = offTime;
@@ -532,6 +583,10 @@ public class Player {
 			}
 		}
 		
+		// Sort NoteEvents by timestamp
+		Collections.sort(noteEvents, NoteEvent.TIMESTAMP_COMPARATOR);
+
+		// Determine idle time
 		final long idleTimeUs = lastNoteOffUs + this.idleWaitUs;
 		return idleTimeUs;
 	}

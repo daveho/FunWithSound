@@ -15,17 +15,18 @@
 
 package io.github.daveho.funwithsound;
 
-import io.github.daveho.gervill4beads.Midi;
-
 import java.io.IOException;
+import java.lang.reflect.Method;
 import java.util.BitSet;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 import javax.sound.midi.MidiUnavailableException;
 import javax.sound.midi.Receiver;
 import javax.sound.midi.ShortMessage;
 
+import io.github.daveho.gervill4beads.Midi;
 import processing.core.PApplet;
 import processing.core.PConstants;
 import processing.event.KeyEvent;
@@ -258,6 +259,8 @@ public class FunWithSound {
 	Player player;
 	Receiver receiver;
 	Visualization[] visualizations;
+	Method onNoteEvent;
+	ConcurrentLinkedQueue<NoteEvent> noteEventQueue;
 	
 	/**
 	 * Constructor.
@@ -275,9 +278,22 @@ public class FunWithSound {
 		parent.registerMethod("keyEvent", this);
 		parent.registerMethod("post", this);
 		
+		this.onNoteEvent = findMethod("onNoteEvent", new Class<?>[]{NoteEvent.class});
+		if (onNoteEvent != null) {
+			noteEventQueue = new ConcurrentLinkedQueue<NoteEvent>();
+		}
+		
 		System.out.println("Starting ##library.name## version ##library.prettyVersion##");
 	}
 	
+	private Method findMethod(String name, Class<?>[] parameterTypes) {
+		try {
+			return parent.getClass().getMethod(name, parameterTypes);
+		} catch (Exception e) {
+			return null;
+		}
+	}
+
 	/**
 	 * Enable or disable a visualization.
 	 * 
@@ -297,6 +313,18 @@ public class FunWithSound {
 	}
 	
 	public void draw() {
+		if (noteEventQueue != null) {
+			// If there are any NoteEvents, dispatch them to onNoteEvent
+			while (!noteEventQueue.isEmpty()) {
+				NoteEvent noteEvent = noteEventQueue.remove();
+				try {
+					onNoteEvent.invoke(parent, new Object[]{noteEvent});
+				} catch (Exception e) {
+					System.err.println("Error invoking onNoteEvent: " + e.getMessage());
+				}
+			}
+		}
+		
 		int Y = 10;
 		for (Visualization v : visualizations) {
 			if (v.isEnabled()) {
@@ -372,7 +400,7 @@ public class FunWithSound {
 	}
 
 	protected Player createPlayer() {
-		return new Player() {
+		Player player = new Player() {
 			@Override
 			protected void prepareToPlay() throws MidiUnavailableException, IOException {
 				super.prepareToPlay();
@@ -383,5 +411,26 @@ public class FunWithSound {
 				receiver = getReceiver();
 			}
 		};
+		
+		if (onNoteEvent != null) {
+			player.setNoteEventCallback(new NoteEventCallback() {
+				@Override
+				public void onNoteEvent(NoteEvent noteEvent) {
+					noteEventQueue.add(noteEvent);
+				}
+			});
+		}
+		
+		return player;
+	}
+	
+	/**
+	 * @return true if the player is currently playing, false otherwise
+	 */
+	public boolean isPlaying() {
+		if (player == null) {
+			return false;
+		}
+		return player.isPlaying();
 	}
 }
