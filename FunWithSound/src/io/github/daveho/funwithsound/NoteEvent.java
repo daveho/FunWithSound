@@ -47,7 +47,7 @@ public class NoteEvent extends MidiMessageAndTimeStamp {
 		}
 	};
 	
-	private Instrument instrument;
+	public final Instrument instrument;
 
 	/**
 	 * Constructor.
@@ -59,13 +59,6 @@ public class NoteEvent extends MidiMessageAndTimeStamp {
 	public NoteEvent(MidiMessage msg, long timeStamp, Instrument instrument) {
 		super(msg, timeStamp);
 		this.instrument = instrument;
-	}
-	
-	/**
-	 * @return the {@link Instrument}
-	 */
-	public Instrument getInstrument() {
-		return instrument;
 	}
 	
 	/**
