@@ -29,16 +29,33 @@ public class ConvertToCode {
 	/**
 	 * Convert a {@link Rhythm} to code in the form of a call to
 	 * the {@link Composer} class's {@link Composer#r(Strike...)}
-	 * method.
+	 * method.  Newlines will be used in the returned code representation.
 	 * 
 	 * @param rhythm the {@link Rhythm}
 	 * @param tempo the {@link Tempo}
 	 * @return the code for the {@link Rhythm}
 	 */
 	public static String toCode(Rhythm rhythm, Tempo tempo) {
+		return toCode(rhythm, tempo, true);
+	}
+	
+	/**
+	 * Convert a {@link Rhythm} to code in the form of a call to
+	 * the {@link Composer} class's {@link Composer#r(Strike...)}
+	 * method.
+	 * 
+	 * @param rhythm the {@link Rhythm}
+	 * @param tempo the {@link Tempo}
+	 * @param useNL  true if newlines should be used in the returned code representation
+	 * @return the code for the {@link Rhythm}
+	 */
+	public static String toCode(Rhythm rhythm, Tempo tempo, boolean useNL) {
 		StringBuilder buf = new StringBuilder();
 		
-		buf.append("r(\n");
+		buf.append("r(");
+		if (useNL) {
+			buf.append("\n");
+		}
 		
 		boolean first = true;
 		
@@ -51,11 +68,14 @@ public class ConvertToCode {
 			buf.append(toCode(s, tempo));
 		}
 		
-		buf.append("\n)");
+		if (useNL) {
+			buf.append("\n");
+		}
+		buf.append(")");
 		
 		return buf.toString();
 	}
-	
+
 	/**
 	 * Convert a {@link Strike} into code in the form of a call to the
 	 * {@link Composer} class's {@link Composer#s(double, double, int)} method.
@@ -80,6 +100,21 @@ public class ConvertToCode {
 
 		return buf.toString();
 	}
+
+	/**
+	 * Convert a {@link Melody} to code in the form of a call to
+	 * the {@link Composer} class's {@link Composer#m(Object...)}
+	 * method.  Newlines will be used in the returned code representation.
+	 * 
+	 * @param melody the {@link Melody}
+	 * @param scale the {@link Scale}: if non-null, pitches that belong to the
+	 *    scale will be generated as scale-relative notes rather than
+	 *    absolute MIDI note numbers
+	 * @return the code for the {@link Melody}
+	 */
+	public static String toCode(Melody melody, Scale scale) {
+		return toCode(melody, scale, true);
+	}
 	
 	/**
 	 * Convert a {@link Melody} to code in the form of a call to
@@ -90,12 +125,17 @@ public class ConvertToCode {
 	 * @param scale the {@link Scale}: if non-null, pitches that belong to the
 	 *    scale will be generated as scale-relative notes rather than
 	 *    absolute MIDI note numbers
+	 * @param useNL  true if newlines should be used in the returned code representation,
+	 *               false otherwise
 	 * @return the code for the {@link Melody}
 	 */
-	public static String toCode(Melody melody, Scale scale) {
+	public static String toCode(Melody melody, Scale scale, boolean useNL) {
 		StringBuilder buf = new StringBuilder();
 		
-		buf.append("m(\n");
+		buf.append("m(");
+		if (useNL) {
+			buf.append("\n");
+		}
 		
 		boolean first = true;
 		
@@ -108,7 +148,10 @@ public class ConvertToCode {
 			buf.append(toCode(c, scale));
 		}
 		
-		buf.append("\n);\n");
+		if (useNL) {
+			buf.append("\n");
+		}
+		buf.append(")");
 		
 		return buf.toString();
 	}

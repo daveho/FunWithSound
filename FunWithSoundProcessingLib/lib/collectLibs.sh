@@ -26,11 +26,12 @@ echo "Building Gervill4Beads library..."
 echo "Building core FunWithSound library..."
 (cd $fwsDir && ant)
 
-# Copy all of the required libraries
+# Copy all of the required libraries.
+# Note that because Gervill4Beads now uses the built-in version
+# of Gervill in J2SE 1.7+, we no longer need gervill.jar.
 echo "Copying libraries..."
 cp $fwsDir/funwithsound-core.jar .
 cp $g4bDir/gervill4beads.jar .
 cp $g4bDir/lib/beads*.jar .
-cp $g4bDir/lib/gervill.jar .
 cp $g4bDir/lib/tritonus*.jar .
 
