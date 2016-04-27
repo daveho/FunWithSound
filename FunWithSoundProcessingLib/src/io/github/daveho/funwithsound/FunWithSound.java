@@ -62,8 +62,17 @@ public class FunWithSound {
 		}
 	}
 	
-	private static final long DEFAULT_START_DELAY_US = 50000L; // 50 ms
-	private static final long DEFAULT_IDLE_WAIT_US = 2000000L; // 2 s
+	/**
+	 * Default start delay when saving a wave file
+	 * (in microseconds.)
+	 */
+	public static final long DEFAULT_START_DELAY_US = 50000L; // 50 ms
+	
+	/**
+	 * Default idle wait when saving a wave file
+	 * (in microseconds.)
+	 */
+	public static final long DEFAULT_IDLE_WAIT_US = 2000000L; // 2 s
 	
 	/**
 	 * Abstract base class for visualizations.
