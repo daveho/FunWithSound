@@ -45,6 +45,25 @@ public class FunWithSound {
 	
 	private static final int HIGH_NOTE = 108;
 	private static final int LOW_NOTE = 21;
+
+	private static final int BLACK_KEYS = 0x54A; // bits indicate black keys
+	
+	private static final int W = 11;
+	private static final int H = 60;
+	
+	private static int totalWidth;
+	static {
+		// Determine the total width of the piano keyboard
+		for (int note = LOW_NOTE, cyc = 9; note <= HIGH_NOTE; note++, cyc++) {
+			if (((1 << (cyc%12)) & BLACK_KEYS) == 0) {
+				// White key
+				totalWidth += W;
+			}
+		}
+	}
+	
+	private static final long DEFAULT_START_DELAY_US = 50000L; // 50 ms
+	private static final long DEFAULT_IDLE_WAIT_US = 2000000L; // 2 s
 	
 	/**
 	 * Abstract base class for visualizations.
@@ -114,9 +133,6 @@ public class FunWithSound {
 			// Do nothing by default
 		}
 	}
-	
-	private static final int W = 11;
-	private static final int H = 60;
 
 	// Map of keys to offsets from current start note.
 	//  e r   y u i    are the black keys
@@ -369,18 +385,6 @@ public class FunWithSound {
 		}
 	}
 	
-	private static final int BLACK_KEYS = 0x54A; // bits indicate black keys
-	
-	private static int totalWidth;
-	static {
-		// Determine the total width of the piano keyboard
-		for (int note = LOW_NOTE, cyc = 9; note <= HIGH_NOTE; note++, cyc++) {
-			if (((1 << (cyc%12)) & BLACK_KEYS) == 0) {
-				// White key
-				totalWidth += W;
-			}
-		}
-	}
 
 	public void play(Composer c) {
 		// Make sure there isn't a player playing currently
@@ -397,6 +401,22 @@ public class FunWithSound {
 		player = createPlayer();
 		player.setComposition(c.getComposition());
 		player.startPlaying();
+	}
+	
+	public void saveWaveFile(Composer c, String fileName) {
+		saveWaveFile(c, fileName, DEFAULT_START_DELAY_US, DEFAULT_IDLE_WAIT_US);
+	}
+	
+	public void saveWaveFile(Composer c, String fileName, long startDelayUs, long idleWaitUs) {
+		Player player = createPlayer();
+		player.setComposition(c.getComposition());
+		try {
+			player.setStartDelayUs(startDelayUs);
+			player.setIdleWaitUs(idleWaitUs);
+			player.saveWaveFile(fileName);
+		} catch (Exception e) {
+			System.err.println("Couldn't save wave file: " + e.toString());
+		}
 	}
 
 	protected Player createPlayer() {
