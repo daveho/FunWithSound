@@ -1,6 +1,6 @@
 # FunWithSound
 
-FunWithSound is a library intended to make it easy to create music using [Processing](http://processessing.org) and [Beads](http://www.beadsproject.net).  It can also be used from plain Java code.
+FunWithSound is a library intended to make it easy to create music using [Processing](http://processing.org) and [Beads](http://www.beadsproject.net).  It can also be used from plain Java code.
 
 ## Requirements
 
