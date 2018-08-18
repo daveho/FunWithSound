@@ -86,6 +86,8 @@ public abstract class DemoBase extends Composer {
 	
 	public static final String FLUID = SOUNDFONT_DIR + "/fluid/FluidR3 GM2-2.SF2";
 	
+	public static final String VDW = SOUNDFONT_DIR + "/hammersound/Vintage Dreams Waves v2.sf2";
+	
 	public abstract void create();
 	
 	public Rhythm dr(double c, Rhythm r) {
